@@ -1,0 +1,21 @@
+.auth-inputs::placeholder {
+  font-size: 13px;
+}
+
+.auth-inputs {
+  border-width: 1.5px;
+}
+
+.auth-otp{
+    border: 2px solid rgb(203, 203, 203);
+    padding: 5px;
+    width: 50px;
+    border-radius: 4px;
+}
+
+/* Hide spinners in Chrome, Edge, and Safari */
+.auth-otp::-webkit-inner-spin-button,
+.auth-otp::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
