@@ -64,6 +64,7 @@ const handleSubmitForm=async(e)=>{
     //  navigate('/')
     }
     catch(error){
+      if(error?.statusCode===403) return
       console.log("login error",error)
       toast.error(error?.message || "Login failed. Please try again.");
     }

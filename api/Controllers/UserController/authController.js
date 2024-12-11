@@ -19,6 +19,7 @@ import { errorHandler } from "../../utils/error.js";
 import jwt from 'jsonwebtoken'
 import { generateUserAccessToken } from "../../utils/jwtTokens/accessToken.js";
 import { generateUserRefreshToken } from "../../utils/jwtTokens/refreshToken.js";
+import { refreshTokenDecoder } from "../../utils/jwtTokens/decodeRefreshToken.js";
 // initializing transporter for sending mail
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -226,3 +227,5 @@ export const logout = async(req,res,next)=>{
     return next(errorHandler(500,"something went wrong please try again"));
   }
 }
+
+

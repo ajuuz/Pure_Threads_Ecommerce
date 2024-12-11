@@ -88,7 +88,7 @@ const NavBar = () => {
               <div className="cursor-pointer">
                 <FaRegHeart />
               </div>
-              <div className="cursor-pointer">
+              <div onClick={()=>navigate('/cart')} className="cursor-pointer">
                 <FaOpencart />
               </div>
            </div>

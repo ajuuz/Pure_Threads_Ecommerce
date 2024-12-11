@@ -47,7 +47,22 @@ const addressSchema = new mongoose.Schema({
     }
 })
 
+addressSchema.pre("updateOne", async function (next) {
+    const update = this.getUpdate(); // Retrieves the update object
+    const query = this.getQuery();  // Retrieves the filter/query object
 
+  
+    if (update && update.isDefault === true) {
+        const docThatUpdate = await this.model.findOne(query); // Retrieves the document based on the query
+        if (docThatUpdate) {
+            await this.model.updateMany(
+                { userId: docThatUpdate.userId, _id: { $ne: docThatUpdate._id } },
+                { $set: { isDefault: false } }
+            );
+        }
+    }
+    next();
+});
 
 
 const addressDB = mongoose.model('addresses',addressSchema);

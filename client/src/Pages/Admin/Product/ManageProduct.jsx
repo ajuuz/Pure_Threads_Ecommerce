@@ -20,9 +20,10 @@ import { editEntireProduct,  getParticularProduct } from "@/api/Admin/productApi
 
 // implementing toast for messages
 import { toast } from "sonner"
-
+import {toast as reactToastify} from 'react-toastify'
 // for showing loading
 import spinner from '../../../assets/Spin@1x-1.0s-200px-200px.svg'
+import { validateOtherForms } from "@/Utils/formValidation";
 
 
 const ManageProduct = () => {
@@ -140,6 +141,15 @@ useEffect(()=>{
   }
 
   const handleSubmit=async()=>{
+    const validation = validateOtherForms(formData);
+        if(Object.values(validation).length>0)
+            {
+              for(let x of Object.values(validation))
+                {
+                  reactToastify.error(x,{className: "custom-toast",progressClassName: "custom-progress-bar"});
+                  return;
+                }
+            }
     setLoading(true)
     if(id)
     {

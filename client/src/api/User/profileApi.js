@@ -7,7 +7,7 @@ export const getUserProfile = async()=>{
     }
     catch(error)
     {
-        throw error?.response.data || error;
+        throw error?.response.data && {...error?.response.data,statusCode:error.status} || error
     }
 }
 
@@ -19,6 +19,6 @@ export const updateUserProfile=async(changedData)=>{
     }
     catch(error)
     {
-        throw error?.response.data || error;
+        throw error?.response.data && {...error?.response.data,statusCode:error.status} || error
     }
 }

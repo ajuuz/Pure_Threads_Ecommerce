@@ -1,13 +1,16 @@
-import { getParticularProduct, getRelatedProducts } from '@/api/User/productApi';
+import React, { useEffect, useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom';
+
 import { Button } from '@/components/ui/button';
 import Card from '@/components/UserComponent/Card/Card';
 import Footer from '@/components/UserComponent/Footer/Footer';
 import { LensZoom } from '@/components/UserComponent/LensZoom/LensZoom';
 import NavBar from '@/components/UserComponent/NavBar/NavBar'
 import Rating from '@/components/UserComponent/Rating/Rating';
-import React, { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom';
 
+import { getParticularProduct, getRelatedProducts } from '@/api/User/productApi';
+
+import { toast } from 'sonner';
 
 
 const ProductDetailPage = () => {
@@ -15,30 +18,51 @@ const ProductDetailPage = () => {
     const [images,setImages] = useState([]);
     const [selectedImageIndex,setSelectedImageIndex] = useState(0)
     const [relatedProducts,setRelatedProducts] = useState([])
+    const [selectedSize,setSelectedSize] = useState(null)
+
+
     const {id} = useParams()
+   
 
     useEffect(()=>{
         let categoryId="";
         const fetchParticularProduct = async()=>{
             try{
                 const productResult = await getParticularProduct(id);
-                categoryId = productResult.product.category
-                setImages(productResult?.product.images)
+                categoryId = productResult?.product?.category
+                setImages(productResult?.product?.images)
                 setProduct(productResult?.product)
 
                 const relatedProductResult = await getRelatedProducts(categoryId)
-                console.log(relatedProductResult?.products)
                 setRelatedProducts(relatedProductResult?.products.filter((product)=>product._id!=productResult.product._id))
             }
             catch(error)
             {
-                console.error(error.message)
+                console.log("some other error occured")
             }
         } 
         fetchParticularProduct();
-
-        
     },[])
+
+    const handleAddToCart=async()=>{
+        if(selectedSize===null) return toast.warning("select a size to continue")
+        try{
+            const addingToCartResult = await addToCart(selectedSize);
+            console.log(addingToCartResult.message)
+        }
+        catch(error)
+        {
+            console.log(error.message)
+        }
+    }
+
+    const handleSelectSize=(stock,index)=>{
+        if(stock>1)
+        {
+            setSelectedSize(index)
+        }
+    }
+
   return (
     <div className="h-[200vh] relative pt-24">
       <NavBar />
@@ -77,13 +101,13 @@ const ProductDetailPage = () => {
             <div>
                 <p>Select Size</p>
                 <div className='flex gap-4'>
-                    {product?.size.map((size)=>(
-                        <div key={size?.size} className='w-16 text-center py-2 border-2 rounded-md'>{size.size}</div>
+                    {product?.size.map((size,index)=>(
+                        <div onClick={()=>handleSelectSize(size.stock,index)} key={size?.size} className={`w-16 text-center py-2 border-2 rounded-md ${selectedSize===index && "bg-black text-white border-2 border-black"} ${size?.stock<1 && `bg-muted border-none text-muted-foreground`} `}>{size.size}</div>
                     ))}
                 </div>
             </div>
             <div>
-                <Button className="max-w-[510px]">Add to Cart</Button>
+                <Button onClick={handleAddToCart} className="max-w-[510px]">Add to Cart</Button>
                 <Button className="max-w-[510px]">Add to Wishlist</Button>
             </div>
         </div>

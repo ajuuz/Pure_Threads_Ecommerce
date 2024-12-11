@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import { errorHandler } from "../utils/error.js";
+import { refreshTokenDecoder } from "../utils/jwtTokens/decodeRefreshToken.js";
 
 export const verifyUser = async (req,res,next)=>{
     const accessToken = req?.cookies?.userAccessToken;
@@ -8,12 +9,13 @@ export const verifyUser = async (req,res,next)=>{
     {
         try{
             jwt.verify(accessToken,process.env.ACCESS_TOKEN_SECRET);
+            const userId = refreshTokenDecoder(req)
+            req.userId = userId
             next()
         }
         catch(error)
         {
-            console.log(error.message)
-            return next(errorHandler(401,"you are not authorized , token verification failed"))
+            return next(errorHandler(401,"you are not authorized , token incorrect failed"))
         }
 
     }
@@ -28,7 +30,7 @@ const handleRefreshToken = async(refreshToken,req,res,next)=>{
     {
         try{
             const decodeRefresh = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
-            const newAccessToken = jwt.sign({ id: decodeRefresh.id }, process.env.ACCESS_TOKEN_SECRET, {
+            const newAccessToken = jwt.sign({ id: decodeRefresh?.id }, process.env.ACCESS_TOKEN_SECRET, {
                 expiresIn: "1m",
             });
             
@@ -38,17 +40,17 @@ const handleRefreshToken = async(refreshToken,req,res,next)=>{
                 sameSite: "strict",
                 maxAge: 1 * 60 * 1000,
             });
+            const userId = refreshTokenDecoder(req)
+            req.userId = userId
             next();
         }
         catch(error)
         {
-            console.log(error)
             return next(errorHandler(401,"you are not authorized , refresh token is invalid"))
         }
     }
     else
     {
-        console.log("you are not authorized")
-        res.status(401).json({ message: "No access token and no refresh token provided" });
+        res.next(errorHandler(401,"you are not logged in"))
     }
 }

@@ -3,10 +3,9 @@ import { errorHandler } from "../../utils/error.js";
 
 export const getProducts=async(req,res,next)=>{
     const sort = JSON.parse(req.query.sort);
-    console.log(sort)
-
     try{
-        const products = await productDB.find({isActive:true}).sort(sort).populate('category')
+        const activeProducts = await productDB.find({isActive:true}).sort(sort).populate('category')
+        const products = activeProducts.filter((activeProduct)=>activeProduct?.category && activeProduct?.category?.isActive)
         if(!products) return next(errorHandler(404,"products not found"))
         return res.status(200).json({success:true,message:"products fetched successfully",products})
     }

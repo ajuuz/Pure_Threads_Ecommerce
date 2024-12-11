@@ -15,6 +15,7 @@ import {toast as reactToastify} from "react-toastify"
 // apis
 import {  getUserProfile, updateUserProfile } from '@/api/User/profileApi'
 import { validateUserDetailsForm } from '@/Utils/formValidation'
+import { useNavigate } from 'react-router-dom'
 
 const Account = () => {
 
@@ -24,6 +25,8 @@ const Account = () => {
         phone:null,
         disabled:true
     })
+
+const navigate = useNavigate();
 
     useEffect(()=>{
         const fetchUserProfile = async()=>{
@@ -68,13 +71,13 @@ const Account = () => {
             return 
         }
         try{
-            
             const updateResult = await updateUserProfile(rest);
             toast.success(updateResult.message)
             setFormData((prev)=>({...prev,disabled:true}))
         }
         catch(error)
         {
+            if(error?.statusCode===403) return   
             toast.error(error.message);
         }
     }

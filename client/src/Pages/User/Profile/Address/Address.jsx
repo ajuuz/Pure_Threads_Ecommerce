@@ -16,7 +16,8 @@ const Address = () => {
     const [addresses,setAddresses] = useState([])
 
     //navigate
-    const navigate = useNavigate()
+    const navigate = useNavigate();
+   
 
 
     useEffect(()=>{
@@ -27,6 +28,7 @@ const Address = () => {
             }
             catch(error)
             {
+                if(error?.statusCode===403) return
                 toast.error(error.message)
             }
         }

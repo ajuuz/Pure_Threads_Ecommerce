@@ -18,7 +18,9 @@ export const getParticularProduct = async(id)=>{
     }
     catch(error)
     {
-        throw error?.response.data || error
+        console.log(error)
+        
+        throw error?.response.data && {...error?.response.data,statusCode:error.status} || error
     }
 }
 

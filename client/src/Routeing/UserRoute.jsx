@@ -14,6 +14,7 @@ import UserLoginPrivate from './Protected_Routing/User/UserLoginPrivate';
 import Account from '@/Pages/User/Profile/Account/Account';
 import Address from '@/Pages/User/Profile/Address/Address';
 import ManageAddress from '@/Pages/User/Profile/Address/ManageAddress';
+import Cart from '@/Pages/User/Cart/Cart';
 
 
 
@@ -25,12 +26,13 @@ const UserRoute = () => {
         <Route path='/signup' element={<UserLoginPrivate><Signup/></UserLoginPrivate>}/>
         <Route path='/signup/otp' element={<Otp/>}/>
         <Route path='/' element={<LandingPage/>}/>
-        <Route path='/shop' element={<UserPrivate><ShopPage/></UserPrivate>}/>
-        <Route path='/products/:id' element={<UserPrivate><ProductDetailPage/></UserPrivate>}/>
-        <Route path='/profile' element={<Account/>}/>
-        <Route path='/address' element={<Address/>}/>
-        <Route path="/address/add" element={<ManageAddress/>}/>
-        <Route path="/address/manage/:id" element={<ManageAddress/>}/>
+        <Route path='/shop' element={<ShopPage/>}/>
+        <Route path='/products/:id' element={<ProductDetailPage/>}/>
+        <Route path='/profile' element={<UserPrivate><Account/></UserPrivate>}/>
+        <Route path='/address' element={<UserPrivate><Address/></UserPrivate>}/>
+        <Route path="/address/add" element={<UserPrivate><ManageAddress/></UserPrivate>}/>
+        <Route path="/address/manage/:id" element={<UserPrivate><ManageAddress/></UserPrivate>}/>
+        <Route path="/cart" element={<Cart/>}/>
     </Routes>
     </>
   )

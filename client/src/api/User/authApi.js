@@ -7,8 +7,7 @@ export const loginUser = async (userData)=>{
     }
     catch(error)
     {
-        console.log("working")
-        throw error?.response?.data || error;
+        throw error?.response.data && {...error?.response.data,statusCode:error.status} || error
     }
 }
 
@@ -79,3 +78,5 @@ export const logout = async()=>{
         throw error?.response?.data || error;
     }
 }
+
+

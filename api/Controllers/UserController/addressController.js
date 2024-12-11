@@ -90,8 +90,6 @@ export const setDefaultAddress = async(req,res,next)=>{
         const updatedAddress = await addressDB.updateOne({_id:addressId},{ isDefault: true });
             if(!updatedAddress) return next(errorHandler(404,"address not found"))
 
-        const updatedOtherAddresses = await addressDB.updateMany({userId,_id:{$ne:addressId}},{$set:{isDefault:false}})
-            if(!updatedOtherAddresses) return next(errorHandler(404,"addresses not found"))
 
         const addresses = await addressDB.find({userId});
         return res.status(200).json({success:true,message:"address set as default",addresses})

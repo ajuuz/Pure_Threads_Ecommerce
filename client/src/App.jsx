@@ -7,12 +7,14 @@ import AdminRoute from "./Routeing/AdminRoute.jsx";
 
 import { Toaster } from "sonner";
 import { ToastContainer } from "react-toastify";
+
+
 const App = () => {
+
   return (
     <div>
-      
       <Router>
-        <ToastContainer/>
+      <ToastContainer/>
       <Toaster position="bottom-center"  richColors/> {/* Toast container */}
         <Routes>
           <Route path="/*" element={<UserRoute/>} />
