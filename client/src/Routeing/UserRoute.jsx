@@ -27,7 +27,7 @@ const UserRoute = () => {
         <Route path='/signup/otp' element={<Otp/>}/>
         <Route path='/' element={<LandingPage/>}/>
         <Route path='/shop' element={<ShopPage/>}/>
-        <Route path='/products/:id' element={<ProductDetailPage/>}/>
+        <Route path='/products/:productId' element={<ProductDetailPage/>}/>
         <Route path='/profile' element={<UserPrivate><Account/></UserPrivate>}/>
         <Route path='/address' element={<UserPrivate><Address/></UserPrivate>}/>
         <Route path="/address/add" element={<UserPrivate><ManageAddress/></UserPrivate>}/>

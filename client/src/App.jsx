@@ -15,7 +15,7 @@ const App = () => {
     <div>
       <Router>
       <ToastContainer/>
-      <Toaster position="bottom-center"  richColors/> {/* Toast container */}
+      <Toaster position="bottom-center"  richColors toastOptions={{style: {flex:"flex",justifyContent:"center"}}}/> 
         <Routes>
           <Route path="/*" element={<UserRoute/>} />
           <Route path="/admin*" element={<AdminRoute/>} />

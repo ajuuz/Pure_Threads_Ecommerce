@@ -20,12 +20,12 @@ export const verifyUser = async (req,res,next)=>{
 
     }
     else{
-        handleRefreshToken(refreshToken,req,res,next)
+        handleRefreshToken(req,res,next,refreshToken)
     }
 }
 
 
-const handleRefreshToken = async(refreshToken,req,res,next)=>{
+const handleRefreshToken = async(req,res,next,refreshToken)=>{
     if(refreshToken)
     {
         try{
@@ -51,6 +51,6 @@ const handleRefreshToken = async(refreshToken,req,res,next)=>{
     }
     else
     {
-        res.next(errorHandler(401,"you are not logged in"))
+       return next(errorHandler(401,"you are not logged in"))
     }
 }

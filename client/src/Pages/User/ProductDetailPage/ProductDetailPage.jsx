@@ -12,6 +12,8 @@ import { getParticularProduct, getRelatedProducts } from '@/api/User/productApi'
 
 import { toast } from 'sonner';
 
+import { addToCart, selectSizeOfProduct } from '@/api/User/cartApi';
+
 
 const ProductDetailPage = () => {
     const [product,setProduct]=useState(null)
@@ -21,14 +23,13 @@ const ProductDetailPage = () => {
     const [selectedSize,setSelectedSize] = useState(null)
 
 
-    const {id} = useParams()
-   
+    const {productId} = useParams()
 
     useEffect(()=>{
         let categoryId="";
         const fetchParticularProduct = async()=>{
             try{
-                const productResult = await getParticularProduct(id);
+                const productResult = await getParticularProduct(productId);
                 categoryId = productResult?.product?.category
                 setImages(productResult?.product?.images)
                 setProduct(productResult?.product)
@@ -47,19 +48,23 @@ const ProductDetailPage = () => {
     const handleAddToCart=async()=>{
         if(selectedSize===null) return toast.warning("select a size to continue")
         try{
-            const addingToCartResult = await addToCart(selectedSize);
-            console.log(addingToCartResult.message)
+            const addingToCartResult = await addToCart(productId,selectedSize);
+            toast.success(addingToCartResult.message)
         }
         catch(error)
         {
-            console.log(error.message)
+            if(error.statusCode===422) return toast.info(error.message)
+            toast.warning(error.message)
         }
     }
 
-    const handleSelectSize=(stock,index)=>{
-        if(stock>1)
-        {
+    const handleSelectSize=async(productId,index)=>{
+        // if(stock>1){setSelectedSize(index)}
+        try{
+            await selectSizeOfProduct(productId,index)
             setSelectedSize(index)
+        }catch(error){
+            if(error.statusCode===422) return toast.info(error.message)
         }
     }
 
@@ -102,7 +107,7 @@ const ProductDetailPage = () => {
                 <p>Select Size</p>
                 <div className='flex gap-4'>
                     {product?.size.map((size,index)=>(
-                        <div onClick={()=>handleSelectSize(size.stock,index)} key={size?.size} className={`w-16 text-center py-2 border-2 rounded-md ${selectedSize===index && "bg-black text-white border-2 border-black"} ${size?.stock<1 && `bg-muted border-none text-muted-foreground`} `}>{size.size}</div>
+                        <div onClick={()=>handleSelectSize(productId,index)} key={size?.size} className={`w-16 text-center py-2 border-2 rounded-md ${selectedSize===index && "bg-black text-white border-2 border-black"} ${size?.stock<1 && `bg-muted border-none text-muted-foreground`} `}>{size.size}</div>
                     ))}
                 </div>
             </div>
