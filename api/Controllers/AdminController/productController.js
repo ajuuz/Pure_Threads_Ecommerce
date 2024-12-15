@@ -83,10 +83,10 @@ export const getParticularProduct = async(req,res,next)=>{
 
 // to update whole entire product using put method 
 export const editEntireProduct=async(req,res,next)=>{
-    console.log("entire product")
     const id = req.params.id;
     try{
         const {formData,imageURLsWithIndexes} = req.body;
+        console.log(formData)
         const updatedProduct = await productDB.updateOne({_id:id},{$set:formData})
         if(imageURLsWithIndexes.length>0)
         {
@@ -129,6 +129,7 @@ export const patchProduct=async(req,res,next)=>{
     else
     {
         const index = req.body.index    //controller for removing image
+        console.log(id,index)
         try{
             await productDB.updateOne({ _id: id },{ $unset: { [`images.${index}`]: "" } });
             const updatedProduct =  await productDB.updateOne({ _id: id },{ $pull: { images: null } });

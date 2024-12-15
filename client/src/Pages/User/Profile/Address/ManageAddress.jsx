@@ -20,7 +20,7 @@ import { toast as reactToastify } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 // apis
 import { addAddress, editAddress, getAddress } from "@/api/User/addressApi";
-import { useNavigate,useParams } from "react-router-dom";
+import { useLocation, useNavigate,useParams } from "react-router-dom";
 
 const ManageAddress = () => {
 // states
@@ -39,7 +39,9 @@ const ManageAddress = () => {
 
     const {id} = useParams();
     const navigate = useNavigate();
-
+    const location = useLocation();
+    const {from} = location.state || {}
+    console.log(from)
     // useEffects
     useEffect(()=>{
         if(id){
@@ -82,7 +84,7 @@ const ManageAddress = () => {
             try{
                 const addAddressResult = await editAddress(formData,id);
                 toast.success(addAddressResult.message)
-                navigate('/address')
+                navigate(from)
             }
             catch(error)
             {
@@ -93,7 +95,7 @@ const ManageAddress = () => {
             try{
                 const addAddressResult = await addAddress(formData);
                 toast.success(addAddressResult.message)
-                navigate('/address')
+                navigate(from)
             }
             catch(error)
             {
@@ -122,7 +124,7 @@ const ManageAddress = () => {
     <>
     <div className="md:ps-[340px]  pt-28">
       <NavBar />
-      <SideBar current="address" />
+      {from==="/address" && <SideBar current="address" />}
       <div className="py-7 px-10 shadow-[rgba(0,0,0,0.1)_0px_0px_10px_1px] rounded-xl w-[90%]">
         <div className="mb-6">
             <div className="flex justify-between items-center">

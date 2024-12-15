@@ -31,13 +31,25 @@ export const getCartProducts = async ()=>{
     }
 }
 
-export const updateQuantity = async(productId,size,quantity)=>{
+export const updateCart = async(productId,size,quantity)=>{
     try{
         const response = await axiosInstance.patch('/users/cart',{productId,size,quantity})
         return response.data
     }
     catch(error){
         throw error?.response?.data && {...error?.response.data,statusCode:error.status} || error
+    }
+}
+
+export const proceedToCheckout = async()=>{
+    try{
+        const response = await axiosInstance.post('/users/proceedToCheckout')
+        return response.data
+    }
+    catch(error)
+    {
+        throw error?.response?.data && {...error?.response.data,statusCode:error.status} || error
+
     }
 }
 

@@ -68,7 +68,7 @@ const Address = () => {
     <div className='p-10 shadow-[rgba(0,0,0,0.1)_0px_1px_30px_1px] rounded-xl w-[90%] grid  grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4'>
         
         <div className='p-6  shadow-[rgba(0,0,0,0.1)_0px_1px_30px_1px] rounded-xl flex flex-col gap-2 justify-center items-center'>
-            <div onClick={()=>navigate('/address/add')} className='bg-black text-white p-2 rounded-3xl'>
+            <div onClick={()=>navigate('/address/add',{ state: { from: '/address'}})} className='bg-black text-white p-2 rounded-3xl'>
                 <FaPlus className='text-3xl'/>
             </div>
             <p className='text-muted-foreground font-semibold text-xs'>ADD NEW ADDRESS</p>
@@ -76,7 +76,7 @@ const Address = () => {
 
         {addresses.map((address)=>
         <div key={address._id}  className='p-6 shadow-[rgba(0,0,0,0.1)_0px_1px_30px_1px] rounded-xl'>
-            <div onClick={()=>navigate(`/address/manage/${address._id}`)}>
+            <div onClick={()=>navigate(`/address/manage/${address._id}`,{ state: { from: '/address'}})}>
             <h2 className='font-bold'>{address?.name?address.name:"John Doe"}</h2>
             <p>{address?.buildingName?address.buildingName:""}</p>
             <p className='truncate'>{`${address?.address?address?.address:""},${address?.district?address?.district:""}`}</p>

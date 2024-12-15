@@ -87,7 +87,6 @@ useEffect(()=>{
  const handleInputChange=(additionalInfo,e,value,name)=>{
   if(additionalInfo)
   {
-    console.log("working")
     const index = parseInt(e.target.name)
      setFormData((prev) => {
       const updatedAdditionalInfo = [...prev.additionalInfo];
@@ -97,19 +96,19 @@ useEffect(()=>{
   }
   else if(name)
   {
-    console.log(name,value)
     setFormData((prev)=>({...prev,[name]:value}))
   }
   else
   {
-    console.log("else is working")
     if(e.target.type==="checkbox")
-    {
-      setFormData((prev)=>({...prev,isActive:!prev.isActive}))
-    }
-    else
-    {
+      {
+        setFormData((prev)=>({...prev,isActive:!prev.isActive}))
+      }
+      else
+      {
+      console.log(e.target.value)
       setFormData((prev)=>({...prev,[e.target.name]:e.target.value}))
+      console.log(formData)
     }
   }
  }
@@ -155,8 +154,16 @@ useEffect(()=>{
     {
       try{
         const imagesNeededToUpload = croppedImage.map((image,index)=>({[index]:image})).filter((item) => Object.values(item)[0] instanceof Blob)
-        const response = await editEntireProduct(id,formData,imagesNeededToUpload);
-        console.log(response.message)
+        console.log(formData)
+        const updatedFormData = {...formData, size : [
+          { size: "S", stock: formData.S },
+          { size: "M", stock: formData.M },
+          { size: "L", stock: formData.L },
+          { size: "XL", stock: formData.XL },
+          { size: "XXL", stock: formData.XXL },
+        ]}
+
+        const response = await editEntireProduct(id,updatedFormData,imagesNeededToUpload);
         toast.success(response.message)
         navigate('/admin/products')
       }
@@ -187,7 +194,7 @@ useEffect(()=>{
     const InputFields = [{label:"Product Name",type:"text",placeHolder:"eg: Navy Slim Fit Stretch Shirt",id:"name",name:"name",value:formData.name,style:"h-9 w-full"},{label:"Description",type:"text",placeHolder:"eg: This formal shirt ensures delicate balance while choosing fit and plain pattern that works best for you.....",id:"textArea",name:"description",value:formData.description,style:"border-2 border-gray-100 p-2 rounded-lg w-full"},{label:"Price",type:"text",id:"regularPrice",name:"regularPrice",value:formData.regularPrice,style:"h-9 w-50",divStyle:"flex gap-3 items-center float-left me-4"},{label:"Should be Listed:",type:"checkbox",id:"isActive",name:"isActive",value:formData.isActive,style:"accent-black me-2 scale-125" ,divStyle:"w-48 flex justify-around"}]
     const secondLastInputFields = [{label:"color",type:"text",placeHolder:"eg: Navy blue",id:"color",name:"color",value:formData.color,style:"h-9 w-full"},{label:"size of Model wearing shirt",type:"text",placeHolder:"eg: Model wears L sized shirt",id:"sizeOfModel",name:"sizeOfModel",value:formData.sizeOfModel,style:"h-9 w-full"},{label:"wash care",type:"text",placeHolder:"eg: dry clean",id:"washCare",name:"washCare",value:formData.washCare,style:"h-9 w-full"}]
     const additionalInputs = formData.additionalInfo.map((inputValue,index)=>({label:"",type:"text",id:`addInfo${index}`,name:`${index}`,value:inputValue,style:"h-9 w-full"}))
-    const sizeInputFields=[{label:"S",type:"Number",id:"S",name:"S",value:formData.S,style:"border w-20 ms-2 size-input text-center",divStyle:"md:float-left me-3 ms-1 md:ms-0 "},{label:"M",type:"Number",id:"M",name:"M",value:formData.M,style:"border w-20 ms-2 size-input text-center"},{label:"L",type:"Number",id:"L",name:"L",value:formData.L,style:"border w-20 ms-2 size-input text-center",divStyle:"md:float-left md:me-3 md:ms-0 ms-2"},{label:"XL",type:"Number",id:"XL",name:"XL",value:formData.XL,style:"border w-20 ms-2 size-input text-center"},{label:"XXL",type:"Number",id:"XXL",name:"XXL",value:formData.XXL,style:"border w-20 ms-2 size-input text-center",divStyle:"md:ms-10"}]
+    const sizeInputFields=[{label:"S",type:"Number",id:"size",name:"S",value:formData.S,style:"border w-20 ms-2 size-input text-center",divStyle:"md:float-left me-3 ms-1 md:ms-0 "},{label:"M",type:"Number",id:"M",name:"M",value:formData.M,style:"border w-20 ms-2 size-input text-center"},{label:"L",type:"Number",id:"L",name:"L",value:formData.L,style:"border w-20 ms-2 size-input text-center",divStyle:"md:float-left md:me-3 md:ms-0 ms-2"},{label:"XL",type:"Number",id:"XL",name:"XL",value:formData.XL,style:"border w-20 ms-2 size-input text-center"},{label:"XXL",type:"Number",id:"XXL",name:"XXL",value:formData.XXL,style:"border w-20 ms-2 size-input text-center",divStyle:"md:ms-10"}]
   return (
     <div className="AdminAddProduct relative h-[200vh] ps-5 md:ps-[300px] pe-5 pt-16">
       <SideBar />

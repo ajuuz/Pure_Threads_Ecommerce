@@ -138,3 +138,7 @@
 .custom-toast svg {
   fill: #ffffff !important; /* Exclamation icon color */
 }
+
+body{
+  background-color: rgb(255, 255, 255);
+}

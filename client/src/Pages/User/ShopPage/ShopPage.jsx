@@ -5,7 +5,7 @@ import NavBar from "@/components/UserComponent/NavBar/NavBar";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-
+import { motion } from "framer-motion";
 const ShopPage = () => {
 
    const [products,setProducts] = useState([])
@@ -40,11 +40,12 @@ const onCardClick=(id)=>{
         <aside className="border-2 hidden  lg:flex flex-col gap-1 fixed top-[100px] left-5 bg-white shadow-lg rounded-lg w-[300px] p-5">
            <FilterComponent/>
         </aside>
-        <div className="grid mx-auto grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-8 sm:gap-5 md:gap-5 lg:gap-4 xl:gap-4">
-            {products.map((product)=>(
+        <motion.div className="grid mx-auto grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-8 sm:gap-5 md:gap-5 lg:gap-4 xl:gap-4" initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: "easeOut" }}>
+              {products.map((product)=>(
                 <Card image1={product.images[0].url} title={product.name} category={product?.category.name} price={product.salesPrice} withDescription={true} onCardClick={()=>onCardClick(product?._id)}/>
-            ))}
-        </div>
+               ))}
+          </motion.div>
+        
       </main>
     </div>
   );

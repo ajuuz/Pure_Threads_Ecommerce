@@ -82,18 +82,52 @@ export const getCartProducts = async(req,res,next)=>{
     }
 }
 
-export const updateQuantity = async(req,res,next)=>{
+export const updateCart = async(req,res,next)=>{
     const {productId,size,quantity} = req.body;
-    console.log(productId,size,quantity)
+
+    if(quantity && quantity>0 && quantity<=5)
+    {
+        console.log(quantity)
+        try{
+            const userId = refreshTokenDecoder(req);
+            const updatedCart = await cartDB.findOneAndUpdate({userId,"items.product":productId,"items.size":size},{$set:{"items.$[item].quantity":quantity}},{arrayFilters:[{"item.product":productId,"item.size":size}]}).populate('items.product')
+            if(!updatedCart) return next(errorHandler(404,"no product has been updated"));
+            console.log("working");
+            return res.status(200).json({success:true,message:"updated successfully",updatedCart})
+
+        }
+        catch(error){
+            console.log(error)
+            return next(errorHandler(500,"something went wrong please try again"))
+
+        }
+    }
+    else{
+        try{
+            const userId = refreshTokenDecoder(req);
+            const updatedCart = await cartDB.updateOne({userId},{$pull:{items:{product:productId,size:size}}})
+            if(!updatedCart) return next(errorHandler(404,"no product has been removed"));
+            return res.status(200).json({success:true,message:"product removed successfully"})
+
+        }
+        catch(error){
+            console.log(error)
+            return next(errorHandler(500,"something went wrong please try again"))
+
+        }
+    }
+}
+
+
+export const proceedToCheckout = async(req,res,next)=>{
     try{
         const userId = refreshTokenDecoder(req);
-        const updatedCart = await cartDB.findOneAndUpdate({userId,"items.product":productId,"items.size":size},{$set:{"items.$[item].quantity":quantity}},{arrayFilters:[{"item.product":productId,"item.size":size}]}).populate('items.product')
-        if(!updatedCart) return next(errorHandler(404,"no product has been updated"));
-        console.log("working");
-        return res.status(200).json({success:true,message:"updated successfully",updatedCart})
+        console.log("working")
+        const cart = await cartDB.findOne({userId}).populate('items.product')
 
     }
-    catch(error){
-        console.log(error)
+    catch(error)
+    {
+        return next(errorHandler(500,"something went wrong please try again"))
     }
 }
