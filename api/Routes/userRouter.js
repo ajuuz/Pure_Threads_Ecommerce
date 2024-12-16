@@ -5,7 +5,7 @@ import { generateOtp,verifyLogin,verifyOtp,resendOtp, googleAuth, logout } from 
 import { getCategories } from '../Controllers/UserController/categoryController.js';
 import { getParticularProduct, getProducts, getRelatedProduct } from '../Controllers/UserController/ProductController.js';
 import { verifyUser } from '../Middlewares/userAuthMiddleware.js';
-import { getUserProfile, updateUserProfile } from '../Controllers/UserController/profileController.js';
+import { changePassword, getUserProfile, updateUserProfile } from '../Controllers/UserController/profileController.js';
 import { addAddress, deleteAddress, editAddress, getAddress, getAddresses, setDefaultAddress } from '../Controllers/UserController/addressController.js';
 import { verifyUserBlocked } from '../Middlewares/userBlockMiddleware.js';
 import { addToCart, getCartProducts, proceedToCheckout, selectSizeForProduct, updateCart } from '../Controllers/UserController/cartController.js';
@@ -30,7 +30,8 @@ router.get('/products/:id',getParticularProduct)
 router.get('/products/category/:catId',getRelatedProduct)
 
 router.get('/',verifyUser,verifyUserBlocked,getUserProfile)
-router.patch('/',verifyUser,verifyUserBlocked,updateUserProfile)
+router.put('/',verifyUser,verifyUserBlocked,updateUserProfile)
+router.patch('/',verifyUser,verifyUserBlocked,changePassword)
 
 // address
 router.get('/address',verifyUser,verifyUserBlocked,getAddresses)
