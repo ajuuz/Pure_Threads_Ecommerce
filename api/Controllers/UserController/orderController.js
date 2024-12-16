@@ -2,6 +2,7 @@ import cartDB from "../../Models/cartSchema.js";
 import orderDB from "../../Models/orderSchema.js";
 import productDB from "../../Models/productSchema.js";
 import { errorHandler } from "../../utils/error.js";
+import { refreshTokenDecoder } from "../../utils/jwtTokens/decodeRefreshToken.js";
 
 export const placeOrder = async(req,res,next)=>{
     const {paymentMethod,deliveryAddress} = req.body
@@ -35,5 +36,43 @@ export const placeOrder = async(req,res,next)=>{
     catch(error){
         console.log(error.message)
        return next(errorHandler(500,"something went wrong"))
+    }
+}
+
+export const getOrders = async(req,res)=>{
+    try{
+        const userId = refreshTokenDecoder(req);
+        const orders = await orderDB.find({userId})
+        if(!orders) return next(errorHandler(404,"orders not found"));
+        return res.status(200).json({success:true,message:"orders fetched successfully",orders})
+    }catch(error){
+        console.log(error.message)
+        return next(errorHandler(500,"something went wrong"))
+    }
+}
+
+export const cancelOrder = async(req,res,next)=>{
+    const {orderId} = req.params
+    try{
+        const updatedOrder = await orderDB.updateOne({orderId},{$set:{status:"cancelled"}});
+        if(!updatedOrder.matchedCount) return next(errorHandler(404,"order not found"))
+        if(!updatedOrder.modifiedCount) return next(errorHandler(400,"No changes made"));
+        return res.status(200).json({success:true,message:"Your Order has been Cancelled"});
+    }
+    catch(error)
+    {
+        return next(errorHandler(500,"something went wrong , please try again"))
+    }
+}
+
+export const getParticularOrder = async(req,res,next)=>{
+    const {orderId} = req.params
+    try{
+        const order = await orderDB.findOne({orderId})
+        if(!order) return next(errorHandler(404,"order not found"));
+        res.status(200).json({success:true,message:"order fetched successfully",order})
+    }
+    catch(error){
+        return next(errorHandler(500,"something went wrong , please try again"))
     }
 }

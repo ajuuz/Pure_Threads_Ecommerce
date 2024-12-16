@@ -13,6 +13,7 @@ import Customer from '@/Pages/Admin/Customer/Customer';
 import ManageProduct from '@/Pages/Admin/Product/ManageProduct';
 import AdminPrivate from './Protected_Routing/Admin/AdminPrivate';
 import AdminLoginPrivate from './Protected_Routing/Admin/AdminLoginPrivate';
+import Orders from '@/Pages/Admin/Orders/Orders';
 const AdminRoute = () => {
   return (
    <>
@@ -26,6 +27,7 @@ const AdminRoute = () => {
         <Route path='/categories/add' element={<AdminPrivate><AddCategory/></AdminPrivate>}/>
         <Route path='/category/edit/:id' element={<AdminPrivate><AddCategory/></AdminPrivate>}/>
         <Route path='/customers' element={<AdminPrivate><Customer/></AdminPrivate>}/>
+        <Route path='/orders' element={<Orders/>}/>
     </Routes>
    </>
   )

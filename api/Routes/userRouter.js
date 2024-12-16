@@ -9,7 +9,7 @@ import { getUserProfile, updateUserProfile } from '../Controllers/UserController
 import { addAddress, deleteAddress, editAddress, getAddress, getAddresses, setDefaultAddress } from '../Controllers/UserController/addressController.js';
 import { verifyUserBlocked } from '../Middlewares/userBlockMiddleware.js';
 import { addToCart, getCartProducts, proceedToCheckout, selectSizeForProduct, updateCart } from '../Controllers/UserController/cartController.js';
-import { placeOrder } from '../Controllers/UserController/orderController.js';
+import { cancelOrder, getOrders, getParticularOrder, placeOrder } from '../Controllers/UserController/orderController.js';
 import { validateProduct } from '../Middlewares/productCheckerMiddleware.js';
 const router = express.Router();
 
@@ -50,5 +50,8 @@ router.post('/proceedToCheckout',proceedToCheckout)
 
 
 // order
-router.post('/order',validateProduct,placeOrder)
+router.post('/orders',validateProduct,placeOrder)
+router.get('/orders',getOrders)
+router.patch('/orders/:orderId',cancelOrder)
+router.get('/orders/:orderId',getParticularOrder)
 export default router;

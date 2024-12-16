@@ -39,7 +39,7 @@ const SideBar = () => {
       <div className='flex flex-col gap-6 mt-16'>
         <p className='text-lg font-semibold flex items-center justify-between cursor-pointer'><GiCardboardBoxClosed />Dashboard<RxCaretRight /></p>
         <p className='text-lg font-semibold flex items-center justify-between cursor-pointer' onClick={()=>navigate('/admin/products')}><GiCardboardBoxClosed />Products<RxCaretRight /></p>
-        <p className='text-lg font-semibold flex items-center justify-between cursor-pointer'><GiCardboardBoxClosed />Orders<RxCaretRight /></p>
+        <p className='text-lg font-semibold flex items-center justify-between cursor-pointer' onClick={()=>navigate('/admin/orders')}><GiCardboardBoxClosed />Orders<RxCaretRight /></p>
         <p className='text-lg font-semibold flex items-center justify-between cursor-pointer'  onClick={()=>navigate('/admin/customers')}><GiCardboardBoxClosed />Customers<RxCaretRight /></p>
         <p className='text-lg font-semibold flex items-center justify-between cursor-pointer'><GiCardboardBoxClosed />Sales<RxCaretRight /></p>
         <p className='text-lg font-semibold flex items-center justify-between cursor-pointer'  onClick={()=>navigate('/admin/categories')}><GiCardboardBoxClosed />Categeroies<RxCaretRight /></p>

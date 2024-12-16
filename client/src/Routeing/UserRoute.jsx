@@ -17,6 +17,7 @@ import ManageAddress from '@/Pages/User/Profile/Address/ManageAddress';
 import Cart from '@/Pages/User/Cart/Cart';
 import CheckOut from '@/Pages/User/CheckOut/CheckOut';
 import Orders from '@/Pages/User/Profile/Orders/Orders';
+import OrderDetail from '@/Pages/User/Profile/Orders/OrderDetail';
 
 
 const UserRoute = () => {
@@ -36,6 +37,7 @@ const UserRoute = () => {
         <Route path="/cart" element={<Cart/>}/>
         <Route path="/checkout/address" element={<CheckOut/>}/>
         <Route path="/orders" element={<Orders/>}/>
+        <Route path="/orders/:orderId" element={<OrderDetail/>}/>
     </Routes>
     </>
   )

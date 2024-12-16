@@ -2,10 +2,12 @@ import React from "react";
 import { motion } from "framer-motion";
 
 import { FaCheck } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 
 const OrderSuccess=({orderData})=> {
 
+  const navigate = useNavigate()
 
     const formatDate = (date,dateOnly) => {
         let options;
@@ -129,12 +131,14 @@ const OrderSuccess=({orderData})=> {
         {/* Buttons */}
         <div className="flex justify-between mt-6">
           <motion.button
+            onClick={()=>navigate('/orders')}
             whileHover={{ scale: 1.05 }}
             className="bg-black text-white hover:bg-gray-900 px-4 py-2 rounded"
           >
             View Orders
           </motion.button>
           <motion.button
+            onClick={()=>navigate('/shop')}
             whileHover={{ scale: 1.05 }}
             className="bg-black hover:bg-gray-900 text-white px-4 py-2 rounded"
           >

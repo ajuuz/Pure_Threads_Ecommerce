@@ -1,8 +1,9 @@
 import { updateCart } from "@/api/User/cartApi"
+import { toast } from "sonner"
 
   
 export const incrementQuantity =async (index,cartProduct,productId,size,quantity,cartProducts,setCArtProducts,setIsAvailableProduct) =>{
-    if(quantity>=5) return
+    if(quantity>=5) return toast.warning("maximum quantity reached")
     const sizeObject = cartProduct?.product?.size.find(item=>item.size===size)
     console.log(sizeObject)
     try{
@@ -27,7 +28,7 @@ export const incrementQuantity =async (index,cartProduct,productId,size,quantity
   }
   
 export const decrementQuantity =async(index,cartProduct,productId,size,quantity,cartProducts,setCArtProducts,setIsAvailableProduct) => {
-    if(quantity<=1) return
+    if(quantity<=1) return toast.warning("minimum quantity reached")
     const sizeObject = cartProduct?.product?.size.find(item=>item.size===size)
     console.log(sizeObject)
     try{

@@ -7,6 +7,7 @@ import { addCategory, editEntireCategory, getCategories, getParticularCategory, 
 import { addProduct, editEntireProduct, getParticularProduct, getProducts, patchProduct } from '../Controllers/AdminController/productController.js';
 import { editCustomers, getCustomers } from '../Controllers/AdminController/customerController.js';
 import { verifyAdmin } from '../Middlewares/adminAuthMiddleware.js';
+import { getAllOrders, updateOrderStatus } from '../Controllers/AdminController/orderController.js';
 const router = express.Router();
 
 
@@ -31,6 +32,8 @@ router.patch('/products/:id',verifyAdmin,patchProduct)
 router.get('/customers',verifyAdmin,getCustomers)
 router.patch('/customers',verifyAdmin,editCustomers)
 
-
+// orders
+router.get('/orders',getAllOrders)
+router.patch('/orders/:orderId',updateOrderStatus)
 
 export default router;
