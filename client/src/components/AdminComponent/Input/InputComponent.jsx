@@ -22,11 +22,12 @@ const InputComponent = ({ InputFields ,handleInputChange,formData,additionalInfo
           />
           :<Input placeHolder={input.placeHolder}
            type={input.type}
+           min={input.type === "number" ? 0 : undefined}
            disabled={input?.disabled ? input.disabled:false}
            checked={input.type==="checkbox"||input.type==="radio"?formData.isActive:undefined} 
            id={input.id} name={input.name} 
            value={input.value} 
-           className={`${input.style} placeholder:text-xs placeholder:text-gray-400 placeholder:font-semibold`} 
+           className={`${input.style}  placeholder:text-xs placeholder:text-gray-400 placeholder:font-semibold`} 
            onChange={additionalInfo?(e)=>handleInputChange(true,e,null,null):(e)=>handleInputChange(false,e,null,null)}
            />
         }

@@ -9,6 +9,8 @@ import { getUserProfile, updateUserProfile } from '../Controllers/UserController
 import { addAddress, deleteAddress, editAddress, getAddress, getAddresses, setDefaultAddress } from '../Controllers/UserController/addressController.js';
 import { verifyUserBlocked } from '../Middlewares/userBlockMiddleware.js';
 import { addToCart, getCartProducts, proceedToCheckout, selectSizeForProduct, updateCart } from '../Controllers/UserController/cartController.js';
+import { placeOrder } from '../Controllers/UserController/orderController.js';
+import { validateProduct } from '../Middlewares/productCheckerMiddleware.js';
 const router = express.Router();
 
 
@@ -45,4 +47,8 @@ router.post('/cart',addToCart)
 router.get('/cart',getCartProducts)
 router.patch('/cart',updateCart);
 router.post('/proceedToCheckout',proceedToCheckout)
+
+
+// order
+router.post('/order',validateProduct,placeOrder)
 export default router;

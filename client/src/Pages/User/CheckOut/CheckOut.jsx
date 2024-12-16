@@ -10,6 +10,9 @@ import { Button } from '@/components/ui/button';
 import { decrementQuantity, handleRemoveProduct, incrementQuantity } from '@/Utils/cartOperations';
 import CheckOutAddress from '@/components/UserComponent/CheckOut/CheckOutAddress';
 import { PaymentMethods } from '@/components/UserComponent/CheckOut/PaymentMethods';
+import { placeOrder } from '@/api/User/orderApi';
+import { toast } from 'sonner';
+import OrderSuccess from '@/components/UserComponent/CheckOut/OrderSuccess';
 
 const CheckOut = () => {
 
@@ -19,6 +22,7 @@ const CheckOut = () => {
   const [selectedAddressIndex,setSelectedAddressIndex]= useState()
   const [isFirstPage,setIsFirstPage] = useState(true)
   const [paymentMethod,setPaymentMethod]=useState("cod")
+  const [orderSuccess,setOrderSuccess] = useState(false);
 
   const navigate = useNavigate()
 
@@ -42,6 +46,7 @@ const CheckOut = () => {
     const fetchProductAndValidate=async()=>{
       try{
         const fetchCartProductsResult=await fetchCartProducts();
+        if(!orderSuccess && fetchCartProductsResult.fetchedProductArray.length===0) return navigate('/shop')
         setCArtProducts(fetchCartProductsResult.fetchedProductArray)
         setIsAvailableProduct(fetchCartProductsResult.isAvailableReducer)
       }
@@ -62,18 +67,34 @@ const handlePlaceOrder=async()=>{
       setIsAvailableProduct(fetchCartProductsResult.isAvailableReducer)
       return
     }
-    console.log("working");
+
+    if(paymentMethod==="cod")
+    {
+      const deliveryAddress = addresses[selectedAddressIndex]
+      const placeOrderResult = await placeOrder(paymentMethod,deliveryAddress)
+      if(placeOrderResult.success)
+      {
+        setOrderSuccess(placeOrderResult.orderData)
+        console.log(placeOrderResult.orderData)
+      }
+    }
+    else{
+      toast.info("other payment methods are currently on work. will release soon")
+    }
+  
   }
   catch(error)
   {
     console.log(error.message)
+    toast.error(error.message);
   }
 }
 
   return (
     <div className="min-h-screen  relative pt-32">
-  <NavBar />
+  <NavBar/>
       <div className="max-w-7xl mx-auto bg-white shadow-lg rounded-lg">
+        {orderSuccess && <OrderSuccess  orderData={orderSuccess}/>}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 p-8">
           {/* Order Summary */}
           <div className=" md:col-span-2">
@@ -152,18 +173,5 @@ const handlePlaceOrder=async()=>{
   )
 }
 
-//   <h1 className="text-2xl font-bold mb-8">Checkout</h1>
-  
-//   <div className="grid lg:grid-cols-2 gap-8 px-10">
-//     <div className="space-y-8">
-//       <AddressSection addresses={addresses} selectedAddressIndex={selectedAddressIndex} setSelectedAddressIndex={setSelectedAddressIndex}/>
-//       <PaymentMethod />
-//     </div>
-    
-//     <div>
-//       <OrderSummary />
-//     </div>
-//   </div>
-// </div>
 
 export default CheckOut

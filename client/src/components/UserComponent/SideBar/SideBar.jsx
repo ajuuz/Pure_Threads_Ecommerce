@@ -41,6 +41,12 @@ const navigate = useNavigate()
             <div className={`bg-black   w-5 h-5  ${current==="address" ? "block":"invisible"}`}></div>
         </div>
 
+        <div onClick={()=>navigate('/orders')} className='flex gap-10 justify-between items-center'>
+            <div className={`bg-black   w-5 h-5  ${current==="order" ? "visible":"invisible"}`}></div>
+                <div className='flex flex-1 gap-6 items-center'><FaBagShopping className='text-xl'/>Orders</div>
+            <div className={`bg-black   w-5 h-5  ${current=="order" ? "visible":"invisible"}`}></div>
+        </div>
+
         <div onClick={()=>navigate('/coupon')} className='flex gap-10 justify-between items-center'>
             <div className={`bg-black   w-5 h-5  ${current==="coupon" ? "visible":"invisible"}`}></div>
                 <div className='flex flex-1 gap-6 items-center'><FaBagShopping className='text-xl'/>Coupons</div>

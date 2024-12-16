@@ -105,7 +105,7 @@ const NavBar = () => {
                 <FaRegHeart />
                 <p>wishlist</p>
                 </div>
-              <div className="md:hidden flex items-center gap-4">
+              <div onClick={()=>navigate('/cart')} className="md:hidden flex items-center gap-4">
                 <FaOpencart />
                 <p>cart</p>
               </div>

@@ -34,7 +34,10 @@ export const addProduct = async (req, res,next) => {
     }
     catch(error)
     {
-        console.log(error)
+        if(Object.values(error.errors)[0].properties.type==="min")
+        {
+           return next(errorHandler(500,"stock cannot be less than zero (0)"))
+        }
         next(errorHandler(500,"something went wrong during adding product"))
 
     }
@@ -87,7 +90,7 @@ export const editEntireProduct=async(req,res,next)=>{
     try{
         const {formData,imageURLsWithIndexes} = req.body;
         console.log(formData)
-        const updatedProduct = await productDB.updateOne({_id:id},{$set:formData})
+        const updatedProduct = await productDB.updateOne({_id:id},{$set:formData},{ runValidators: true } )
         if(imageURLsWithIndexes.length>0)
         {
             for(const {index,imageURL} of imageURLsWithIndexes)
@@ -102,7 +105,10 @@ export const editEntireProduct=async(req,res,next)=>{
     }
     catch(error)
     {
-        console.log(error)
+        if(Object.values(error.errors)[0].properties.type==="min")
+            {
+               return next(errorHandler(500,"stock cannot be less than zero (0)"))
+            }
         next(errorHandler(500,"something went wrong during gettting products"))
     }
 }
