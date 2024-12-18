@@ -23,7 +23,12 @@ const LandingPage = () => {
         const fetchProducts=async()=>{
             try{
                 const sort=JSON.stringify({createdAt:-1})
-                const productsResult = await getProducts(sort)
+                const limit = 5;
+                const currentPage=1
+                const category=[];
+                const fit=[];
+                const sleeves=[];
+                const productsResult = await getProducts(sort,limit,currentPage,category,fit,sleeves)
                 console.log(productsResult.products.slice(0,5))
                 setNewArrivals(productsResult.products.slice(0,5))
             }

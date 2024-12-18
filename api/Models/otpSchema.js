@@ -3,7 +3,6 @@ import mongoose from "mongoose";
 const otpSchema = new mongoose.Schema({
     FormData:{
         type: Object, // Store the entire form data as an object
-        required: true,
     },
     email:{
         type:String,

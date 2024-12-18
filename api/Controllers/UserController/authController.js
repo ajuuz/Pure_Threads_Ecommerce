@@ -229,3 +229,69 @@ export const logout = async(req,res,next)=>{
 }
 
 
+export const forgotPassword = async(req,res,next)=>{
+  const {email} = req.body;
+  console.log(email)
+  if(!email) return next(errorHandler(400,"email doesnt recieved"))
+  try{
+    const user = await UsersDB.findOne({email})
+    if(!user) return next(errorHandler(404,"user not found. Please check your email"));
+
+     // if user already has not expired otp . then to navigate to otp verify page
+     const userWithOtp = await otpDB.findOne({email})
+     if(userWithOtp) return res.status(200).json({success:true,message:"already send your otp. please check"})
+ 
+     const otp = crypto.randomInt(10000, 99999);
+     const otpData = new otpDB({
+       email,
+       otp,
+       createdAt: Date.now(),
+     });
+ 
+     await otpData.save();
+     
+     // Send OTP to the user's email
+     const mailOptions = {
+       from: "pure threads", // Sender's email
+       to: email,
+       subject: "Your OTP for Signup",
+       text: `Your OTP code for changing password is: ${otp}`,
+     };
+     
+     // Sending the email with the OTP
+     transporter.sendMail(mailOptions, (err, info) => {
+         if (err) {
+             console.log(err);
+             return next(errorHandler(500,"Failed to send OTP" ))
+         }
+         // Return success message with an OTP sent notification
+         res.status(200).json({success: true,message: "OTP sent to your given email. Please verify."});
+     });
+ 
+     // expire otp
+     setTimeout(async()=>{
+         const updatedOtp = await otpDB.updateOne({email},{$set:{otp:null}})
+         console.log(updatedOtp)        
+     },1000*60)
+
+  }catch(error){
+    console.log(error.message)
+    return next(errorHandler(500, "something went wrong . please try again"));
+  }
+}
+
+export const forgotChangePassword=async(req,res,next)=>{
+
+  const {email,newPassword} = req.body;
+  try{
+    const hashedPassword = bcrypt.hashSync(newPassword, 10);
+    const updatedPassword  = await UsersDB.updateOne({email},{$set:{password:hashedPassword}})
+    console.log(updatedPassword)
+    if(!updatedPassword.matchedCount) return next(errorHandler(404,"user not found"));
+    if(!updatedPassword.modifiedCount) return next(errorHandler(400,"no changes made"))
+      return res.status(200).json({success:true,message:"password changed sucesfully"})
+  }catch(error){
+    console.log("error in changing  password ",error)
+    return next(errorHandler(500, "something went wrong . please try again"));
+  }
+}

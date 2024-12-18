@@ -45,6 +45,7 @@ export const validateUserDetailsForm = (formData)=>{
 
 export const validateOtherForms = (formData)=>{
   let formErrors={};
+  console.log(formData)
   for(let i in formData)
   {
     if (i === "email") {
@@ -60,9 +61,18 @@ export const validateOtherForms = (formData)=>{
         if (formData[i]===null||formData[i]==="") {
             formErrors[i] = "Name is required";
           }
-          else if(/^[A-Za-z\s]{3,20}$/.test(formData[i])===false){
-            formErrors[i] = "Name must contain only letters and at least 2 characters. format"
+          else if(/^[A-Za-z\s]{3,}$/.test(formData[i])===false){
+            formErrors[i] = "Name must contain only Alphabets and at least 3 characters."
           }
+    }
+
+    // Validate regularPrice
+    else if (i === "regularPrice") {
+      if (formData[i] === null || formData[i] === "") {
+        formErrors[i] = "Price number is required";
+      } else if (!/^\d{0,5}$/.test(formData[i])) {
+        formErrors[i] = "Price must be between Rs 0-99999.";
+      }
     }
 
     // Validate phone

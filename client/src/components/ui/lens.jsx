@@ -4,8 +4,8 @@ import { AnimatePresence, motion } from "framer-motion";
 
 export const Lens = ({
   children,
-  zoomFactor = 1.5,
-  lensSize = 170,
+  zoomFactor = 1.6,
+  lensSize = 270,
   isStatic = false,
   position = { x: 200, y: 150 },
   hovering,

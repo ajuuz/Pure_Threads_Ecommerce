@@ -1,8 +1,18 @@
 // Card.jsx
 import React, { useState } from "react";
 
-const Card = ({image1,image2,title,category,price,withDescription,onCardClick}) => {
+const Card = ({image1,image2,product,withDescription,onCardClick}) => {
     const [currentImage,setCurrentImage] = useState(image1)
+
+
+
+    const stockCalculator=()=>{
+       const stock = product?.size.reduce((acc,curr)=>acc+=curr.stock,0)
+       if(stock===0) return "Out of Stock"
+       if(stock<=5) return "Limited Stock"
+       return null
+    }
+
   return (
     <div onClick={onCardClick} 
      onMouseEnter={!withDescription?()=>setCurrentImage(image2):null} 
@@ -11,14 +21,16 @@ const Card = ({image1,image2,title,category,price,withDescription,onCardClick}) 
       <img
         className="h-80  rounded-lg"
         src={currentImage||'https://mtek3d.com/wp-content/uploads/2018/01/image-placeholder-500x500.jpg'}
-        alt={title}
+        alt={product?.name}
       />
       {withDescription &&
       <div className="p-2">
-        <p className="font-semibold text-sm  text-gray-500 ">{title}</p>
-        <p className="text-muted-foreground">{category}</p>
-        <div className="flex font-medium">Rs. {price}</div>
-        <div className="text-red-500">out of Stock</div>
+        <p className="font-semibold text-sm  text-gray-500 ">{product?.name}</p>
+        <p className="text-muted-foreground">{product?.categoryDetails?.name}</p>
+        <div className="flex font-medium">Rs. {product?.salesPrice}</div>
+        <div className="text-muted-foreground">{product?.fit}</div>
+        <div className="text-muted-foreground">{product?.sleeves}</div>
+        <div className="text-red-500">{stockCalculator()}</div>
       </div>
       }
     </div>

@@ -86,7 +86,7 @@ const formatOrderDate = (isoDate) => {
         <h1 className="text-3xl font-bold text-gray-900 mb-8">My Orders</h1>
         <div className="space-y-6  ">
           {orders.map((order,index) => (
-            <Card onClick={()=>navigate(`/orders/${order?.orderId}`)} key={order.orderId} className="overflow-hidden hover:shadow-lg transition-shadow duration-300 ">
+            <Card  key={order.orderId} className="overflow-hidden hover:shadow-lg transition-shadow duration-300 ">
               <CardContent className="p-6">
                 <div className="flex justify-between items-center mb-4">
                   <div>
@@ -95,7 +95,7 @@ const formatOrderDate = (isoDate) => {
                   </div>
                   <Badge  className={`${getStatusColor(order.status)} hover:${getStatusColor(order.status)}  text-white`}>{order.status}</Badge>
                 </div>
-                <div className="flex items-center mb-4">
+                <div onClick={()=>navigate(`/orders/${order?.orderId}`,{state:{from:"user"}})} className="flex items-center mb-4">
                   {order.items.slice(0, 3).map((item, index) => (
                     <div className='relative'>
                       <div key={item?._id} className={`relative rounded-full overflow-hidden border-2 border-white w-16 h-16 ${index !== 0 ? '-ml-4' : ''}`} style={{zIndex: 3 - index}}>

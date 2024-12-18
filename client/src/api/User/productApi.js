@@ -1,8 +1,8 @@
 import { axiosInstance } from "../axiosInstance";
 
-export const getProducts = async(sort)=>{
+export const getProducts = async(sort,limit,currentPage,category,fit,sleeves,searchQuery)=>{
     try{
-        const response = await axiosInstance(`/users/products?sort=${sort}`)
+        const response = await axiosInstance(`/users/products?limit=${limit}&sort=${sort}&currentPage=${currentPage}&category=${category}&fit=${fit}&sleeves=${sleeves}&searchQuery=${searchQuery}`)
         return response.data
     }
     catch(error)

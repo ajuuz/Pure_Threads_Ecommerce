@@ -144,7 +144,7 @@ const ProductDetailPage = () => {
         <h3 className='text-center font-medium text-xl'>You may also like</h3>
         <div className="card-container flex gap-5 justify-center overflow-x-auto  pt-4 pb-10 rounded-xl">
               {relatedProducts.map((product) => (
-              <Card key={product?._id} title={product?.name} price={product?.salesPrice} image1={product?.images[0].url} withDescription={true}  onClick={() => alert(`You clicked on `)} />
+              <Card key={product?._id} product={product} image1={product?.images[0].url} withDescription={true}  onClick={() => alert(`You clicked on `)} />
               ))}
            </div>
     </section>

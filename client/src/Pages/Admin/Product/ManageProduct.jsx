@@ -140,6 +140,7 @@ useEffect(()=>{
   }
 
   const handleSubmit=async()=>{
+    
     const validation = validateOtherForms(formData);
         if(Object.values(validation).length>0)
             {
@@ -149,6 +150,11 @@ useEffect(()=>{
                   return;
                 }
             }
+        if(croppedImage.filter(Boolean).length<3)
+          {
+            reactToastify.error("minimum three images needed to upload",{className: "custom-toast",progressClassName: "custom-progress-bar"})
+            return
+          }
     setLoading(true)
     if(id)
     {
@@ -176,7 +182,6 @@ useEffect(()=>{
     else{
 
       try{
-        console.log(croppedImage)
         const response = await formDatasubmission(croppedImage,formData,"products")
         toast.success(response.message)
         navigate('/admin/products')
@@ -235,7 +240,7 @@ useEffect(()=>{
               <SelectContent>
                 <SelectItem value="full">Full Sleeves</SelectItem>
                 <SelectItem value="half">Half sleeves</SelectItem>
-                <SelectItem value="three">half</SelectItem>
+                <SelectItem value="elbow">Elbow sleeves</SelectItem>
               </SelectContent>
             </Select>
           </div>

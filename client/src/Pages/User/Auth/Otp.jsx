@@ -35,6 +35,7 @@ const Otp = () => {
 
     const location = useLocation()
     const email = location.state?.email || null;//accessing the passed email
+    const from = location.from || null
     const navigate = useNavigate()
 
     // TIMER RUNNING FOR RESEND OTP
@@ -86,7 +87,11 @@ const Otp = () => {
             {
                 toast.success(response.message);
                 localStorage.removeItem('count')
-                navigate('/login')
+                if(from==="signup"){
+                    navigate('/login')
+                }else{
+                    navigate('/forgotChangePassword')
+                }
             }
             setLoading(false)
         }

@@ -1,11 +1,10 @@
 import productDB from "../../Models/productSchema.js";
-import { errorHandler } from "../../utils/error.js";
+import { errorHandler } from "../../utils/error.js";0
 
 export const addProduct = async (req, res,next) => {
   const {name,description,regularPrice,isActive,category,
     sleeves,S,M,L,XL,XXL,fit,color,sizeOfModel,washCare,
     additionalInfo,imageURLs} = req.body;
-
     try{
         const newProduct = await new productDB({
             name,

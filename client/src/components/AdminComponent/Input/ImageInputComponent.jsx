@@ -90,7 +90,7 @@ const ImageInputComponent = ({ImagesFields,handleImageChange,croppedImage,setCro
 
             {index >2 &&
               <div onClick={()=>handleRemoveImageInput(index)} className="border-2  border-gray-600 p-1 rounded-3xl bg-black w-6 h-6 items-center ms-auto flex justify-center">
-             <ImCross className="text-white text-[10px]"/>
+             <ImCross className="text-white  text-[10px]"/>
               </div>}
             
               {croppedImage[index] ? (
