@@ -59,7 +59,7 @@ const Signup = () => {
                     console.log(formData.email)
                     toast.success(response.message)
                     localStorage.removeItem('count')
-                    navigate('/signup/otp',{state:{email:formData.email,from:"signup"}})
+                    navigate('/otp',{state:{email:formData.email,from:"signup"}})
                     setLoading(false)
                 }
             }

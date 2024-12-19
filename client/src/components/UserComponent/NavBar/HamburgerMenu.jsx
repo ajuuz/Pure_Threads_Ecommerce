@@ -11,6 +11,8 @@ import {
     AccordionTrigger,
   } from "@/components/ui/accordion"
 
+import { motion } from 'framer-motion';
+
 //   icons
   import { IoIosArrowBack } from "react-icons/io";
 import { useNavigate } from 'react-router-dom';
@@ -42,7 +44,13 @@ const HamburgerMenu = ({setIsHamburger}) => {
     }
 
   return (
-    <div className='hamburgerMenu border-4  bg-white left-2 top-8 absolute shadow-xl font-medium flex flex-col  px-10 py-5 min-h-[94vh] rounded-xl'>
+    <motion.div 
+    className='hamburgerMenu border-4  bg-white left-2 top-8 absolute shadow-xl font-medium flex flex-col  px-10 py-5 min-h-[94vh] rounded-xl' 
+    initial={{ x: "-40vw" }}
+    animate={{ x: 0 }}
+    exit={{ x: "-100vw" }}
+    transition={{ type: "spring", stiffness: 50 }}
+    >
       <div className='font-mono font-extrabold text-2xl mb-6 flex items-center me-5 relative right-8 gap-2'><IoIosArrowBack onClick={()=>setIsHamburger(false)} className='cursor-pointer'/>PURE THREADS</div>
       <div className='pb-6 text-sm'>CONTACT</div>
       <div className='pb-6 text-sm'>ABOUT</div>
@@ -78,7 +86,7 @@ const HamburgerMenu = ({setIsHamburger}) => {
         </Accordion>
      </div>
      
-    </div>
+    </motion.div>
   )
 }
 

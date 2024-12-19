@@ -1,7 +1,7 @@
 import express from 'express';
 // import UsersDB from '../Models/Schema.js';
 
-import { generateOtp,verifyLogin,verifyOtp,resendOtp, googleAuth, logout, forgotPassword,forgotChangePassword } from '../Controllers/UserController/authController.js';
+import { generateOtp,verifyLogin,verifyOtp,resendOtp, googleAuth, logout,forgotChangePassword, forgotVerifyEmail } from '../Controllers/UserController/authController.js';
 import { getCategories } from '../Controllers/UserController/categoryController.js';
 import { getParticularProduct, getProducts, getRelatedProduct } from '../Controllers/UserController/ProductController.js';
 import { verifyUser } from '../Middlewares/userAuthMiddleware.js';
@@ -21,7 +21,7 @@ router.post('/login',verifyLogin) //USER LOGIN
 router.post('/resendOtp',resendOtp) //USER RESEND OTP
 router.post('/googleLogin',googleAuth)
 router.post('/logout',logout)
-router.post('/forgotPassword',forgotPassword)
+router.post('/forgotPassword',forgotVerifyEmail)
 router.patch('/forgotPassword',forgotChangePassword)
 
 // categories
@@ -31,7 +31,6 @@ router.get('/categories',getCategories)
 router.get('/products',getProducts)
 router.get('/products/:id',getParticularProduct)
 router.get('/products/category/:catId',getRelatedProduct)
-// router.get('/getProducts',getProductss)
 
 router.get('/',verifyUser,verifyUserBlocked,getUserProfile)
 router.put('/',verifyUser,verifyUserBlocked,updateUserProfile)

@@ -80,7 +80,7 @@ export const logout = async()=>{
 }
 
 
-export const forgotPassword=async(email)=>{
+export const forgotVerifyEmail=async(email)=>{
     try{
         console.log("working")
         const response  = await axiosInstance.post('/users/forgotPassword',{email})
@@ -91,9 +91,9 @@ export const forgotPassword=async(email)=>{
     }
 }
 
-export  const forgotChangePassword=async(email,password)=>{
+export  const forgotChangePassword=async(email,newPassword)=>{
     try{
-        const response = await axiosInstance.patch('/users/forgotPassword',{email,password})
+        const response = await axiosInstance.patch('/users/forgotPassword',{email,newPassword})
         return response.data
     }catch(error){
         throw error?.response.data && {...error?.response.data,statusCode:error.status} || error

@@ -16,18 +16,11 @@ import crypto from "crypto";
 // importing custom error handling function for handling errors
 import { errorHandler } from "../../utils/error.js";
 
-import jwt from 'jsonwebtoken'
 import { generateUserAccessToken } from "../../utils/jwtTokens/accessToken.js";
 import { generateUserRefreshToken } from "../../utils/jwtTokens/refreshToken.js";
-import { refreshTokenDecoder } from "../../utils/jwtTokens/decodeRefreshToken.js";
-// initializing transporter for sending mail
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.email,
-    pass: process.env.pass,
-  },
-});
+import { otpSender } from "../../utils/otpSender.js";
+
+
 
 
 // route for verifying email
@@ -41,9 +34,8 @@ export const generateOtp = async (req, res, next) => {
     if(userExists) return next(errorHandler(409,'Email already exists. Please use a different email.'))
 
 
-    // if user already has not expired otp . then to navigate to otp verify page
-    const userWithOtp = await otpDB.findOne({email})
-    if(userWithOtp) return res.status(200).json({success:true,message:"already send your otp. please check"})
+    // if user already has not expired otp . then delete and create one
+    await otpDB.deleteOne({email})
 
     const otp = crypto.randomInt(10000, 99999);
     const otpData = new otpDB({
@@ -57,26 +49,9 @@ export const generateOtp = async (req, res, next) => {
       otp,
       createdAt: Date.now(),
     });
-
     await otpData.save();
     
-    // Send OTP to the user's email
-    const mailOptions = {
-      from: "pure threads", // Sender's email
-      to: email,
-      subject: "Your OTP for Signup",
-      text: `Your OTP code for signup is: ${otp}`,
-    };
-    
-    // Sending the email with the OTP
-    transporter.sendMail(mailOptions, (err, info) => {
-        if (err) {
-            console.log(err);
-            return next(errorHandler(500,"Failed to send OTP" ))
-        }
-        // Return success message with an OTP sent notification
-        res.status(200).json({success: true,message: "OTP sent to your given email. Please verify."});
-    });
+    await otpSender(email,otp,res,next)
 
     // expire otp
     setTimeout(async()=>{
@@ -99,12 +74,15 @@ export const verifyOtp = async (req, res,next) => {
   try {
     const document = await otpDB.findOne({ email });
     if (document.otp == otp) {
-      if (!document.FormData) {
-        return next(errorHandler(400,"Form data is missing. Cannot create user."))
+      if (document.FormData) {
+        const newUser = new UsersDB(document.FormData);
+        await newUser.save();
+        res.status(201).json({ success: true, message: "new account created successfully" });
       }
-      const newUser = new UsersDB(document.FormData);
-      await newUser.save();
-      res.status(201).json({ success: true, message: "new account created successfully" });
+      else{
+        res.status(201).json({ success: true, message: "You can now change password" });
+      }
+      await otpDB.deleteOne({email})
     } else {
       return next(errorHandler(401,"otp is incorrect.please try again"))
     }
@@ -140,33 +118,15 @@ export const verifyLogin = async (req, res,next) => {
 
 
 // resend otp
-export const resendOtp = async (req,res)=>{
+export const resendOtp = async (req,res,next)=>{
     const {email} = req.body;
     try{
         const otp = crypto.randomInt(10000, 99999);
         const updatedOtp = await otpDB.updateOne({email},{$set:{otp:otp}})
-        console.log(updatedOtp)
 
-       
-
-        if(!updatedOtp.modifiedCount) return  res.status(404).json({success:false,message:"session has been expired",sessionExpires:true})
-        // Send OTP to the user's email
-    const mailOptions = {
-        from: "pure threads", // Sender's email
-        to: email,
-        subject: "Your OTP for Signup",
-        text: `Your OTP code for signup is: ${otp}`,
-      };
-  
-      // Sending the email with the OTP
-      transporter.sendMail(mailOptions, (err, info) => {
-        if (err) {
-          console.log(err);
-          return next(errorHandler(500,"Failed to send OTP" ))
-        }
-        // Return success message with an OTP sent notification
-        res.status(200).json({success: true,message: "OTP sent to your email. Please verify.",});
-      });
+      if(!updatedOtp.modifiedCount) return  res.status(404).json({success:false,message:"session has been expired",sessionExpires:true})
+    
+      await otpSender(email,otp,res,next)
 
        // expire otp
       setTimeout(async()=>{
@@ -229,7 +189,7 @@ export const logout = async(req,res,next)=>{
 }
 
 
-export const forgotPassword = async(req,res,next)=>{
+export const forgotVerifyEmail = async(req,res,next)=>{
   const {email} = req.body;
   console.log(email)
   if(!email) return next(errorHandler(400,"email doesnt recieved"))
@@ -237,9 +197,8 @@ export const forgotPassword = async(req,res,next)=>{
     const user = await UsersDB.findOne({email})
     if(!user) return next(errorHandler(404,"user not found. Please check your email"));
 
-     // if user already has not expired otp . then to navigate to otp verify page
-     const userWithOtp = await otpDB.findOne({email})
-     if(userWithOtp) return res.status(200).json({success:true,message:"already send your otp. please check"})
+  // if user already has not expired otp . then delete and create one
+  await otpDB.deleteOne({email})
  
      const otp = crypto.randomInt(10000, 99999);
      const otpData = new otpDB({
@@ -247,26 +206,9 @@ export const forgotPassword = async(req,res,next)=>{
        otp,
        createdAt: Date.now(),
      });
- 
      await otpData.save();
      
-     // Send OTP to the user's email
-     const mailOptions = {
-       from: "pure threads", // Sender's email
-       to: email,
-       subject: "Your OTP for Signup",
-       text: `Your OTP code for changing password is: ${otp}`,
-     };
-     
-     // Sending the email with the OTP
-     transporter.sendMail(mailOptions, (err, info) => {
-         if (err) {
-             console.log(err);
-             return next(errorHandler(500,"Failed to send OTP" ))
-         }
-         // Return success message with an OTP sent notification
-         res.status(200).json({success: true,message: "OTP sent to your given email. Please verify."});
-     });
+     await otpSender(email,otp,res,next)
  
      // expire otp
      setTimeout(async()=>{
@@ -281,8 +223,9 @@ export const forgotPassword = async(req,res,next)=>{
 }
 
 export const forgotChangePassword=async(req,res,next)=>{
-
+console.log("working")
   const {email,newPassword} = req.body;
+  console.log(email,newPassword)
   try{
     const hashedPassword = bcrypt.hashSync(newPassword, 10);
     const updatedPassword  = await UsersDB.updateOne({email},{$set:{password:hashedPassword}})

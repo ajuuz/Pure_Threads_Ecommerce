@@ -18,9 +18,8 @@ import Cart from '@/Pages/User/Cart/Cart';
 import CheckOut from '@/Pages/User/CheckOut/CheckOut';
 import Orders from '@/Pages/User/Profile/Orders/Orders';
 import OrderDetail from '@/Pages/User/Profile/Orders/OrderDetail';
-import ForgotPassword from '@/Pages/User/Auth/ForgotPassword';
-import ForgotChangePassword from '@/Pages/User/Auth/ForgotChangePassword';
-
+import VerifyEmail from '@/Pages/User/Auth/ForgotPassword/VerifyEmail';
+import ChangePassword from '@/Pages/User/Auth/ForgotPassword/ChangePassword';
 
 const UserRoute = () => {
   return (
@@ -28,9 +27,9 @@ const UserRoute = () => {
     <Routes>
         <Route path='/login' element={<UserLoginPrivate><Login/></UserLoginPrivate>}/>
         <Route path='/signup' element={<UserLoginPrivate><Signup/></UserLoginPrivate>}/>
-        <Route path='/signup/otp' element={<Otp/>}/>
-        <Route path="/forgotPassword" element={<ForgotPassword/>}/>
-        <Route path="/forgotChangePassword" element={<ForgotChangePassword/>}/>
+        <Route path='/otp' element={<Otp/>}/>
+        <Route path="/forgot/verifyEmail" element={<VerifyEmail/>}/>
+        <Route path="/forgot/changePassword" element={<ChangePassword/>}/>
         <Route path='/' element={<LandingPage/>}/>
         <Route path='/shop' element={<ShopPage/>}/>
         <Route path='/products/:productId' element={<ProductDetailPage/>}/>

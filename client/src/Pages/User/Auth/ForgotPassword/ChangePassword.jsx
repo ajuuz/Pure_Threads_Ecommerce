@@ -1,5 +1,5 @@
 import React from 'react'
-import './auth.css'
+import '../auth.css'
 // shadcn component
 import { Button } from '@/components/ui/button';
 
@@ -7,27 +7,28 @@ import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 
 // importing api's function
-import { forgotChangePassword, forgotPassword, } from '@/api/User/authApi';
+import { forgotChangePassword } from '@/api/User/authApi';
 
-
-
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useAsyncError, useLocation, useNavigate } from 'react-router-dom';
 
 // implementing toast for messages
 import { toast } from 'sonner';
 import {toast as reactToastify} from "react-toastify"
 
 
-const ForgotChangePassword = () => {
+const ChangePassword = () => {
 
 const [formData,setFormData] = useState({
   newPassword:"",
   confirmPassword:""
 })
+const [loading,setLoading] = useState(false)
+
 
 const location = useLocation()
-const {email} = location.state
-
+const email = location.state?.email||{}
+console.log(location.state)
+console.log(email)
 // for navigating to landing page
 const navigate = useNavigate()
 
@@ -39,9 +40,12 @@ const handleInputChange=(e)=>{
 
 const handleSubmitForm=async(e)=>{
   e.preventDefault();
-    if(formData.newPassword!=formData.confirmPassword) return reactToastify.error("new and confirm password should be same")
+
+  if(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(formData.newPassword)===false) return reactToastify.error("At least 8 characters, includes uppercase, lowercase, digit, and special character.")
+  else if(formData.newPassword!=formData.confirmPassword) return reactToastify.error("new and confirm password should be same")
+
     try{
-     const response = await forgotChangePassword(email,newPassword);
+     const response = await forgotChangePassword(email,formData.newPassword);
      console.log(response);
      toast.success(response.message);
      navigate('/login')
@@ -71,7 +75,7 @@ const handleSubmitForm=async(e)=>{
                 <input className='py-2 px-4 w-[300px] mt-1 border rounded-sm border-gray-200 auth-inputs' type="password"  name='confirmPassword' onChange={(e)=>handleInputChange(e)} required/>
             </div>
             
-            <Button onClick={handleSubmitForm}>Change Password</Button>
+            <Button  onClick={handleSubmitForm}>Change Password</Button>
         </form>
       </div>
     </div>
@@ -79,4 +83,4 @@ const handleSubmitForm=async(e)=>{
   )
 }
 
-export default ForgotChangePassword
+export default ChangePassword

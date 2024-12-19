@@ -15,7 +15,7 @@ import { resendOtp,verifyOtp } from '@/api/User/authApi.js';
 const Otp = () => {
 
     const [timer,setTimer]=useState(()=>{
-        const storedCount = localStorage.getItem('count');
+    const storedCount = localStorage.getItem('count');
     return storedCount ? parseInt(storedCount) : 60;
     });
 
@@ -33,117 +33,112 @@ const Otp = () => {
     )
 
 
-    const location = useLocation()
-    const email = location.state?.email || null;//accessing the passed email
-    const from = location.from || null
-    const navigate = useNavigate()
-
-    // TIMER RUNNING FOR RESEND OTP
-        useEffect(()=>{
-          const timerInterval =  setInterval(()=>{
-            setTimer((prev)=>{
-                if(prev<=1)
-                {
-                    clearInterval(timerInterval);
-                    return 0;
-                }
-                return prev-1;
-            })
-           },1000)
-           return () => clearInterval(timerInterval); // Cleanup interval on unmount
-        },[otpSend])
-
-        useEffect(()=>{
-            localStorage.setItem('count',timer)
-        },[timer])
-
-        useEffect(()=>{
-                if(!email)navigate('/signup')
-        },[])
-    
-    // function for seting otp value in state and change foucus of input for each input field
-    const OtpInputChange=(e)=>{
-              
-        if(e.target.value && e.target.name < 4)
-            {
-                document.getElementById(`${Number(e.target.name)+1}`).focus()
-            }
-            else{
-                document.getElementById(`${Number(e.target.name)-1}`).focus()
-        }
-            setOtp({
-                ...otp,
-                [e.target.name]:e.target.value
-            })
-        }
-
-    // SUBMIT BUTTON FOR OTP VERIFICATION
-    const handleOtpSubmit=async()=>{
-        try{
-            setLoading(true)
-            const response = await verifyOtp({email:email,otp:`${otp[0]+otp[1]+otp[2]+otp[3]+otp[4]}`})
-            console.log(response)
-            if(response.success)
-            {
-                toast.success(response.message);
-                localStorage.removeItem('count')
-                if(from==="signup"){
-                    navigate('/login')
-                }else{
-                    navigate('/forgotChangePassword')
-                }
-            }
-            setLoading(false)
-        }
-        catch(error)
+const location = useLocation()
+const email = location.state?.email || null;//accessing the passed email
+const from = location.state?.from || null
+const navigate = useNavigate()
+// TIMER RUNNING FOR RESEND OTP
+useEffect(()=>{
+  const timerInterval =  setInterval(()=>{
+    setTimer((prev)=>{
+        if(prev<=1)
         {
-            if(error.sessionExpires)
-                {
-                    console.log("session expires not verified",error.message)
-                    toast.error(error.message)
-                    navigate('/signup')
-                }
-                else
-                {    
-            console.log("verifiying otp error",error.message)
-            toast.error(error.message)
-                }
-                setLoading(false)
+            clearInterval(timerInterval);
+            return 0;
         }
+        return prev-1;
+    })
+   },1000)
+   return () => clearInterval(timerInterval); // Cleanup interval on unmount
+},[otpSend])
+
+useEffect(()=>{localStorage.setItem('count',timer)},[timer])
+
+useEffect(()=>{if(!email)navigate('/signup')},[])
+    
+// function for seting otp value in state and change foucus of input for each input field
+const OtpInputChange=(e)=>{
+          
+    if(e.target.value && e.target.name < 4)
+        {
+            document.getElementById(`${Number(e.target.name)+1}`).focus()
+        }
+        else{
+            document.getElementById(`${Number(e.target.name)-1}`).focus()
+    }
+        setOtp({
+            ...otp,
+            [e.target.name]:e.target.value
+        })
     }
 
-    // RESEND FUNCTION FOR RESENDING OTP
-    const handleResendOtp=async()=>{
-        
-        try{
-            setLoading(true)
-            const response = await resendOtp({email:email});
-            console.log(response)
-            toast.success(response.message)
-            setOtp({
-            '0':null,
-            '1':null,
-            '2':null,
-            '3':null,
-            '4':null,})
-            setOtpSend(!otpSend)
-            setTimer(60)
-            setLoading(false)
+// SUBMIT BUTTON FOR OTP VERIFICATION
+const handleOtpSubmit=async()=>{
+    try{
+        setLoading(true)
+        const response = await verifyOtp({email:email,otp:`${otp[0]+otp[1]+otp[2]+otp[3]+otp[4]}`})
+        console.log(response)
+        if(response.success)
+        {
+            toast.success(response.message);
+            localStorage.removeItem('count')
+            if(from==="signup"){
+                navigate('/login')
+            }else{
+                navigate('/forgot/changePassword',{state:{email}})
+            }
         }
-        catch(error){
-            if(error.sessionExpires)
-                {
-                    console.log("session expires no resend",error.message)
+        setLoading(false)
+    }
+    catch(error)
+    {
+        if(error.sessionExpires)
+            {
+                console.log("session expires not verified",error.message)
                 toast.error(error.message)
                 navigate('/signup')
             }
-            else{
-                console.log("resend otp error",error.message)
-                toast.error(error.message)
+            else
+            {    
+        console.log("verifiying otp error",error.message)
+        toast.error(error.message)
             }
             setLoading(false)
-        }
     }
+}
+
+    // RESEND FUNCTION FOR RESENDING OTP
+const handleResendOtp=async()=>{
+    
+    try{
+        setLoading(true)
+        const response = await resendOtp({email:email});
+        console.log(response)
+        toast.success(response.message)
+        setOtp({
+        '0':null,
+        '1':null,
+        '2':null,
+        '3':null,
+        '4':null,})
+        setOtpSend(!otpSend)
+        setTimer(60)
+        setLoading(false)
+    }
+    catch(error){
+        if(error.sessionExpires)
+            {
+                console.log("session expires no resend",error.message)
+            toast.error(error.message)
+            navigate('/signup')
+        }
+        else{
+            console.log("resend otp error",error.message)
+            toast.error(error.message)
+        }
+        setLoading(false)
+    }
+}
 
 
 
