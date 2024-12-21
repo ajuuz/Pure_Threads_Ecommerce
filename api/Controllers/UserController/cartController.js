@@ -8,7 +8,7 @@ export const selectSizeForProduct = async(req,res,next)=>{
     const {productId,sizeIndex} = req.body
     try{
         const productDetails = await productDB.findOne({_id:productId});
-        if(productDetails?.size[sizeIndex]?.stock<1) return next(errorHandler(422,"Sorry, the selected size is currently out of stock"))//unprocessable entity
+        if(productDetails?.sizes[sizeIndex]?.stock<1) return next(errorHandler(422,"Sorry, the selected size is currently out of stock"))//unprocessable entity
         return res.status(200).json({success:true,message:"size selected successfully"})
     }
     catch(error)
@@ -27,7 +27,7 @@ export const addToCart = async(req,res,next)=>{
 
         const productDetails = await productDB.findOne({_id:productId});
         if(!productDetails) return next(errorHandler(404,"product not found"))
-        if(productDetails?.size[sizeIndex]?.stock<1) return next(errorHandler(422,"Sorry, the selected size is currently out of stock"))//unprocessable entity
+        if(productDetails?.sizes[sizeIndex]?.stock<1) return next(errorHandler(422,"Sorry, the selected size is currently out of stock"))//unprocessable entity
 
         const  cart = await cartDB.findOne({userId})
         if(!cart)
@@ -36,7 +36,7 @@ export const addToCart = async(req,res,next)=>{
                 userId,
                 items:[{
                     product:productId,
-                    size:productDetails?.size[sizeIndex]?.size,
+                    size:productDetails?.sizes[sizeIndex]?.size,
                     quantity:1
                 }]
             })
@@ -45,18 +45,18 @@ export const addToCart = async(req,res,next)=>{
         }
         else
         {
-            const existingProduct = cart?.items?.find((item)=>item?.product?.toString()===productId && item?.size===productDetails?.size[sizeIndex]?.size)
+            const existingProduct = cart?.items?.find((item)=>item?.product?.toString()===productId && item?.size===productDetails?.sizes[sizeIndex]?.size)
             if(existingProduct)
             {
                 if(existingProduct.quantity<=5)
                 {
-                    const addQuantity = await cartDB.updateOne({userId,"items.product":productId,"items.size":productDetails?.size[sizeIndex]?.size},{$inc:{"items.$[item].quantity":1}},{arrayFilters:[{"item.product":productId,"item.size":productDetails?.size[sizeIndex]?.size}]})
+                    const addQuantity = await cartDB.updateOne({userId,"items.product":productId,"items.size":productDetails?.sizes[sizeIndex]?.size},{$inc:{"items.$[item].quantity":1}},{arrayFilters:[{"item.product":productId,"item.size":productDetails?.sizes[sizeIndex]?.size}]})
                     if(!addQuantity.modifiedCount) return next(errorHandler(404,"product not found in the cart"))
                     return res.status(200).json({success:true,message:"one more added successfully to the cart"})
                 }
             }
             else{
-                const addNewProduct = await cartDB.updateOne({userId},{$push:{items:{product:productId,size:productDetails?.size[sizeIndex]?.size,quantity:1}}})
+                const addNewProduct = await cartDB.updateOne({userId},{$push:{items:{product:productId,size:productDetails?.sizes[sizeIndex]?.size,quantity:1}}})
                 if(!addNewProduct.modifiedCount) return next(errorHandler(404,"cart not found in the cart"));
                 return res.status(200).json({success:"true",message:"Added to Cart"})
             }

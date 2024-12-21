@@ -2,32 +2,10 @@ import productDB from "../../Models/productSchema.js";
 import { errorHandler } from "../../utils/error.js";0
 
 export const addProduct = async (req, res,next) => {
-  const {name,description,regularPrice,isActive,category,
-    sleeves,S,M,L,XL,XXL,fit,color,sizeOfModel,washCare,
-    additionalInfo,imageURLs} = req.body;
+    const formData = req.body;
+    const data = {...formData,images:formData.imageURLs,salesPrice:formData.regularPrice}
     try{
-        const newProduct = await new productDB({
-            name,
-            description,
-            regularPrice,
-            salesPrice:regularPrice,
-            isActive,
-            images:imageURLs,
-            category,
-            sleeves,
-            fit,
-            size : [
-                { size: "S", stock: S },
-                { size: "M", stock: M },
-                { size: "L", stock: L },
-                { size: "XL", stock: XL },
-                { size: "XXL", stock: XXL },
-              ],
-              color,
-              sizeOfModel,
-              washCare,
-            additionalInfo,
-        })
+        const newProduct = await new productDB(data)
         await newProduct.save();
         res.status(201).json({success:true,message:"new product added successfully"});
     }
@@ -61,14 +39,14 @@ export const getParticularProduct = async(req,res,next)=>{
     try{
         const productDetails = await productDB.findOne({_id:id})
         if(!productDetails) return next(errorHandler(404,"product not found"))
-        
-        const {size,...rest} = productDetails.toObject()
+        console.log(productDetails)
+        const {sizes,...rest} = productDetails.toObject()
         const sizeObj={
-            "S":size[0].stock,
-            "M":size[1].stock,
-            "L":size[2].stock,
-            "XL":size[3].stock,
-            "XXL":size[4].stock,
+            "S":sizes[0].stock,
+            "M":sizes[1].stock,
+            "L":sizes[2].stock,
+            "XL":sizes[3].stock,
+            "XXL":sizes[4].stock,
         }
         return res.status(200).json({success:true,message:"product fetched successfully",product:{...rest,...sizeObj}})
     }
@@ -88,7 +66,6 @@ export const editEntireProduct=async(req,res,next)=>{
     const id = req.params.id;
     try{
         const {formData,imageURLsWithIndexes} = req.body;
-        console.log(formData)
         const updatedProduct = await productDB.updateOne({_id:id},{$set:formData},{ runValidators: true } )
         if(imageURLsWithIndexes.length>0)
         {
@@ -98,17 +75,16 @@ export const editEntireProduct=async(req,res,next)=>{
                 await productDB.updateOne({_id:id},{$set:{[updatedField]:imageURL}})
             }
         }
-        
         if (updatedProduct.nModified === 0) return next(errorHandler(400,"No changes made"));
         return res.status(200).json({ success:true,message: "product updated successfully" });
     }
     catch(error)
     {
         if(Object.values(error.errors)[0].properties.type==="min")
-            {
-               return next(errorHandler(500,"stock cannot be less than zero (0)"))
-            }
-        next(errorHandler(500,"something went wrong during gettting products"))
+        {
+           return next(errorHandler(500,"stock cannot be less than zero (0)"))
+        }
+       return next(errorHandler(500,"something went wrong during gettting products"))
     }
 }
 

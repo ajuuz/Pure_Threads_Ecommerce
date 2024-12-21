@@ -7,7 +7,7 @@ export const validateProduct =async(req,res,next)=>{
         const userId = refreshTokenDecoder(req);
         const cart = await cartDB.findOne({userId}).populate({path:'items.product',populate:{path:'category',select:'name -_id'}})
         cart.items.forEach((item)=>{
-        const sizeObject = item?.product?.size.find(x=>x.size===item?.size)
+        const sizeObject = item?.product?.sizes.find(x=>x.size===item?.size)
              if(!item?.product?.isActive)
             {
               return next(errorHandler(400,"some of your cart item is currently unavailable"))

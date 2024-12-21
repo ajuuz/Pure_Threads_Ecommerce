@@ -62,17 +62,18 @@ const CheckOut = () => {
 const handlePlaceOrder=async()=>{
   try{
     const fetchCartProductsResult = await fetchCartProducts();
-      
+    
     if(fetchCartProductsResult.isAvailableReducer.filter(Boolean).length!==0) {
       setIsAvailableProduct(fetchCartProductsResult.isAvailableReducer)
       return
     }
-
+    console.log("working")
+    
     if(paymentMethod==="cod")
-    {
-      const deliveryAddress = addresses[selectedAddressIndex]
-      const placeOrderResult = await placeOrder(paymentMethod,deliveryAddress)
-      if(placeOrderResult.success)
+      {
+        const deliveryAddress = addresses[selectedAddressIndex]
+        const placeOrderResult = await placeOrder(paymentMethod,deliveryAddress)
+        if(placeOrderResult.success)
       {
         setOrderSuccess(placeOrderResult.orderData)
         console.log(placeOrderResult.orderData)

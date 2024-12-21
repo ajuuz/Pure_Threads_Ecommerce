@@ -4,9 +4,8 @@ export const fetchCartProducts = async ()=>{
     try{
         const fetchCartProductsResult = await getCartProducts();
         const fetchedProductArray = fetchCartProductsResult?.cartProducts || []
-        console.log(fetchedProductArray)
         const isAvailableReducer = fetchedProductArray.reduce((acc,curr)=>{
-          const sizeObject = curr?.product?.size.find(item=>item.size===curr?.size)
+          const sizeObject = curr?.product?.sizes.find(item=>item.size===curr?.size)
            if(!curr?.product?.isActive)
           {
             acc.push("product is currently not available")

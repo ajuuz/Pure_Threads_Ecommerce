@@ -3,8 +3,8 @@ import { uploadImage,formSubmit } from '@/api/Admin/formSubmissionApi';
 
 export const formDatasubmission =async (images,formData,endPoint)=>{
         if(images.length===0){
-            console.log("please select an image");
-            toast.error("please select an image")
+            console.log("please select 3 image");
+            toast.error("please select 3 image")
             return
         }
 
@@ -21,7 +21,7 @@ export const formDatasubmission =async (images,formData,endPoint)=>{
             throw new Error(imageUploadResult.message || "Failed to upload image");
             return;
         }
-
+        console.log(imageUploadResult.data)
         const formDatasubmissionResult = await formSubmit(formData,imageUploadResult.data,endPoint);
         console.log(formDatasubmissionResult);
         return formDatasubmissionResult;

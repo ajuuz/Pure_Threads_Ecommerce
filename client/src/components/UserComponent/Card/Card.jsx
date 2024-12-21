@@ -7,7 +7,7 @@ const Card = ({image1,image2,product,withDescription,onCardClick}) => {
 
 
     const stockCalculator=()=>{
-       const stock = product?.size.reduce((acc,curr)=>acc+=curr.stock,0)
+       const stock = product?.sizes.reduce((acc,curr)=>acc+=curr.stock,0)
        if(stock===0) return "Out of Stock"
        if(stock<=5) return "Limited Stock"
        return null

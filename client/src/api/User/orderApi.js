@@ -2,6 +2,7 @@ import { axiosInstance } from "../axiosInstance";
 
 export const placeOrder = async(paymentMethod,deliveryAddress)=>{
     try{
+        console.log("working place order")
         const response = await axiosInstance.post('/users/orders',{paymentMethod,deliveryAddress})
         return response.data
     }

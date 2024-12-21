@@ -32,6 +32,7 @@ const ProductDetailPage = () => {
                 const productResult = await getParticularProduct(productId);
                 categoryId = productResult?.product?.category
                 setImages(productResult?.product?.images)
+                console.log(productResult?.product)
                 setProduct(productResult?.product)
 
                 const relatedProductResult = await getRelatedProducts(categoryId)
@@ -106,7 +107,7 @@ const ProductDetailPage = () => {
             <div>
                 <p>Select Size</p>
                 <div className='flex gap-4'>
-                    {product?.size.map((size,index)=>(
+                    {product?.sizes.map((size,index)=>(
                         <div onClick={()=>handleSelectSize(productId,index)} key={size?.size} className={`w-16 text-center py-2 border-2 rounded-md ${selectedSize===index && "bg-black text-white border-2 border-black"} ${size?.stock<1 && `bg-muted border-none text-muted-foreground`} `}>{size.size}</div>
                     ))}
                 </div>

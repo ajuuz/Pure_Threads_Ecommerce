@@ -25,9 +25,10 @@ const Product = () => {
         const response = await getProducts()
         const productDetails = response.data;
         console.log(productDetails)
-        const transformedProducts=productDetails.map((product,index)=>(
-          [product._id,[{name:"sno",value:index+1},{name:"image",value:product.images[0]?.url},{name:"name",value:product.name},{name:"category",value:product.category?.name},{name:"price",value:product.regularPrice},{name:"stock",value:product.size[0].stock+product.size[1].stock+product.size[2].stock+product.size[3].stock+product.size[4].stock},{name:"state",value:product.isActive},{name:"offer",value:product.offer}]]
-        ))
+        const transformedProducts=productDetails.map((product,index)=>{
+          let sumOfStock = product.sizes.reduce((acc,curr)=>acc+=curr.stock,0)
+         return [product._id,[{name:"sno",value:index+1},{name:"image",value:product?.images[0]?.url},{name:"name",value:product.name},{name:"category",value:product?.category?.name},{name:"price",value:product?.regularPrice},{name:"stock",value:sumOfStock},{name:"state",value:product?.isActive},{name:"offer",value:product?.offer}]]
+      })
         setProducts(transformedProducts)
       }
       fetchProducts();

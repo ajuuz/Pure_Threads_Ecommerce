@@ -5,6 +5,7 @@ import { errorHandler } from "../../utils/error.js";
 import { refreshTokenDecoder } from "../../utils/jwtTokens/decodeRefreshToken.js";
 
 export const placeOrder = async(req,res,next)=>{
+    console.log("working")
     const {paymentMethod,deliveryAddress} = req.body
     const userId = req.userId
     const items = req.cartItems.toObject()
@@ -29,12 +30,12 @@ export const placeOrder = async(req,res,next)=>{
             const productId = item.product._id;
             const quantityPurchased = item.quantity;
             const sizePurchased = item.size;
-            await productDB.updateOne({_id:productId},{$inc:{'size.$[s].stock':-quantityPurchased}},{arrayFilters:[{'s.size':sizePurchased}]},{ runValidators: true })
+            await productDB.updateOne({_id:productId},{$inc:{'sizes.$[s].stock':-quantityPurchased}},{arrayFilters:[{'s.size':sizePurchased}]},{ runValidators: true })
         }
             res.status(201).json({success:true,message:"order Placed Successfully",orderData:{orderId:newOrder.orderId,deliveryAddress,deliveryDate:newOrder.deliveryDate,totalAmount:newOrder.totalAmount,paymentMethod:newOrder.paymentMethod,createdAt:newOrder.createdAt}})
     }
     catch(error){
-        console.log(error.message)
+        console.log(error)
        return next(errorHandler(500,"something went wrong"))
     }
 }

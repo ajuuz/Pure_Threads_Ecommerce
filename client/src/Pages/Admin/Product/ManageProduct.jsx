@@ -140,7 +140,6 @@ useEffect(()=>{
   }
 
   const handleSubmit=async()=>{
-    
     const validation = validateOtherForms(formData);
         if(Object.values(validation).length>0)
             {
@@ -159,16 +158,15 @@ useEffect(()=>{
     if(id)
     {
       try{
+        // filtering only blob object discarding the image url that already exists and also matching with index
         const imagesNeededToUpload = croppedImage.map((image,index)=>({[index]:image})).filter((item) => Object.values(item)[0] instanceof Blob)
-        console.log(formData)
-        const updatedFormData = {...formData, size : [
+        const updatedFormData = {...formData, sizes : [
           { size: "S", stock: formData.S },
           { size: "M", stock: formData.M },
           { size: "L", stock: formData.L },
           { size: "XL", stock: formData.XL },
           { size: "XXL", stock: formData.XXL },
         ]}
-
         const response = await editEntireProduct(id,updatedFormData,imagesNeededToUpload);
         toast.success(response.message)
         navigate('/admin/products')
@@ -180,9 +178,15 @@ useEffect(()=>{
       setLoading(false)
     }
     else{
-
       try{
-        const response = await formDatasubmission(croppedImage,formData,"products")
+        const updatedFormData = {...formData, sizes : [
+          { size: "S", stock: formData.S },
+          { size: "M", stock: formData.M },
+          { size: "L", stock: formData.L },
+          { size: "XL", stock: formData.XL },
+          { size: "XXL", stock: formData.XXL },
+        ]}
+        const response = await formDatasubmission(croppedImage,updatedFormData,"products")
         toast.success(response.message)
         navigate('/admin/products')
       }
