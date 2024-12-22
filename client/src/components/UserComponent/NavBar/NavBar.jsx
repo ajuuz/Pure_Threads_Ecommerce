@@ -64,13 +64,13 @@ const NavBar = () => {
     <div className="bg-white text-black text-center shadow-inner shadow-slate-300">FLAT 20% OFF</div>
         {isHamburger && <HamburgerMenu setIsHamburger={setIsHamburger}/>}
     <nav className="bg-black text-white flex items-center justify-between px-8 py-4  w-full">
-      <div className="flex items-center gap-16">
+      <div className="flex items-end gap-4 md:gap-16 ">
             <div className="flex items-center gap-5">
                 <div className="cursor-pointer" onClick={()=>setIsHamburger(true)}><GiHamburgerMenu /></div>
                 <div className="logo font-mono font-extrabold md:text-2xl">PureThreads</div>
             </div>
-        <div className="hidden md:flex gap-5">
-            <span onClick={()=>navigate('/')} className="cursor-pointer">Home</span>
+        <div className="flex gap-5 md:mb-1">
+            <span onClick={()=>navigate('/')} className="hidden md:block cursor-pointer">Home</span>
             <span onClick={()=>navigate('/shop')} className="cursor-pointer">Sale</span>
            {!user && <span className="cursor-pointer"  onClick={()=>navigate('/login')}>SignUp</span>} 
         </div>
@@ -101,7 +101,7 @@ const NavBar = () => {
                 <RiAccountCircleLine />
                 <p>Profile</p>
               </div>
-              <div className="md:hidden flex items-center gap-4">
+              <div onClick={()=>navigate('/wishlist')} className="md:hidden flex items-center gap-4">
                 <FaRegHeart />
                 <p>wishlist</p>
                 </div>

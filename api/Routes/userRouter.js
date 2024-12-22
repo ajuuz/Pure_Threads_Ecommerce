@@ -11,6 +11,7 @@ import { verifyUserBlocked } from '../Middlewares/userBlockMiddleware.js';
 import { addToCart, getCartProducts, proceedToCheckout, selectSizeForProduct, updateCart } from '../Controllers/UserController/cartController.js';
 import { cancelOrder, getOrders, getParticularOrder, placeOrder } from '../Controllers/UserController/orderController.js';
 import { validateProduct } from '../Middlewares/productCheckerMiddleware.js';
+import { addToWishlist, getWishlistProducts, removeFromWishlist,  } from '../Controllers/UserController/wishlistController.js';
 const router = express.Router();
 
 
@@ -51,6 +52,11 @@ router.post('/cart',addToCart)
 router.get('/cart',getCartProducts)
 router.patch('/cart',updateCart);
 router.post('/proceedToCheckout',proceedToCheckout)
+
+//wishlist
+router.post('/wishlist/:productId',addToWishlist)
+router.get('/wishlist',getWishlistProducts)
+router.patch('/wishlist/:productId',removeFromWishlist)
 
 
 // order
