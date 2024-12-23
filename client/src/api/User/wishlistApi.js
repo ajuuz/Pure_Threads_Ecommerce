@@ -9,9 +9,13 @@ export const addToWishlist=async(productId)=>{
     }
 }
 
-export const getWishlistProducts =async()=>{
+export const getWishlistProducts =async(onlyIdNeeded)=>{
     try{
-        const response = await axiosInstance.get('/users/wishlist')
+        const response = await axiosInstance({
+            method:"GET",
+            url:'/users/wishlist',
+            params:{onlyIdNeeded}
+        })
         return response.data;
     }catch(error){
         throw error?.response.data && {...error?.response.data,statusCode:error.status} || error
@@ -20,7 +24,6 @@ export const getWishlistProducts =async()=>{
 
 export const removeFromWishlist = async(productId)=>{
     try{
-        console.log(productId)
         const response = await axiosInstance.patch(`/users/wishlist/${productId}`)
         return response.data
     }catch(error){

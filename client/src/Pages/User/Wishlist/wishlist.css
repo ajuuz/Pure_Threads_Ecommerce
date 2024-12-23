@@ -1,0 +1,21 @@
+.wishlist-card{
+    transition: transform 0.5s;
+   
+}
+
+.wishlist-trashBin{
+    transition: all 0.5s;
+}
+.wishlist-card:hover .wishlist-trashBin{
+    opacity: 1;
+}
+
+
+.wishlist-shadow {
+    transition: transform 0.5s, box-shadow 0.8s;
+    box-shadow: inset 200px 1px 900px rgba(34, 34, 34, 0.5);
+}
+
+.wishlist-shadow:hover{
+    box-shadow: inset 500px 0px 900px rgba(0, 0, 0, 0.2), 4px 5px 10px rgba(0, 0, 0, 0.2);
+}

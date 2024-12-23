@@ -85,7 +85,7 @@ const NavBar = () => {
         </div>
         <div className="flex gap-7 items-center">
            <div className="hidden md:flex gap-7">
-              <div className="cursor-pointer">
+              <div onClick={()=>navigate('/wishlist')} className="cursor-pointer">
                 <FaRegHeart />
               </div>
               <div onClick={()=>navigate('/cart')} className="cursor-pointer">

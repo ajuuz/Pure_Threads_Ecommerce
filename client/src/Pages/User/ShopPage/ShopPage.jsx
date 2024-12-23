@@ -31,6 +31,7 @@ const ShopPage = () => {
     sleeves:[]
   })
   const [selectedValue,setSelectedValue] = useState({label:"newest",sort:{createdAt:-1}})
+  const [sort,setSort] = useState({createdAt:1})
   const [refresh,setRefresh] = useState(false)
   const [wishlisted,setWishlisted] = useState([])
 
@@ -40,7 +41,7 @@ const ShopPage = () => {
    useEffect(()=>{
     const fetchProducts=async()=>{
         try{
-          const sortCriteria=JSON.stringify(selectedValue.sort)
+          const sortCriteria=JSON.stringify(sort)
           const limit=10
           const category = filterCheckBoxes.category;
           const fit = filterCheckBoxes.fit;
@@ -61,7 +62,8 @@ const ShopPage = () => {
    useEffect(()=>{
     const fetchWishlistedProducts=async()=>{
       try{
-      const fetchWishlistedProductsResult = await getWishlistProducts();
+        const onlyIdNeeded=true
+      const fetchWishlistedProductsResult = await getWishlistProducts(onlyIdNeeded);
       console.log(fetchWishlistedProductsResult.wishlist.items)
       setWishlisted(fetchWishlistedProductsResult.wishlist.items)
       }catch(error){
@@ -109,22 +111,42 @@ const handleFilterClick=()=>{
 
 const handleSort=(value)=>{
   setSelectedValue(value)
+  if(value==="newest")
+  {
+    setSort({ createdAt: -1 })
+  }
+  else if(value==="Price: Low to High")
+  {
+    setSort({ regularPrice: 1 })
+  }
+  else if(value==="Price: High to Low")
+  {
+    setSort({ regularPrice: -1 })
+  }
+  else if(value==="Aa-Zz")
+  {
+    setSort({ name: 1 })
+  }
+  else if(value==="Zz-Aa")
+  {
+    setSort({ name: -1 })
+  }
 }
 
   return (
-    <div className=" relative pt-[120px] pb-5 lg:ps-[350px]">
+    <div className=" relative pt-[120px] pb-5 lg:ps-[350px] pe-10">
       <NavBar />
-      <div className="flex justify-end py-1 pe-28">
+      <div className="flex justify-end py-1">
       <Select name="updateStatus" onValueChange={handleSort}>
       <SelectTrigger className="w-[180px]">
         <SelectValue placeholder={`sort by : ${selectedValue.label}`} />
       </SelectTrigger>
       <SelectContent>
-        <SelectItem value={{ label: "newest", sort: { createdAt: -1 } }}>Newest</SelectItem>
-        <SelectItem value={{ label: "Price: Low to High", sort: { regularPrice: 1 } }}>Price: Low to High</SelectItem>
-        <SelectItem value={{ label: "Price: High to Low", sort: { regularPrice: -1 } }}>Price: High to Low</SelectItem>
-        <SelectItem value={{ label: "Aa-Zz", sort: { name: 1 } }}>Aa-Zz</SelectItem>
-        <SelectItem value={{ label: "Zz-Aa", sort: { name: -1 } }}>Zz-Aa</SelectItem>
+        <SelectItem value="newest">Newest</SelectItem>
+        <SelectItem value="Price: Low to High">Price: Low to High</SelectItem>
+        <SelectItem value="Price: High to Low">Price: High to Low</SelectItem>
+        <SelectItem value="Aa-Zz">Aa-Zz</SelectItem>
+        <SelectItem value="Zz-Aa">Zz-Aa</SelectItem>
       </SelectContent>
     </Select>
       </div>
@@ -132,7 +154,7 @@ const handleSort=(value)=>{
         <aside className="border-2 hidden  lg:flex flex-col gap-1 fixed top-[100px] left-5 bg-white shadow-lg rounded-lg w-[300px] p-5">
            <FilterComponent handleSearchInput={handleSearchInput} handleFilterCheckBox={handleFilterCheckBox}  handleFilterClick={handleFilterClick}/>
         </aside>
-        <motion.div className="px-4 grid mx-auto grid-cols-2 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-5 md:gap-5  lg:gap-4 xl:gap-4" initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: "easeOut" }}>
+        <motion.div className=" grid mx-auto grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-5 md:gap-5  lg:gap-4 xl:gap-4" initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: "easeOut" }}>
               {products.map((product)=>(
                 <Card key={product?._id} image1={product?.images[0]?.url}  product={product} withDescription={true} onCardClick={()=>onCardClick(product?._id)} isWishlisted={wishlisted.includes(product._id)} setWishlisted={setWishlisted}/>
                ))}

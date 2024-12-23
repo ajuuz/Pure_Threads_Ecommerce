@@ -20,7 +20,6 @@ import { errorHandler } from "../../utils/error.js";
 export const getProducts = async(req,res,next)=>{
     const sortCriteria = JSON.parse(req.query.sort);
     const {limit,currentPage,category,fit,sleeves,searchQuery} = req.query;
-    console.log(searchQuery)
     try{
         const filter = {isActive:true}
         if(category.length>0){
