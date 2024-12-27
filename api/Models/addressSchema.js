@@ -50,7 +50,7 @@ const addressSchema = new mongoose.Schema({
 addressSchema.pre("updateOne", async function (next) {
     const update = this.getUpdate(); // Retrieves the update object
     const query = this.getQuery();  // Retrieves the filter/query object
-  
+    console.log(update)
     if (update && update.isDefault === true) {
         const docThatUpdate = await this.model.findOne(query); // Retrieves the document based on the query
         if (docThatUpdate) {

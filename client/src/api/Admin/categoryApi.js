@@ -30,11 +30,11 @@ export const getParticularCategory = async(id)=>{
     }
 }
 
-export const editCategory=async(id)=>{
+export const editCategory=async(categoryId)=>{
     try{
         const response = await axiosInstance({
             method:'PATCH',
-            url:`admin/categories?id=${id}`
+            url:`admin/categories/${categoryId}`
         })
         console.log(response.data)
         return response.data;
@@ -76,6 +76,20 @@ export const editEntireCategory=async(id,formData,imagesNeededToUpload)=>{
     }
     catch(error)
     {
+        throw error?.response.data || error;
+    }
+}
+
+export const updateCategoryOffer=async(categoryId,offerValue,offerType)=>{
+    try{
+        const response = await axiosInstance({
+            method:"PATCH",
+            url:`admin/categories/${categoryId}`,
+            data:{offerValue,offerType}
+        })
+        return response.data;
+    }
+    catch(error){
         throw error?.response.data || error;
     }
 }

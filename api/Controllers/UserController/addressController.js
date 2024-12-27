@@ -53,11 +53,9 @@ export const editAddress=async(req,res,next)=>{
         const updateAddress = await addressDB.updateOne({_id:addressId},{$set:formData})
         if (updateAddress.nModified === 0) return res.status(400).json({ message: "No changes were made" });
         return res.status(200).json({success:"true",message:"address updated successfully"})
-
     }
     catch(error)
     {
-        console.log(error.message)
         return next(errorHandler(500,"something went wrong please try again"))
     }
 }

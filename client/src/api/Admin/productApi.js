@@ -17,9 +17,9 @@ export const getProducts = async()=>{
 }
 
 
-export const getParticularProduct = async(id)=>{
+export const getParticularProduct = async(productId)=>{
     try{
-        const response = await axiosInstance(`admin/products/${id}`,{
+        const response = await axiosInstance(`admin/products/${productId}`,{
             method:"GET"
         });
         return response.data
@@ -36,7 +36,7 @@ export const getParticularProduct = async(id)=>{
 
 
 
-export const editEntireProduct = async(id,formData,imagesNeededToUpload)=>{
+export const editEntireProduct = async(productId,formData,imagesNeededToUpload)=>{
     try{
         const imageURLsWithIndexes=[]
         if(imagesNeededToUpload.length>0)
@@ -61,7 +61,7 @@ export const editEntireProduct = async(id,formData,imagesNeededToUpload)=>{
                         imageURLsWithIndexes.push({index:imagesIndexes[i],imageURL:imageUploadResult.data[i]})
                     }
                 }
-        const response = await axiosInstance({method:'PUT',url:`admin/products/${id}`,data:{imageURLsWithIndexes,formData}})
+        const response = await axiosInstance({method:'PUT',url:`admin/products/${productId}`,data:{imageURLsWithIndexes,formData}})
         return response.data
     }
     catch(error)
@@ -72,12 +72,12 @@ export const editEntireProduct = async(id,formData,imagesNeededToUpload)=>{
 }
 
 
-export const changeProductState=async(id)=>{
+export const changeProductState=async(productId)=>{
     try{
         console.log("working")
         const response = await axiosInstance({
             method:'PATCH',
-            url:`admin/products/${id}`
+            url:`admin/products/${productId}`
         })
         console.log(response.data)
         return response.data;
@@ -89,12 +89,11 @@ export const changeProductState=async(id)=>{
 }
 
 
- export const removeProductImage=async(id,index)=>{
+ export const removeProductImage=async(productId,index)=>{
         try{
-            console.log("removeP working")
             const response =  await axiosInstance({
                 method:'PATCH',
-                url:`admin/products/${id}`,
+                url:`admin/products/${productId}`,
                 data:{
                     index:index
                 }
@@ -105,4 +104,20 @@ export const changeProductState=async(id)=>{
         {
             throw error?.response.data || error
         }
+}
+
+export const updateProductOffer=async(productId,offerValue,offerType,offerPrice)=>{
+    try{
+        console.log("wokring")
+        const response = await axiosInstance({
+            method:"PATCH",
+            url:`/admin/products/${productId}`,
+            data:{offerValue,offerType,offerPrice}
+        })
+        return response.data
+    }
+    catch(error)
+    {
+        throw error?.response.data || error
+    }
 }

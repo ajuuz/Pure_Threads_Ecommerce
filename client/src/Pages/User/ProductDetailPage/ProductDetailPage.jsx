@@ -14,6 +14,7 @@ import { toast } from 'sonner';
 
 import { addToCart, selectSizeOfProduct } from '@/api/User/cartApi';
 
+import { motion } from 'framer-motion';
 
 const ProductDetailPage = () => {
     const [product,setProduct]=useState(null)
@@ -91,8 +92,13 @@ const ProductDetailPage = () => {
         <div className='details flex flex-col gap-9'>
 
             <h1 className='font-bold text-3xl'>{product?.name||"product name"}</h1>
-            <p>Rs. {product?.salesPrice||0}</p>
-            
+
+            <div className='flex'>
+              <p className='flex items-end gap-5'><span className='font-semibold text-3xl'>Rs. {product?.salesPrice||0}</span>  <span className='text-xl text-muted-foreground font-semibold'>Rs.<span className='line-through text-2xl text-muted-foreground ms-1'>{product?.regularPrice}</span></span> <span className='text-xl text-green-700 font-bold'></span></p>
+              <motion.div className="flex items-center px-2 w-fit bg-gradient-to-r from-red-500 to-orange-500 text-white font-bold text-center rounded-lg shadow-lg" animate={{   scale: [1, 1.1, 1],   y: [0, -10, 0],   boxShadow: [     "0px 5px 15px rgba(0, 0, 0, 0.2)",     "0px 10px 25px rgba(0, 0, 0, 0.3)",     "0px 5px 15px rgba(0, 0, 0, 0.2)",   ], }} transition={{   duration: 3,   repeat: Infinity,   repeatType: "loop", }} >
+                  {product?.takenOffer.offerValue} {product?.takenOffer?.offerType} off
+              </motion.div>
+            </div>
 
             <div>
                 <h3>Available Coupons</h3>

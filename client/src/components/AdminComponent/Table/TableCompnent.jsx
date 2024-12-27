@@ -11,10 +11,9 @@ import {
 
  
 
-import Modal from '../Modal/Modal';
 
 
-const TableComponent = ({headers,body,handleSwitchClick,handleCellClick}) => {
+const TableComponent = ({headers,body,handleCellClick}) => {
   
 
   
@@ -31,17 +30,7 @@ const TableComponent = ({headers,body,handleSwitchClick,handleCellClick}) => {
                 <TableRow>
                     {row[1].map((cell,index)=>{
                         return(
-                            cell.name==='state'
-                            ?<TableCell className="text-center border">
-                            <Modal id={row[0]} type="switch" handleClick={handleSwitchClick}  state={cell.value}   dialogTitle="are you sure" dialogDescription="you can list again"/>
-                            </TableCell>
-                            :cell.name==="image"
-                            ?<TableCell className="border text-center max-w-20">
-                              <div className='inline-block  border-black border-[3px] rounded-lg'>
-                              <img src={cell.value} alt="category" className=" h-12 object-cover rounded-md" />
-                              </div>
-                              </TableCell>
-                         : <TableCell onClick={()=>handleCellClick(row[0])} className={`text-center ${index===0 && "font-medium"} border ${cell.name==="categoryName" && "w-[20%]"} `}>{cell.value}</TableCell>
+                            <TableCell onClick={()=>(cell.name==="name" || cell.name==="image") && handleCellClick(row[0])}  className={`text-center ${index===0 && "font-medium"} border ${(cell.name==="categoryName"|| cell.name==="offer") && "w-[10%]"} ${(cell.name==="name" || cell.name==="image") && "cursor-pointer"}`}>{cell.value}</TableCell>
                         )
                     })}
                 </TableRow>

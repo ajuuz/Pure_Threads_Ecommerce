@@ -8,6 +8,7 @@ import { addProduct, editEntireProduct, getParticularProduct, getProducts, patch
 import { editCustomers, getCustomers } from '../Controllers/AdminController/customerController.js';
 import { verifyAdmin } from '../Middlewares/adminAuthMiddleware.js';
 import { getAllOrders, updateOrderStatus } from '../Controllers/AdminController/orderController.js';
+import { addNewCoupon, getAllCoupons } from '../Controllers/AdminController/couponController.js';
 const router = express.Router();
 
 
@@ -18,15 +19,15 @@ router.post('/categories',verifyAdmin,addCategory)
 router.get('/categories',verifyAdmin,getCategories)
 router.get('/categories/:id',verifyAdmin,getParticularCategory)
 router.put('/categories/:id',verifyAdmin,editEntireCategory)
-router.patch('/categories',verifyAdmin,patchCategory)
+router.patch('/categories/:categoryId',verifyAdmin,patchCategory)
 router.post('/logout',logout);
 
 // products
 router.get('/products',verifyAdmin,getProducts)
 router.post('/products',verifyAdmin,addProduct)
-router.get('/products/:id',verifyAdmin,getParticularProduct)
-router.put('/products/:id',verifyAdmin,editEntireProduct)
-router.patch('/products/:id',verifyAdmin,patchProduct)
+router.get('/products/:productId',verifyAdmin,getParticularProduct)
+router.put('/products/:productId',verifyAdmin,editEntireProduct)
+router.patch('/products/:productId',verifyAdmin,patchProduct)
 
 // customers
 router.get('/customers',verifyAdmin,getCustomers)
@@ -36,4 +37,7 @@ router.patch('/customers',verifyAdmin,editCustomers)
 router.get('/orders',getAllOrders)
 router.patch('/orders/:orderId',updateOrderStatus)
 
+// coupon
+router.post('/coupons',addNewCoupon)
+router.get('/coupons',getAllCoupons)
 export default router;

@@ -69,7 +69,8 @@ const Orders = () => {
                 const ordersResult = await getAllOrders();
                 const transformedOrders = ordersResult?.orders.map((order,index)=>{
                     return [order._id,[{name:"Order ID",value:order?.orderId},
-                                       {name:"products",value:<div onClick={()=>navigate(`/orders/${order?.orderId}`,{state:{from:"admin"}})} className='flex justify-center'>{order.items.slice(0, 3).map((item, index) => (
+                                       {name:"products",value:<div onClick={()=>navigate(`/orders/${order?.orderId}`,{state:{from:"admin"}})} className='flex justify-center'>
+                                        {order.items.slice(0, 3).map((item, index) => (
                                         <div className='relative'>
                                           <div key={item?._id} className={`relative rounded-full overflow-hidden border-2 border-white w-10 h-10 ${index !== 0 ? '-ml-4' : ''}`} style={{zIndex: 3 - index}}>
                                             <img

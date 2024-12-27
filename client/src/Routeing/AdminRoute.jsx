@@ -14,6 +14,7 @@ import ManageProduct from '@/Pages/Admin/Product/ManageProduct';
 import AdminPrivate from './Protected_Routing/Admin/AdminPrivate';
 import AdminLoginPrivate from './Protected_Routing/Admin/AdminLoginPrivate';
 import Orders from '@/Pages/Admin/Orders/Orders';
+import Coupon from '@/Pages/Admin/Coupon/Coupon';
 const AdminRoute = () => {
   return (
    <>
@@ -28,6 +29,7 @@ const AdminRoute = () => {
         <Route path='/category/edit/:id' element={<AdminPrivate><AddCategory/></AdminPrivate>}/>
         <Route path='/customers' element={<AdminPrivate><Customer/></AdminPrivate>}/>
         <Route path='/orders' element={<Orders/>}/>
+        <Route path="/coupon" element={<Coupon/>}/>
     </Routes>
    </>
   )

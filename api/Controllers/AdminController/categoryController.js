@@ -71,18 +71,34 @@ export const editEntireCategory=async(req,res,next)=>{
 
 
 export const patchCategory=async(req,res,next)=>{
-    const id = req.query.id;
-    try{
-        const category = await categoryDB.findById(id);
-        if(!category) return next(errorHandler(404,"category not found"))
-        const updatedCategory = await categoryDB.updateOne({_id:id},{$set:{isActive:!category.isActive}});
-
-        if (updatedCategory.nModified === 0)  return res.status(400).json({ message: "No changes were made" });
-          return res.status(200).json({ success:true,message: "Category updated successfully" });
-    }
-    catch(error)
+    const categoryId = req.params.categoryId;
+    if(req.body?.offerType)
     {
-        next(errorHandler(500,"something went wrong please try again"))
-
+        const offer = req.body
+        await categoryDB.updateOne({_id:categoryId},{offer:offer})
+        .then((updatedCategory)=>{
+            if(updatedCategory.matchedCount===0) return next(errorHandler(404,"category not found"));
+            if(updatedCategory.modifiedCount===0) return next(errorHandler(400,"no updation made"));
+            return res.status(200).json({success:true,message:"category offer updated successfully"});
+        })
+        .catch((error)=>{
+            console.log(error.message)
+            return next(errorHandler(500,"something went wrong please try again"));
+        })
+    }
+    else
+    {
+        try{
+            const category = await categoryDB.findById(categoryId);
+            if(!category) return next(errorHandler(404,"category not found"))
+                const updatedCategory = await categoryDB.updateOne({_id:categoryId},{$set:{isActive:!category.isActive}});
+            
+            if (updatedCategory.modifiedCount === 0)  return res.status(400).json({ message: "No changes were made" });
+            return res.status(200).json({ success:true,message: "Category updated successfully" });
+        }
+        catch(error)
+        {
+            next(errorHandler(500,"something went wrong please try again"))
+        }
     }
 }

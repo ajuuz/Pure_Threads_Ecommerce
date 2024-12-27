@@ -12,7 +12,7 @@ import {
   } from "@/components/ui/alert-dialog"
   
   import { Switch } from "@/components/ui/switch";
-const Modal = ({id,type,handleClick,state,dialogTitle,dialogDescription,alertDialogTriggerrer}) => {
+const Modal = ({handleClick,dialogTitle,dialogDescription,alertDialogTriggerrer}) => {
 
 
   return (
@@ -20,7 +20,7 @@ const Modal = ({id,type,handleClick,state,dialogTitle,dialogDescription,alertDia
          {/* Alert Dialog Modal */}
       <AlertDialog>
         <AlertDialogTrigger>
-        {type==="switch"?<Switch checked={state} />:alertDialogTriggerrer}
+        {alertDialogTriggerrer}
         </AlertDialogTrigger>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -31,7 +31,7 @@ const Modal = ({id,type,handleClick,state,dialogTitle,dialogDescription,alertDia
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel className="relative top-5">Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={()=>handleClick(id)}>Continue</AlertDialogAction>
+            <AlertDialogAction onClick={()=>handleClick()}>Continue</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

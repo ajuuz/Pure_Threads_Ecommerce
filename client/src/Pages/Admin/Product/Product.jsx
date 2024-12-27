@@ -1,23 +1,27 @@
 import React, { useEffect, useState } from "react";
+import './Product.css'
 
 import SideBar from "@/components/AdminComponent/SideBar";
 import { CiSearch } from "react-icons/ci";
 
-
-import './Product.css'
 import TableComponent from "@/components/AdminComponent/Table/TableCompnent";
+import Modal from "@/components/AdminComponent/Modal/Modal";
+import { Switch } from "@/components/ui/switch";
+
+// apis
 import { changeProductState, getProducts } from "@/api/Admin/productApi";
 import { useNavigate } from "react-router-dom";
 
 
 // implementing toast for messages
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import OfferDialogComponent from "@/components/AdminComponent/Dialog/OfferDialogComponent";
 
 const Product = () => {
 
     const [refresh,setRefresh] = useState(false)
     const [products,setProducts]= useState([]);
-
     const navigate = useNavigate()
 
     useEffect(()=>{
@@ -27,7 +31,17 @@ const Product = () => {
         console.log(productDetails)
         const transformedProducts=productDetails.map((product,index)=>{
           let sumOfStock = product.sizes.reduce((acc,curr)=>acc+=curr.stock,0)
-         return [product._id,[{name:"sno",value:index+1},{name:"image",value:product?.images[0]?.url},{name:"name",value:product.name},{name:"category",value:product?.category?.name},{name:"price",value:product?.regularPrice},{name:"stock",value:sumOfStock},{name:"state",value:product?.isActive},{name:"offer",value:product?.offer}]]
+         return [product._id,[{name:"sno",value:index+1},
+                          {name:"image",value:<div className='inline-block  border-black border-[3px] rounded-lg'>
+                                                <img src={product?.images[0].url} alt="category" className=" h-12 object-cover rounded-md" />
+                                              </div>},
+                          {name:"name",value:product.name},
+                          {name:"category",value:product?.category?.name},
+                          {name:"price",value:product?.salesPrice},
+                          {name:"stock",value:sumOfStock},
+                          {name:"state",value:<Modal handleClick={()=>handleSwitchClick(product?._id)}   dialogTitle="are you sure" dialogDescription="you can list again" alertDialogTriggerrer={<Switch checked={product?.isActive} />}/>},
+                          {name:"offer",value:<><p className="font-bold">{product?.offer?.offerValue +" "+ product?.offer?.offerType} off</p><OfferDialogComponent content={product}  offerScope="Product" dialogTriggerer={<Button className="m-0">update Offer</Button>} /></>}
+                            ]]
       })
         setProducts(transformedProducts)
       }

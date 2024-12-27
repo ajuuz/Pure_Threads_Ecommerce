@@ -10,6 +10,10 @@ import { useNavigate } from 'react-router-dom'
 
 // implementing toast for messages
 import { toast } from "sonner"
+import Modal from '@/components/AdminComponent/Modal/Modal'
+import { Switch } from '@/components/ui/switch'
+import { Button } from '@/components/ui/button'
+import OfferDialogComponent from '@/components/AdminComponent/Dialog/OfferDialogComponent'
 
 
 const Category = () => {
@@ -23,7 +27,14 @@ const Category = () => {
             const response = await getCategories();
             const categoriesDetails=response.data;
             const transformedCategoriesDetails = categoriesDetails.map((category,index)=>{
-               return [category._id,[{name:"sno",value:index+1},{name:"image",value:category.images[0]?.url},{name:"categoryName",value:category.name},{name:"description",value:category.description},{name:"state",value:category.isActive},{name:"offer",value:category.offer}]]
+            return [category._id,[{name:"sno",value:index+1},
+                              {name:"image",value:<div className='inline-block  border-black border-[3px] rounded-lg'>
+                                <img src={category?.images[0].url} alt="category" className=" h-12 object-cover rounded-md" />
+                                </div>},
+                              {name:"name",value:category.name},
+                              {name:"description",value:category.description},
+                              {name:"state",value:<Modal handleClick={()=>handleSwitchClick(category._id)} dialogTitle="are you sure" dialogDescription="you can list again" alertDialogTriggerrer={<Switch checked={category?.isActive} />}/>},
+                              {name:"offer",value:<><p className='text-muted-foreground font-bold'>{category?.offer?.offerValue} {category?.offer?.offerType}</p><OfferDialogComponent content={category}  offerScope="Cateogry" dialogTriggerer={<Button className="m-0">update Offer</Button>} /></>}]]
             })
             setCategories(transformedCategoriesDetails);
             }

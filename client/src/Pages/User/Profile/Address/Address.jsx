@@ -86,7 +86,7 @@ const Address = () => {
             </div>
             <div className='flex justify-between mt-3'>
             <span className='text-muted-foreground'>{address.isDefault ? "default":<button onClick={()=>handleSetDefaultAddress(address._id)} className='bg-black  text-white py-1 px-2 rounded-md'>Set Default</button>}</span>
-                <Modal id={address._id} handleClick={hanldeDeleteAddressClick} type="button"   dialogTitle="are you sure" dialogDescription="you can list again" alertDialogTriggerrer={ <button className='bg-black text-white py-1 px-2 rounded-md'>Delete</button> }/>
+                <Modal  handleClick={()=>hanldeDeleteAddressClick(address?._id)} dialogTitle="are you sure" dialogDescription="you can list again" alertDialogTriggerrer={ <button className='bg-black text-white py-1 px-2 rounded-md'>Delete</button> }/>
             </div>
         </div>
         )}

@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Heart } from "lucide-react";
 import { addToWishlist, removeFromWishlist } from "@/api/User/wishlistApi";
 import { toast } from "sonner";
+import { Badge } from "@/components/ui/badge";
 
 const Card = ({image1,image2,product,withDescription,onCardClick,isWishlisted,setWishlisted}) => {
     const [currentImage,setCurrentImage] = useState(image1)
@@ -60,7 +61,7 @@ const Card = ({image1,image2,product,withDescription,onCardClick,isWishlisted,se
         <div onClick={onCardClick}>
           <p className="font-semibold text-sm  text-gray-500 ">{product?.name}</p>
           <p className="text-muted-foreground">{product?.categoryDetails?.name}</p>
-          <div className="flex font-medium">Rs. {product?.salesPrice}</div>
+          <div className="flex font-medium gap-2"><span>Rs. {product?.salesPrice}</span> <span className="text-muted-foreground"><span className="line-through">{product?.regularPrice}</span>/-</span><Badge>{product?.takenOffer?.offerValue} {product?.takenOffer?.offerType}</Badge></div>
           <div className="text-red-500">{stockCalculator()}</div>
         </div>
         <div>

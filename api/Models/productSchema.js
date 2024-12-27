@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import categoryDB from "./categorySchema.js";
 
 const productSchema = mongoose.Schema({
     name:{
@@ -17,9 +18,14 @@ const productSchema = mongoose.Schema({
         type:Number,
         required:true
     },
+    takenOffer:{
+        offerValue:{type:Number,default:0},
+        offerType:{type:String}
+    },
     offer:{
-        type:Number,
-        default:0
+        offerValue:{type:Number,default:0},
+        offerType:{type:String},
+        offerPrice:{type:Number}
     },
     isActive:{
         type:Boolean,
@@ -70,6 +76,52 @@ const productSchema = mongoose.Schema({
 },
 { timestamps: true }  
 )
+
+
+productSchema.pre("updateOne", async function (next) {
+    try{
+
+        const update = this.getUpdate(); // Retrieves the update object
+        const query = this.getQuery();  // Retrieves the filter/query object
+        if (update && update?.offer?.offerValue) {
+        const product = await this.model.findOne(query); // Retrieves the document based on the query
+        const {regularPrice} = product
+        const category = await categoryDB.findOne({_id:product.category}); 
+        
+        let productSalesPrice=update.offer.offerPrice;
+        let categorySalesPrice;
+            console.log(category?.offer?.offerValue)
+        categorySalesPrice = regularPrice - regularPrice*(category?.offer?.offerValue)/100 
+
+        const salesPrice = Math.min(categorySalesPrice,productSalesPrice)
+        console.log(categorySalesPrice,productSalesPrice)
+
+        if(salesPrice<0){
+            const error = new Error("Sales price cannot be negative")
+            error.name="negativePrice"
+            throw error
+        }
+
+        product.salesPrice=Math.floor(salesPrice);
+        if(categorySalesPrice===salesPrice)
+        {
+            product.takenOffer = category.offer;
+        }
+        else
+        {
+            product.takenOffer = product.offer;
+        }
+        console.log(product.takenOffer)
+        product.save()
+        }
+        next();
+    }
+    catch(error)
+    {
+        next(error)
+    }
+});
+
 
 const productDB = mongoose.model('product',productSchema);
 export default productDB;
