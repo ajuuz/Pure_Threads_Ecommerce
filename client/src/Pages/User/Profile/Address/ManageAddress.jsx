@@ -148,3 +148,33 @@ const ManageAddress = () => {
 };
 
 export default ManageAddress;
+
+
+// {isAvailableProduct[index]==="product is currently not available" ?<></>:!isAvailableProduct[index]?<></> : <div className='flex items-center border rounded'>
+//     <Button
+//       disabled={isAvailableProduct[index]==="product is currently not available"}
+//       variant="ghost" 
+//       size="icon" 
+//       onClick={()=>decrementQuantity(index,cartProduct,cartProduct?.product?._id , cartProduct?.size , cartProduct?.quantity,cartProducts,setCArtProducts,setIsAvailableProduct)}
+//       className='h-8 w-8'
+//     >
+//       <Minus className='h-4 w-4' />
+//     </Button>
+//     <span className='w-8 text-center'>{cartProduct?.quantity}</span>
+//     <Button 
+//     disabled={isAvailableProduct[index]==="product is currently not available"}
+//       variant="ghost" 
+//       size="icon" 
+//       onClick={()=>incrementQuantity(index,cartProduct,cartProduct?.product?._id , cartProduct?.size , cartProduct?.quantity,cartProducts,setCArtProducts,setIsAvailableProduct)}
+//       className='h-8 w-8'
+//     >
+//       <Plus className='h-4 w-4' />
+//     </Button>
+//   </div>}
+  
+//   <Button   onClick={()=>handleRemoveProduct(index,cartProduct?.product?._id,cartProduct?.size,cartProducts,setCArtProducts,isAvailableProduct,setIsAvailableProduct)} variant="ghost" size="icon">
+//     <Trash2 className='h-5 w-5 text-red-500' />
+//   </Button>
+// </div>
+// </div>
+// )}

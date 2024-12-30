@@ -1,6 +1,7 @@
 import { getAllCoupons } from '@/api/Admin/couponApi'
 import CouponDialogComponent from '@/components/AdminComponent/Dialog/CouponDialogComponent'
 import SideBar from '@/components/AdminComponent/SideBar'
+import TableComponent from '@/components/AdminComponent/Table/TableCompnent'
 import React, { useEffect, useState } from 'react'
 import { CiSearch } from 'react-icons/ci'
 import { toast } from 'sonner'
@@ -12,7 +13,18 @@ const Coupon = () => {
     const fetchCoupons = async()=>{
       try{
         const getCouponsResult = await getAllCoupons();
-        setCoupons(getCouponsResult.coupons)
+        const transformedCoupons = getCouponsResult?.coupons.map((coupon,index)=>{
+          return [coupon?._id,[{name:"SNO",value:index+1},
+                          {name:"coupon code",value:coupon?.couponCode},
+                          {name:"coupon value",value:`${coupon?.couponValue} ${coupon?.couponType}`},
+                          {name:"description",value:coupon?.description},
+                          {name:"max redeemable",value:coupon?.maxRedeemable??coupon?.couponValue},
+                          {name:"minimum Purchase",value:coupon?.minimumOrderAmount},
+                          {name:"Max Usable Limit",value:coupon?.maxUsableLimit},
+                          {name:"Per user Limit",value:coupon?.perUserLimit}
+                        ]]
+        })
+        setCoupons(transformedCoupons)
       }
       catch(error)
       {
@@ -21,6 +33,8 @@ const Coupon = () => {
     }
     fetchCoupons();
   },[])
+
+  const headers = ["SNO","Coupon Code","coupon value","description","Max Redeemable","minimum Purchase","Max Usable Limit","Per user Limit"]
   return (
     <div className="AdminAddCategory relative ps-5 md:ps-[300px] pe-5 pt-16">
       <SideBar />
@@ -39,11 +53,7 @@ const Coupon = () => {
           </div>
         </div>
 
-      <div className='m-20  shadow-md grid '>
-        <div className=''>
-
-        </div>
-      </div>
+      <TableComponent headers={headers} body={coupons} />
         
     </div>
   )

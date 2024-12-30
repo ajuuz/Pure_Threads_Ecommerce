@@ -34,7 +34,7 @@ const Orders = () => {
       console.log(orderId)
       const cancelOrderResult = await cancelOrder(orderId);
       const updatedOrderArray = [...orders];
-      updatedOrderArray[index].status="cancelled";
+      updatedOrderArray[index].status="Cancelled";
       setOrders(updatedOrderArray)
       toast.success(cancelOrderResult.message)
     }
@@ -46,10 +46,11 @@ const Orders = () => {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'pending': return 'bg-[#FFA600]'
-      case 'shipped': return 'bg-[#28A745]'
-      case 'delivered': return 'bg-[#007BFF]'
-      case 'cancelled': return 'bg-[#DC3545]'
+        case 'Pending': return 'bg-[#FFA600]'
+        case 'Confirmed': return 'bg-[#007BFF]'
+        case 'Shipped': return 'bg-[#28A745]'
+        case 'Delivered': return 'bg-[#2dd251]'
+        case 'Cancelled': return 'bg-[#b30009]'
       default: return 'bg-gray-500'
     }
   }
@@ -132,11 +133,10 @@ const formatOrderDate = (isoDate) => {
                     <Truck className="w-4 h-4" />
                     <span>Estimated delivery in {deliveryDateCalculator(order?.deliveryDate)} days</span>
                   </div>
-                  {order?.status!=="cancelled"
+                  {order?.status!=="Cancelled"
                    &&
                   <div>
                      <Modal handleClick={()=>handleCancelOrder(index,order?.orderId)} type="button"   dialogTitle="are you sure" dialogDescription="you can list again" alertDialogTriggerrer={ <Button  className="bg-[#DC3545] hover:bg-[#DC3545] h-8">Cancel</Button> }/>
-                    
                   </div>
                   }
                 </div>

@@ -11,7 +11,6 @@ import {
     AlertDialogTrigger,
   } from "@/components/ui/alert-dialog"
   
-  import { Switch } from "@/components/ui/switch";
 const Modal = ({handleClick,dialogTitle,dialogDescription,alertDialogTriggerrer}) => {
 
 

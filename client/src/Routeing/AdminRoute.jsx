@@ -29,7 +29,7 @@ const AdminRoute = () => {
         <Route path='/category/edit/:id' element={<AdminPrivate><AddCategory/></AdminPrivate>}/>
         <Route path='/customers' element={<AdminPrivate><Customer/></AdminPrivate>}/>
         <Route path='/orders' element={<Orders/>}/>
-        <Route path="/coupon" element={<Coupon/>}/>
+        <Route path="/coupons" element={<Coupon/>}/>
     </Routes>
    </>
   )

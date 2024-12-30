@@ -21,6 +21,7 @@ import OrderDetail from '@/Pages/User/Profile/Orders/OrderDetail';
 import VerifyEmail from '@/Pages/User/Auth/ForgotPassword/VerifyEmail';
 import ChangePassword from '@/Pages/User/Auth/ForgotPassword/ChangePassword';
 import Wishlist from '@/Pages/User/Wishlist/Wishlist';
+import Coupon from '@/Pages/User/Profile/Coupon/Coupon';
 
 const UserRoute = () => {
   return (
@@ -43,7 +44,7 @@ const UserRoute = () => {
         <Route path="/orders" element={<Orders/>}/>
         <Route path="/orders/:orderId" element={<OrderDetail/>}/>
         <Route path="/wishlist" element={<Wishlist/>}/>
-
+        <Route path="/coupons" element={<Coupon/>}/>
     </Routes>
     </>
   )

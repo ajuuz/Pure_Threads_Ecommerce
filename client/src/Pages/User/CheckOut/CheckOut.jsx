@@ -1,18 +1,24 @@
 import React, { useEffect, useState } from 'react'
+
+import { Minus, Plus, Ticket, Trash2 } from 'lucide-react'
+
 import NavBar from '@/components/UserComponent/NavBar/NavBar'
-import { getAddresses } from '@/api/User/addressApi'
-
-import { Minus, Plus, Trash2 } from 'lucide-react'
-
+import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
-import { fetchCartProducts } from '@/Utils/productAvailableChecker';
 import { Button } from '@/components/ui/button';
-import { decrementQuantity, handleRemoveProduct, incrementQuantity } from '@/Utils/cartOperations';
 import CheckOutAddress from '@/components/UserComponent/CheckOut/CheckOutAddress';
 import { PaymentMethods } from '@/components/UserComponent/CheckOut/PaymentMethods';
-import { placeOrder } from '@/api/User/orderApi';
-import { toast } from 'sonner';
 import OrderSuccess from '@/components/UserComponent/CheckOut/OrderSuccess';
+
+import { toast } from 'sonner';
+
+import { motion } from 'framer-motion';
+import { fetchCartProducts } from '@/Utils/productAvailableChecker';
+import { decrementQuantity, handleRemoveProduct, incrementQuantity } from '@/Utils/cartOperations';
+import { placeOrder } from '@/api/User/orderApi';
+import { getCheckoutAvailableCoupons } from '@/api/User/couponApi';
+import { getAddresses } from '@/api/User/addressApi'
+import { CouponCardType2 } from '@/components/UserComponent/CouponCard/CouponCard';
 
 const CheckOut = () => {
 
@@ -23,6 +29,9 @@ const CheckOut = () => {
   const [isFirstPage,setIsFirstPage] = useState(true)
   const [paymentMethod,setPaymentMethod]=useState("cod")
   const [orderSuccess,setOrderSuccess] = useState(false);
+
+  const [availableCoupons,setAvailableCoupons] = useState([]);
+  const [viewCouponPage,setViewCouponPage] = useState(false);
 
   const navigate = useNavigate()
 
@@ -39,23 +48,36 @@ const CheckOut = () => {
         toast.error(error.message)
     }
 }
-  useEffect(()=>{
 
-    fetchAddresses();
-
-    const fetchProductAndValidate=async()=>{
-      try{
-        const fetchCartProductsResult=await fetchCartProducts();
-        if(!orderSuccess && fetchCartProductsResult.fetchedProductArray.length===0) return navigate('/shop')
-        setCArtProducts(fetchCartProductsResult.fetchedProductArray)
-        setIsAvailableProduct(fetchCartProductsResult.isAvailableReducer)
-      }
-      catch(error){
-        console.log(error)
-      }
+  const fetchProductAndValidate=async(fetchCartProductsResult)=>{
+    try{
+      fetchCartProductsResult=await fetchCartProducts();
+      if(!orderSuccess && fetchCartProductsResult.fetchedProductArray.length===0) return navigate('/shop')
+      setCArtProducts(fetchCartProductsResult?.fetchedProductArray)
+      setIsAvailableProduct(fetchCartProductsResult?.isAvailableReducer)
     }
-    fetchProductAndValidate()
+    catch(error){
+      console.log(error)
+    }
+  }
 
+  const fetchCheckoutAvailableCoupons = async()=>{
+    try{
+      const getCheckoutAvailableCouponsResult =await getCheckoutAvailableCoupons()
+      setAvailableCoupons(getCheckoutAvailableCouponsResult?.availableCoupons);
+    }
+    catch(error)
+    {
+      toast.error(error.message)
+    }
+  } 
+
+  
+
+  useEffect(()=>{
+    fetchAddresses();
+    fetchProductAndValidate();
+    fetchCheckoutAvailableCoupons();
   },[])
 
 
@@ -93,7 +115,7 @@ const handlePlaceOrder=async()=>{
 
   return (
     <div className="min-h-screen  relative pt-32">
-  <NavBar/>
+    <NavBar/>
       <div className="max-w-7xl mx-auto bg-white shadow-lg rounded-lg">
         {orderSuccess && <OrderSuccess  orderData={orderSuccess}/>}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 p-8">
@@ -149,9 +171,19 @@ const handlePlaceOrder=async()=>{
             )}
             </div>
             <div className='flex flex-col py-3 gap-2'>
-            <p className="text-lg font-bold text-muted-foreground">Total Amout : ₹{cartProducts.reduce((acc,curr)=>acc+=(curr?.product?.salesPrice * curr?.quantity),0)}</p>
+              <p className="text-lg font-bold text-muted-foreground">Total Amount : ₹{cartProducts.reduce((acc,curr)=>acc+=(curr?.product?.salesPrice * curr?.quantity),0)}</p>
             </div>
-            <button onClick={cartProducts.length===0?()=>navigate('/shop'):()=>console.log(paymentMethod,isFirstPage)} className="w-full bg-black text-white py-2 rounded-md hover:bg-gray-800">{cartProducts.length===0?"Back to shop":"Apply Coupon"}</button>
+              <button onClick={cartProducts.length===0?()=>navigate('/shop'):()=>setViewCouponPage(true)} className="relative w-full bg-black text-white py-2 rounded-md hover:bg-gray-800">
+                <Badge className="bg-gray-400 rounded-2xl py-1 absolute top-[-10px] right-[-10px]">
+                  {availableCoupons.length}
+                </Badge>
+                {cartProducts.length===0?"Back to shop":"View Coupon"}
+              </button>
+
+            <div className='max-h-[450px] border mt-5 p-5 overflow-y-auto bg-slate-100 grid gap-5'>
+              {availableCoupons.map(coupon=><CouponCardType2 coupon={coupon}/>)}
+            </div>
+
           </div>
 
 

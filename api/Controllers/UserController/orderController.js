@@ -55,7 +55,7 @@ export const getOrders = async(req,res)=>{
 export const cancelOrder = async(req,res,next)=>{
     const {orderId} = req.params
     try{
-        const updatedOrder = await orderDB.updateOne({orderId},{$set:{status:"cancelled"}});
+        const updatedOrder = await orderDB.updateOne({orderId},{$set:{status:"Cancelled"}});
         if(!updatedOrder.matchedCount) return next(errorHandler(404,"order not found"))
         if(!updatedOrder.modifiedCount) return next(errorHandler(400,"No changes made"));
         return res.status(200).json({success:true,message:"Your Order has been Cancelled"});

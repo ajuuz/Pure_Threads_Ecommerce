@@ -14,8 +14,15 @@ export const getAllOrders = async(req,res,next)=>{
 export const updateOrderStatus = async(req,res,next)=>{
     const {orderId} = req.params
     const {status} = req.body
-    try{
-
+    
+    if(!["Pending","Confirmed","Packed","Shipped","Delivered","Returned","Cancelled"].includes(status)) return next(errorHandler(400,"Invalid Status"))
+        const updationFields={status};
+        if(["Cancelled","Delivered"].includes(status)){
+            const today = new Date();
+            today.setDate(today.getDate() + 6);
+            updationFields.deliveryDate = today
+        }
+        try{
         const updatedOrder = await orderDB.updateOne({orderId},{$set:{status}});
         if(!updatedOrder.matchedCount) return next(errorHandler(404,"order not found"));
         if(!updatedOrder.modifiedCount) return next(errorHandler(400,"no changes made"));

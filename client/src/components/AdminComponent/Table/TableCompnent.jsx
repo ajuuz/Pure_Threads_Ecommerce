@@ -30,7 +30,7 @@ const TableComponent = ({headers,body,handleCellClick}) => {
                 <TableRow>
                     {row[1].map((cell,index)=>{
                         return(
-                            <TableCell onClick={()=>(cell.name==="name" || cell.name==="image") && handleCellClick(row[0])}  className={`text-center ${index===0 && "font-medium"} border ${(cell.name==="categoryName"|| cell.name==="offer") && "w-[10%]"} ${(cell.name==="name" || cell.name==="image") && "cursor-pointer"}`}>{cell.value}</TableCell>
+                            <TableCell onClick={()=>(cell.name==="name" || cell.name==="image") && handleCellClick(row[0])}  className={`text-center ${index===0 && "font-medium"} border ${cell.name==="offer" && "w-[10%]"} ${(cell.name==="name" || cell.name==="image") && "cursor-pointer"}`}>{cell.value}</TableCell>
                         )
                     })}
                 </TableRow>

@@ -8,7 +8,8 @@ import { addProduct, editEntireProduct, getParticularProduct, getProducts, patch
 import { editCustomers, getCustomers } from '../Controllers/AdminController/customerController.js';
 import { verifyAdmin } from '../Middlewares/adminAuthMiddleware.js';
 import { getAllOrders, updateOrderStatus } from '../Controllers/AdminController/orderController.js';
-import { addNewCoupon, getAllCoupons } from '../Controllers/AdminController/couponController.js';
+import { addNewCoupon } from '../Controllers/AdminController/couponController.js';
+import { getAllCoupons } from '../Controllers/CommonController/couponController.js';
 const router = express.Router();
 
 

@@ -6,13 +6,6 @@ import { CiSearch } from 'react-icons/ci'
 //components
 import TableComponent from '@/components/AdminComponent/Table/TableCompnent';
 import SideBar from '@/components/AdminComponent/SideBar'
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
 
 // toaster
 import { toast } from 'sonner';
@@ -21,11 +14,14 @@ import { toast } from 'sonner';
 import { getAllOrders, updateOrderStatus } from '@/api/Admin/orderApi';
 import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import Modal from '@/components/AdminComponent/Modal/Modal';
 
 
 const Orders = () => {
     // useState
     const [orders,setOrders] = useState([]);
+    
 
     // router dom
     const navigate = useNavigate()
@@ -38,27 +34,70 @@ const Orders = () => {
       
       const getStatusColor = (status) => {
         switch (status) {
-            case 'processing': return 'bg-[#007BFF]'
-            case 'pending': return 'bg-[#FFA600]'
-          case 'delivered': return 'bg-[#28A745]'
-          case 'cancelled': return 'bg-[#DC3545]'
+            case 'Pending': return 'bg-[#FFA600]'
+            case 'Confirmed': return 'bg-[#007BFF]'
+            case 'Shipped': return 'bg-[#28A745]'
+            case 'Delivered': return 'bg-[#2dd251]'
+            case 'Cancelled': return 'bg-[#b30009]'
           default: return 'bg-gray-500'
         }
       }
-    
-      const handleUpdateStatus=async(index,orderId,status)=>{
+
+      const statusButton = (status)=>{
+        switch (status) {
+          case 'Pending': return "Mark as Confirmed"
+          case 'Confirmed': return 'Mark as Packed'
+          case 'Packed': return 'Mark as Shipped'
+          case 'Shipped': return 'Mark as Delivered'
+        }
+      }
+
+      const nextStatus = {
+        "Pending":"Confirmed",
+        "Confirmed":"Packed",
+        "Packed":"Shipped",
+        "Shipped":"Delivered",
+      }
+
+      const handleUpdateStatus=async(index,order)=>{
+            const nextStatusValue = nextStatus[order.status];
         try{
-            const updateOrderStatusResult =await updateOrderStatus(orderId,status)
+            const updateOrderStatusResult =await updateOrderStatus(order?.orderId,nextStatusValue)
             toast.success(updateOrderStatusResult.message);
+            order.status=nextStatusValue;
             setOrders((prev)=>{
-                const updatedOrders=[...prev];
-                updatedOrders[index][1][6].value=<Badge  className={`${getStatusColor(status)} hover:${getStatusColor(status)}  text-white`}>{status}</Badge>
-                return updatedOrders
+              const updatedOrders=[...prev];
+                  updatedOrders[index][1][6].value=<Badge  className={`${getStatusColor(nextStatusValue)} hover:${getStatusColor(nextStatusValue)}  text-white`}>{`${nextStatusValue}`}</Badge>
+                  updatedOrders[index][1][7].value=
+                  order.status==="Delivered"
+                  ?<Button disabled className="m-0 bg-green-700 w-fit">Delivered</Button>
+                  :<div className='flex gap-2 justify-center'><Modal handleClick={()=>handleUpdateStatus(index,order)} dialogTitle={`Is Order ${nextStatus[order.status]}`} dialogDescription="Are you sure? By clicking continue you are gonna change the status of the order" alertDialogTriggerrer={<Button disabled={order.status==="Delivered"}  className={`m-0 ${order.status==="Delivered" && "bg-green-700"}`}>{`${order.status==="Delivered"?"Delivered":statusButton(nextStatusValue)}`}</Button>}/>
+                        <Modal handleClick={()=>handleCancelOrder(index,order,"Cancelled")} dialogTitle="Cancel Order" dialogDescription="Are you Sure?  By clicking continue you are gonna Cancel this order." alertDialogTriggerrer={<Button disabled={["Delivered","Cancelled"].includes(order.status)} className="m-0 bg-red-700">Cancel</Button>}/>
+                  </div>
+                  return updatedOrders
             })
         }
         catch(error){
             toast.error(error?.message)
         }
+      }
+
+      const handleCancelOrder=async(index,order,status)=>{
+        try{
+          const updateOrderStatusResult =await updateOrderStatus(order?.orderId,status);
+          toast.success(updateOrderStatusResult.message);
+          order.status="Cancelled";
+          setOrders((prev)=>{
+            const updatedOrders=[...prev];
+                updatedOrders[index][1][6].value=<Badge  className={`${getStatusColor(status)} hover:${getStatusColor(status)}  text-white`}>{`${status}`}</Badge>
+                updatedOrders[index][1][7].value=<Button disabled onClick={()=>handleUpdateStatus(index,order)} className="m-0 bg-red-700 w-fit">Cancelled</Button>
+                return updatedOrders;
+          })
+      }
+      catch(error){
+          console.log(error)
+          toast.error(error?.message)
+      }
       }
 
 
@@ -77,7 +116,7 @@ const Orders = () => {
                                               src={item?.product?.images[0]?.url}
                                               alt={item?.product?.name}
                                               layout="fill"
-                                              objectFit="cover"
+                                              // objectFit="cover"
                                             />
                                           </div>
                                             <div className='absolute top-[-2px] right-[-2px] bg-gray-900  h-4 w-4 flex justify-center items-center text-[10px] rounded-3xl' style={{zIndex:4,color:"white"}}>
@@ -91,27 +130,21 @@ const Orders = () => {
                                           </div>
                                         )}
                                       </div>},
-
-                                       {name:"date",value:formatOrderDate(order?.createdAt)},
-                                       {name:"customer",value:"customer"},
-                                       {name:"total",value:order?.totalAmount},
-                                       {name:"payment",value:order?.paymentMethod==="cod"?"Cash On Delivery":order?.paymentMethod},
-                                       {name:"status",value:<Badge  className={`${getStatusColor(order.status)} hover:${getStatusColor(order.status)}  text-white`}>{order.status}</Badge>},
-                                       {name:"updateStatus",value:<div className='flex justify-center'>
-                                        <Select name="updateStatus" onValueChange={(value)=>handleUpdateStatus(index,order?.orderId,value)}>
-                                       <SelectTrigger className="w-[180px]">
-                                         <SelectValue placeholder="update status" />
-                                       </SelectTrigger>
-                                       <SelectContent>
-                                         <SelectItem className="" value="processing">Processing</SelectItem>
-                                         <SelectItem className="" value="pending">Pending</SelectItem>
-                                         <SelectItem className="" value="delivered">delivered</SelectItem>
-                                         <SelectItem className="" value="cancelled">cancelled</SelectItem>
-                                       </SelectContent>
-                                     </Select>
-                                     </div>}]]
+                                      {name:"date",value:formatOrderDate(order?.createdAt)},
+                                      {name:"customer",value:"customer"},
+                                      {name:"total",value:order?.totalAmount},
+                                      {name:"payment",value:order?.paymentMethod==="cod"?"Cash On Delivery":order?.paymentMethod},
+                                      {name:"status",value:<Badge  className={`${getStatusColor(order.status)} hover:${getStatusColor(order.status)}  text-white`}>{order.status}</Badge>},
+                                      {name:"updateStatus",value:
+                                      ["Delivered","Cancelled"].includes(order.status)
+                                      ?<Button disabled className={`m-0 w-fit ${order.status==="Delivered"?"bg-green-700":order.status==="Cancelled"?"bg-red-700":""}`}>{order.status==="Delivered"?"Delivered":order.status==="Cancelled"?"Cancelled":statusButton(order.status)}</Button>
+                                      :<div className='flex gap-2 justify-center'><Modal handleClick={()=>handleUpdateStatus(index,order)} dialogTitle={`Is Order ${nextStatus[order.status]}`} dialogDescription="Are you sure? By clicking continue you are gonna change the status of the order" alertDialogTriggerrer={<Button disabled={["Delivered","Cancelled"].includes(order.status)} className={`m-0 ${order.status==="Delivered"?"bg-green-700":order.status==="Cancelled"?"bg-red-700":""}`}>{order.status==="Delivered"?"Delivered":order.status==="Cancelled"?"Cancelled":statusButton(order.status)}</Button>}/>
+                                        <Modal handleClick={()=>handleCancelOrder(index,order,"Cancelled")} dialogTitle="Cancel Order" dialogDescription="Are you Sure?  By clicking continue you are gonna Cancel this order." alertDialogTriggerrer={<Button disabled={["Delivered","Cancelled"].includes(order.status)} className="m-0 bg-red-700">Cancel</Button>}/>    
+                                      </div>},
+                                     ]]
                 })
                 setOrders(transformedOrders);
+                console.log(transformedOrders)
             }catch(error){
                 toast.error(error.message);
             }
@@ -149,3 +182,5 @@ const Orders = () => {
 }
 
 export default Orders
+
+

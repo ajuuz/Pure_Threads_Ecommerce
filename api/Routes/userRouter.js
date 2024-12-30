@@ -12,6 +12,8 @@ import { addToCart, getCartProducts, proceedToCheckout, selectSizeForProduct, up
 import { cancelOrder, getOrders, getParticularOrder, placeOrder } from '../Controllers/UserController/orderController.js';
 import { validateProduct } from '../Middlewares/productCheckerMiddleware.js';
 import { addToWishlist, getWishlistProducts, removeFromWishlist,  } from '../Controllers/UserController/wishlistController.js';
+import { getAllCoupons } from '../Controllers/CommonController/couponController.js';
+import { getCheckoutAvailableCoupons } from '../Controllers/UserController/couponController.js';
 const router = express.Router();
 
 
@@ -64,4 +66,9 @@ router.post('/orders',validateProduct,placeOrder)
 router.get('/orders',getOrders)
 router.patch('/orders/:orderId',cancelOrder)
 router.get('/orders/:orderId',getParticularOrder)
+
+
+//coupon
+router.get('/coupons',getAllCoupons)
+router.get('/coupons/checkoutAvailable',getCheckoutAvailableCoupons)
 export default router;

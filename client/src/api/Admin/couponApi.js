@@ -1,8 +1,8 @@
 import { axiosInstance } from "../axiosInstance";
 
-export const addNewCoupon=async(couponValue,couponType,maxRedeemable,couponCode,minimumAmount)=>{
+export const addNewCoupon=async(couponFormData)=>{
     try{
-        const response = await axiosInstance.post('/admin/coupons',{couponValue,couponType,maxRedeemable,couponCode,minimumAmount})
+        const response = await axiosInstance.post('/admin/coupons',couponFormData)
         return response.data;
     }
     catch(error)
@@ -13,7 +13,6 @@ export const addNewCoupon=async(couponValue,couponType,maxRedeemable,couponCode,
 
 export const getAllCoupons=async()=>{
     try{
-        console.log("wokring")
         const response = await axiosInstance.get('/admin/coupons')
         return response.data
     }

@@ -1,6 +1,11 @@
 import mongoose from "mongoose";
 
 const couponSchema = mongoose.Schema({
+    couponCode:{
+        type:String,
+        unique:true,
+        required:true
+    },
     couponValue:{
         type:Number,
         default:0
@@ -9,16 +14,22 @@ const couponSchema = mongoose.Schema({
         type:String,
         default:"%"
     },
+    description:{
+        type:String,
+    },
     maxRedeemable:{
         type:Number,
         default:0
     },
-    couponCode:{
-        type:String,
-        unique:true,
-        required:true
+    minimumOrderAmount:{
+        type:Number,
+        default:0
     },
-    minimumAmount:{
+    maxUsableLimit:{
+        type:String,
+        default:"no limit"
+    },
+    perUserLimit:{
         type:Number,
         default:0
     }
