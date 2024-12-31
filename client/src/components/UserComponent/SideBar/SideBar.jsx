@@ -18,7 +18,7 @@ const SideBar = ({current}) => {
 
 const navigate = useNavigate()    
   return (
-    <div className='sideBarOuterDiv fixed top-32 left-5  rounded-3xl shadow-lg w-72 hidden md:inline-block z-999'>
+    <div className='sideBarOuterDiv cursor-pointer fixed top-32 left-5  rounded-3xl shadow-lg w-72 hidden md:inline-block z-999'>
       <div>
         <div className='flex ps-14  gap-4 rounded-b-3xl  items-center shadow-lg py-8 '>
             <div className='rounded-[50px] px-4 text-white py-2 bg-black'>
@@ -47,7 +47,7 @@ const navigate = useNavigate()
             <div className={`bg-black   w-5 h-5  ${current=="order" ? "visible":"invisible"}`}></div>
         </div>
 
-        <div onClick={()=>navigate('/coupon')} className='flex gap-10 justify-between items-center'>
+        <div onClick={()=>navigate('/coupons')} className='flex gap-10 justify-between items-center'>
             <div className={`bg-black   w-5 h-5  ${current==="coupon" ? "visible":"invisible"}`}></div>
                 <div className='flex flex-1 gap-6 items-center'><FaBagShopping className='text-xl'/>Coupons</div>
             <div className={`bg-black   w-5 h-5  ${current==="coupon" ? "visible":"invisible"}`}></div>

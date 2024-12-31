@@ -18,12 +18,12 @@ export const CouponCardType1=({coupon})=>{
     <div className="relative max-w-md mx-auto ">
       <Card className="relative bg-white overflow-hidden">
         {/* Decorative edges */}
-        <div className="absolute left-0 top-0 bottom-0 w-4 bg-gray-700 flex flex-col justify-between py-4">
+        <div className="absolute left-0 top-0 bottom-0 w-4 bg-black flex flex-col justify-between py-4">
           {[...Array(8)].map((_, i) => (
             <div key={i} className="h-4 w-4 bg-white rounded-full translate-x-2" />
           ))}
         </div>
-        <div className="absolute right-0 top-0 bottom-0 w-4 bg-gray-700 flex flex-col justify-between py-4">
+        <div className="absolute right-0 top-0 bottom-0 w-4 bg-black flex flex-col justify-between py-4">
           {[...Array(8)].map((_, i) => (
             <div key={i} className="h-4 w-4 bg-white rounded-full -translate-x-2" />
           ))}
@@ -64,7 +64,7 @@ export const CouponCardType1=({coupon})=>{
           
           <button 
             onClick={() => navigator.clipboard.writeText(couponCode)}
-            className="mt-6 w-full bg-gray-700 text-white py-2 rounded-md  transition-colors"
+            className="mt-6 w-full bg-black text-white py-2 rounded-md  transition-colors"
           >
             Copy Code
           </button>
@@ -76,10 +76,10 @@ export const CouponCardType1=({coupon})=>{
 
 
 
-export const CouponCardType2 = ({coupon})=>{
+export const CouponCardType2 = ({coupon,selectedCoupon,setSelectedCoupon})=>{
   return(
     <div className='bg-white  rounded-md border py-5 flex items-center'>
-      
+  
 
       {/*inner content  */}
       <div className='flex-1 px-5 flex flex-col'>
@@ -89,7 +89,7 @@ export const CouponCardType2 = ({coupon})=>{
             <Ticket/>
             <p className='font-bold border-2  py-2 px-3 border-dashed bg-slate-100 rounded-md text-lg text-muted-foreground'>{coupon?.couponCode}</p>
             </div>
-          <Button className="w-fit  m-0">APPLY</Button>
+          <Button disabled={coupon?.couponCode===selectedCoupon} onClick={()=>setSelectedCoupon(coupon?.couponCode)} className="w-fit  m-0">{coupon?.couponCode===selectedCoupon?"APPLIED":"APPLY"}</Button>
 
           </div>
           <div className='flex'>
@@ -98,9 +98,7 @@ export const CouponCardType2 = ({coupon})=>{
           </div>
         </div>
 
-      {
-        
-      }
+    
         <div className='py-5 relative flex items-center'>
           <div className='absolute h-8 w-8 border-r-2 rounded-3xl -translate-x-10 bg-slate-100'></div>
            <div className='absolute right-0 bg-slate-100 border-l-2 h-8 w-8 rounded-3xl translate-x-10'>

@@ -9,6 +9,7 @@ import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { fetchCartProducts } from '@/Utils/productAvailableChecker'
 import { decrementQuantity, handleRemoveProduct, incrementQuantity } from '@/Utils/cartOperations'
+import { toast } from 'sonner'
 
 const Cart = () => {
   const [cartProducts,setCArtProducts] = useState([])
@@ -40,16 +41,16 @@ const Cart = () => {
     
     try{
       const fetchCartProductsResult = await fetchCartProducts();
-        
       if(fetchCartProductsResult.isAvailableReducer.filter(Boolean).length!==0) {
         setIsAvailableProduct(fetchCartProductsResult.isAvailableReducer)
         return
       }
-      navigate('/checkout/address')
+      navigate('/checkout')
     }
     catch(error)
     {
       console.log(error.message)
+      toast.error(error.message); 
     }
   }
 
@@ -95,7 +96,7 @@ const Cart = () => {
                         disabled={isAvailableProduct[index]==="product is currently not available"}
                         variant="ghost" 
                         size="icon" 
-                        onClick={()=>decrementQuantity(index,cartProduct,cartProduct?.product?._id , cartProduct?.size , cartProduct?.quantity,cartProducts,setCArtProducts,setIsAvailableProduct)}
+                        onClick={()=>decrementQuantity(index,cartProduct,cartProducts,setCArtProducts,setIsAvailableProduct)}
                         className='h-8 w-8'
                       >
                         <Minus className='h-4 w-4' />
@@ -105,13 +106,13 @@ const Cart = () => {
                       disabled={isAvailableProduct[index]==="product is currently not available"}
                         variant="ghost" 
                         size="icon" 
-                        onClick={()=>incrementQuantity(index,cartProduct,cartProduct?.product?._id , cartProduct?.size , cartProduct?.quantity,cartProducts,setCArtProducts,setIsAvailableProduct)}
+                        onClick={()=>incrementQuantity(index,cartProduct,cartProducts,setCArtProducts,setIsAvailableProduct)}
                         className='h-8 w-8'
                       >
                         <Plus className='h-4 w-4' />
                       </Button>
                     </div>
-                    <Button onClick={()=>handleRemoveProduct(index,cartProduct?.product?._id,cartProduct?.size,cartProducts,setCArtProducts,isAvailableProduct,setIsAvailableProduct)} variant="ghost" size="icon">
+                    <Button onClick={()=>handleRemoveProduct(index,cartProduct?.product?._id,cartProduct?.size,setCArtProducts,setIsAvailableProduct)} variant="ghost" size="icon">
                       <Trash2 className='h-5 w-5 text-red-500' />
                     </Button>
                   </div>

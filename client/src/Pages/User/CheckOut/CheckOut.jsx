@@ -19,6 +19,7 @@ import { placeOrder } from '@/api/User/orderApi';
 import { getCheckoutAvailableCoupons } from '@/api/User/couponApi';
 import { getAddresses } from '@/api/User/addressApi'
 import { CouponCardType2 } from '@/components/UserComponent/CouponCard/CouponCard';
+import { Input } from '@/components/ui/input';
 
 const CheckOut = () => {
 
@@ -31,7 +32,8 @@ const CheckOut = () => {
   const [orderSuccess,setOrderSuccess] = useState(false);
 
   const [availableCoupons,setAvailableCoupons] = useState([]);
-  const [viewCouponPage,setViewCouponPage] = useState(false);
+  const [showCoupons,setShowCoupons] = useState(false);
+  const [selectedCoupon,setSelectedCoupon]=useState("");
 
   const navigate = useNavigate()
 
@@ -52,7 +54,7 @@ const CheckOut = () => {
   const fetchProductAndValidate=async(fetchCartProductsResult)=>{
     try{
       fetchCartProductsResult=await fetchCartProducts();
-      if(!orderSuccess && fetchCartProductsResult.fetchedProductArray.length===0) return navigate('/shop')
+      if(!orderSuccess && fetchCartProductsResult?.fetchedProductArray.length===0) return navigate('/shop')
       setCArtProducts(fetchCartProductsResult?.fetchedProductArray)
       setIsAvailableProduct(fetchCartProductsResult?.isAvailableReducer)
     }
@@ -65,6 +67,7 @@ const CheckOut = () => {
     try{
       const getCheckoutAvailableCouponsResult =await getCheckoutAvailableCoupons()
       setAvailableCoupons(getCheckoutAvailableCouponsResult?.availableCoupons);
+      console.log(getCheckoutAvailableCouponsResult.availableCoupons)
     }
     catch(error)
     {
@@ -120,70 +123,22 @@ const handlePlaceOrder=async()=>{
         {orderSuccess && <OrderSuccess  orderData={orderSuccess}/>}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 p-8">
           {/* Order Summary */}
-          <div className=" md:col-span-2">
-            <h2 className="text-xl font-semibold mb-4">Order summary &#x2022; {cartProducts.length} items</h2>
-           
-            <div className="mt-6 flex flex-col gap-2">
-            {cartProducts?.map((cartProduct,index)=>
+          
+          <div className='col-span-2'>
+              <OrderSummaryComponent cartProducts={cartProducts} setCArtProducts={setCArtProducts} isAvailableProduct={isAvailableProduct}  setIsAvailableProduct={setIsAvailableProduct} fetchCheckoutAvailableCoupons={fetchCheckoutAvailableCoupons}/>
 
-                <div key={cartProduct?._id} className={`flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4  rounded-lg p-2 px-4 ${isAvailableProduct[index] ? "shadow-[rgba(200,0,0,0.2)_0px_0px_6px_1px] border-2 border-red-100":"shadow-[rgba(0,0,0,0.1)_0px_0px_10px_1px]"}`}  initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: "easeOut" }}>
-                  <div className='flex gap-4 items-center'>
-                    <img 
-                      src={cartProduct?.product?.images[0]?.url||"https://res.cloudinary.com/dt3ovlqp8/image/upload/v1733138117/secure-uploads/rtr70ck1ho0fqatb8qff.jpg"} 
-                      alt={cartProduct?.product?.name} 
-                      className='w-10  object-cover rounded-lg'
-                    />
-                    <div>
-                      <h2 className='font-semibold text-'>{cartProduct?.product?.name||"Product Name"}</h2>
-                      <p className='text-gray-600'>Size:{cartProduct?.size ||"M"}</p>
-                      <p className='font-medium mt-1 flex items-baseline gap-4'> Rs.{cartProduct?.product?.salesPrice * cartProduct?.quantity || "$99.99"} <span className='text-xs text-muted-foreground'>{cartProduct?.product?.salesPrice} &#215; {cartProduct.quantity}</span></p>
-                      {isAvailableProduct[index] && <p className='text-red-700 font-semibold'>{isAvailableProduct[index]}</p>}
-                    </div>
-                  </div>
-                  <div className='flex items-center gap-4'>
-                    {isAvailableProduct[index]==="product is currently not available" ?<></>:!isAvailableProduct[index]?<></> : <div className='flex items-center border rounded'>
-                      <Button
-                        disabled={isAvailableProduct[index]==="product is currently not available"}
-                        variant="ghost" 
-                        size="icon" 
-                        onClick={()=>decrementQuantity(index,cartProduct,cartProduct?.product?._id , cartProduct?.size , cartProduct?.quantity,cartProducts,setCArtProducts,setIsAvailableProduct)}
-                        className='h-8 w-8'
-                      >
-                        <Minus className='h-4 w-4' />
-                      </Button>
-                      <span className='w-8 text-center'>{cartProduct?.quantity}</span>
-                      <Button 
-                      disabled={isAvailableProduct[index]==="product is currently not available"}
-                        variant="ghost" 
-                        size="icon" 
-                        onClick={()=>incrementQuantity(index,cartProduct,cartProduct?.product?._id , cartProduct?.size , cartProduct?.quantity,cartProducts,setCArtProducts,setIsAvailableProduct)}
-                        className='h-8 w-8'
-                      >
-                        <Plus className='h-4 w-4' />
-                      </Button>
-                    </div>}
-                    
-                    <Button   onClick={()=>handleRemoveProduct(index,cartProduct?.product?._id,cartProduct?.size,cartProducts,setCArtProducts,isAvailableProduct,setIsAvailableProduct)} variant="ghost" size="icon">
-                      <Trash2 className='h-5 w-5 text-red-500' />
-                    </Button>
-                  </div>
-                </div>
-            )}
-            </div>
-            <div className='flex flex-col py-3 gap-2'>
-              <p className="text-lg font-bold text-muted-foreground">Total Amount : ₹{cartProducts.reduce((acc,curr)=>acc+=(curr?.product?.salesPrice * curr?.quantity),0)}</p>
-            </div>
-              <button onClick={cartProducts.length===0?()=>navigate('/shop'):()=>setViewCouponPage(true)} className="relative w-full bg-black text-white py-2 rounded-md hover:bg-gray-800">
+              <div className='flex gap-5 mb-5'>
+                <Input className="flex-1" placeHolder="Enter the coupon code..."/>
+                <Button className="m-0 w-fit">Apply Coupon</Button>
+              </div>
+
+              <Button onClick={cartProducts.length===0?()=>navigate('/shop'):()=>setShowCoupons(true)} className="m-0 relative w-full bg-black text-white py-2 rounded-md hover:bg-gray-800">
                 <Badge className="bg-gray-400 rounded-2xl py-1 absolute top-[-10px] right-[-10px]">
                   {availableCoupons.length}
                 </Badge>
                 {cartProducts.length===0?"Back to shop":"View Coupon"}
-              </button>
-
-            <div className='max-h-[450px] border mt-5 p-5 overflow-y-auto bg-slate-100 grid gap-5'>
-              {availableCoupons.map(coupon=><CouponCardType2 coupon={coupon}/>)}
-            </div>
-
+              </Button>
+              {showCoupons && <ViewCouponComponent showCoupons={showCoupons} availableCoupons={availableCoupons} selectedCoupon={selectedCoupon} setSelectedCoupon={setSelectedCoupon}/>}
           </div>
 
 
@@ -208,3 +163,79 @@ const handlePlaceOrder=async()=>{
 
 
 export default CheckOut
+
+
+const ViewCouponComponent = ({showCoupons,availableCoupons,selectedCoupon,setSelectedCoupon})=>{
+  return(
+    <div>
+      <motion.div
+      className={`max-h-[450px] border mt-5 p-5 overflow-y-auto rounded-md bg-slate-100 grid gap-5 ${availableCoupons.length===0 && "hidden"}`}
+      initial={{ height: 0, opacity: 0 }}
+      animate={{
+        height: showCoupons ? "auto" : 0,
+        opacity: showCoupons ? 1 : 0,
+      }}
+      transition={{ duration: 0.8 }}
+      >
+        {availableCoupons.map(coupon=><CouponCardType2 key={coupon?._id} coupon={coupon} selectedCoupon={selectedCoupon} setSelectedCoupon={setSelectedCoupon}/>)}
+      </motion.div>
+      </div>
+  )
+}
+
+const OrderSummaryComponent = ({cartProducts,setCArtProducts,isAvailableProduct,setIsAvailableProduct,fetchCheckoutAvailableCoupons})=>{
+  return(
+    <div className=" md:col-span-2">
+            <h2 className="text-xl font-semibold mb-4">Order summary &#x2022; {cartProducts.length} items</h2>
+            <div className="mt-6 flex flex-col gap-2">
+            {cartProducts?.map((cartProduct,index)=>
+                <div key={cartProduct?._id} className={`flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4  rounded-lg p-2 px-4 ${isAvailableProduct[index] ? "shadow-[rgba(200,0,0,0.2)_0px_0px_6px_1px] border-2 border-red-100":"shadow-[rgba(0,0,0,0.1)_0px_0px_10px_1px]"}`}  initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: "easeOut" }}>
+                  <div className='flex gap-4 items-center'>
+                    <img 
+                      src={cartProduct?.product?.images[0]?.url||"https://res.cloudinary.com/dt3ovlqp8/image/upload/v1733138117/secure-uploads/rtr70ck1ho0fqatb8qff.jpg"} 
+                      alt={cartProduct?.product?.name} 
+                      className='w-10  object-cover rounded-lg'
+                    />
+                    <div>
+                      <h2 className='font-semibold text-'>{cartProduct?.product?.name||"Product Name"}</h2>
+                      <p className='text-gray-600'>Size:{cartProduct?.size ||"M"}</p>
+                      <p className='font-medium mt-1 flex items-baseline gap-4'> Rs.{cartProduct?.product?.salesPrice * cartProduct?.quantity || "$99.99"} <span className='text-xs text-muted-foreground'>{cartProduct?.product?.salesPrice} &#215; {cartProduct.quantity}</span></p>
+                      {isAvailableProduct[index] && <p className='text-red-700 font-semibold'>{isAvailableProduct[index]}</p>}
+                    </div>
+                  </div>
+                  <div className='flex items-center gap-4'>
+                    {isAvailableProduct[index]==="product is currently not available" ?<></>:!isAvailableProduct[index]?<></> : <div className='flex items-center border rounded'>
+                      <Button
+                        disabled={isAvailableProduct[index]==="product is currently not available"}
+                        variant="ghost" 
+                        size="icon" 
+                        onClick={()=>decrementQuantity(index,cartProduct,cartProducts,setCArtProducts,setIsAvailableProduct,fetchCheckoutAvailableCoupons)}
+                        className='h-8 w-8'
+                      >
+                        <Minus className='h-4 w-4' />
+                      </Button>
+                      <span className='w-8 text-center'>{cartProduct?.quantity}</span>
+                      <Button 
+                      disabled={isAvailableProduct[index]==="product is currently not available"}
+                        variant="ghost" 
+                        size="icon" 
+                        onClick={()=>incrementQuantity(index,cartProduct,cartProducts,setCArtProducts,setIsAvailableProduct,fetchCheckoutAvailableCoupons)}
+                        className='h-8 w-8'
+                      >
+                        <Plus className='h-4 w-4' />
+                      </Button>
+                    </div>}
+                    
+                    <Button   onClick={()=>handleRemoveProduct(index,cartProduct?.product?._id,cartProduct?.size,setCArtProducts,setIsAvailableProduct,fetchCheckoutAvailableCoupons)} variant="ghost" size="icon">
+                      <Trash2 className='h-5 w-5 text-red-500' />
+                    </Button>
+                  </div>
+                </div>
+            )}
+            </div>
+            <div className='flex flex-col py-3 gap-2'>
+              <p className="text-lg font-bold text-muted-foreground">Total Amount : ₹{cartProducts.reduce((acc,curr)=>acc+=(curr?.product?.salesPrice * curr?.quantity),0)}</p>
+            </div>
+          </div>
+  )
+}

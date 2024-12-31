@@ -22,7 +22,6 @@ import VerifyEmail from '@/Pages/User/Auth/ForgotPassword/VerifyEmail';
 import ChangePassword from '@/Pages/User/Auth/ForgotPassword/ChangePassword';
 import Wishlist from '@/Pages/User/Wishlist/Wishlist';
 import Coupon from '@/Pages/User/Profile/Coupon/Coupon';
-
 const UserRoute = () => {
   return (
     <>
@@ -40,7 +39,7 @@ const UserRoute = () => {
         <Route path="/address/add" element={<UserPrivate><ManageAddress/></UserPrivate>}/>
         <Route path="/address/manage/:id" element={<UserPrivate><ManageAddress/></UserPrivate>}/>
         <Route path="/cart" element={<Cart/>}/>
-        <Route path="/checkout/address" element={<CheckOut/>}/>
+        <Route path="/checkout" element={<CheckOut/>}/>
         <Route path="/orders" element={<Orders/>}/>
         <Route path="/orders/:orderId" element={<OrderDetail/>}/>
         <Route path="/wishlist" element={<Wishlist/>}/>

@@ -28,7 +28,8 @@ const Coupon = () => {
     <div className='md:ps-[340px]  pt-32'>
     <NavBar/>
     <SideBar current="address"/>
-      <div className='grid   grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2  xl:grid-cols-3 gap-3 p-5'>
+      {/* <div className='grid   grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2  xl:grid-cols-3 gap-3 p-5'> */}
+      <div className='flex flex-wrap gap-y-7'>
           {coupons.map((coupon,index)=><CouponCardType1 coupon={coupon}/>)}
       </div>
     </div>

@@ -1,6 +1,8 @@
 import { editCustomers, getCustomers } from '@/api/Admin/customerApi';
+import Modal from '@/components/AdminComponent/Modal/Modal';
 import SideBar from '@/components/AdminComponent/SideBar'
 import TableComponent from '@/components/AdminComponent/Table/TableCompnent';
+import { Switch } from '@/components/ui/switch';
 import React, { useEffect, useState } from 'react'
 import { CiSearch } from 'react-icons/ci'
 
@@ -19,7 +21,11 @@ const Customer = () => {
                 const response = await getCustomers();
                 const customersDetails = response.customers;
                 const transformedCustomers = customersDetails.map((customer,index)=>(
-                    [customer._id,[{name:"sno",value:index+1},{name:"name",value:customer.name},{name:"phone",value:customer.phone},{name:"email",value:customer.email},{name:"state",value:customer.isActive}]]
+                    [customer._id,[{name:"sno",value:index+1},
+                        {name:"name",value:customer.name},
+                        {name:"phone",value:customer.phone},
+                        {name:"email",value:customer.email},
+                        {name:"state",value:<Modal handleClick={()=>handleSwitchClick(customer._id)} dialogTitle="are you sure" dialogDescription="you can list again" alertDialogTriggerrer={<Switch checked={customer?.isActive} />}/>}]]
                 ))
                 setCustomers(transformedCustomers)
             }
