@@ -26,8 +26,14 @@ const couponSchema = mongoose.Schema({
         default:0
     },
     maxUsableLimit:{
-        type:String,
-        default:"no limit"
+        isLimited:{
+            type:Boolean,
+            default:false,
+        },
+        limit:{
+            type:Number,
+            default:0
+        }
     },
     perUserLimit:{
         type:Number,

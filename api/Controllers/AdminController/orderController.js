@@ -22,8 +22,15 @@ export const updateOrderStatus = async(req,res,next)=>{
             today.setDate(today.getDate() + 6);
             updationFields.deliveryDate = today
         }
+
+        if(status==="Delivered")
+        {
+            console.log("working")
+            updationFields.paymentStatus="Success"
+        }
+
         try{
-        const updatedOrder = await orderDB.updateOne({orderId},{$set:{status}});
+        const updatedOrder = await orderDB.updateOne({orderId},{$set:updationFields});
         if(!updatedOrder.matchedCount) return next(errorHandler(404,"order not found"));
         if(!updatedOrder.modifiedCount) return next(errorHandler(400,"no changes made"));
         return res.status(200).json({success:true,message:"state update to "+status+" successfully"})

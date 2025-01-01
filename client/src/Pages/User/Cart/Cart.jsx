@@ -7,9 +7,10 @@ import { proceedToCheckout,updateCart } from '@/api/User/cartApi'
 
 import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
-import { fetchCartProducts } from '@/Utils/productAvailableChecker'
-import { decrementQuantity, handleRemoveProduct, incrementQuantity } from '@/Utils/cartOperations'
+import { fetchCartProducts } from '@/Utils/cart/productAvailableChecker'
+import { decrementQuantity, handleRemoveProduct, incrementQuantity } from '@/Utils/cart/cartOperations'
 import { toast } from 'sonner'
+import { totalAmountCalculator } from '@/Utils/cart/cartItemsTotalAmountCalculator'
 
 const Cart = () => {
   const [cartProducts,setCArtProducts] = useState([])
@@ -61,7 +62,6 @@ const Cart = () => {
         <h1 className="text-3xl font-bold mb-6">Your Cart</h1>
         <div className='grid grid-cols-12 gap-8'>
           <section className=' col-span-12 lg:col-span-8 bg-white p-6 rounded-lg shadow-[rgba(0,0,0,0.1)_0px_0px_5px_1px] flex flex-col gap-4'>
-            {/* <div className='border '> */}
 
             {/* one product */}
             {cartProducts.length===0
@@ -140,7 +140,7 @@ const Cart = () => {
             <div className='border-t pt-2'>
               <div className='flex justify-between font-semibold'>
                 <span>Total</span>
-                <span>₹{cartProducts.reduce((acc,curr)=>acc+=(curr?.product?.salesPrice * curr?.quantity),0)}</span>
+                <span>₹{totalAmountCalculator(cartProducts)}</span>
               </div>
             </div>
             <Button disabled={isAvailableProduct.filter(Boolean).length!==0} onClick={handleProceedToChechout} className='w-full mt-6'>Proceed to Checkout</Button>

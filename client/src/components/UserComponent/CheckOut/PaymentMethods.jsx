@@ -3,7 +3,7 @@ import { Label } from "@/components/ui/label"
 import { Wallet, CreditCard, Banknote } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 
-export function PaymentMethods({isAvailableProduct,cartProducts,setPaymentMethod,handlePlaceOrder}) {
+export function PaymentMethods({isAvailableProduct,cartProducts,paymentMethod,setPaymentMethod,handlePlaceOrder,handleRazorPayment}) {
   return (
     <div>
       <h2 className="text-xl font-semibold mb-4">Payment Methods</h2>
@@ -31,7 +31,7 @@ export function PaymentMethods({isAvailableProduct,cartProducts,setPaymentMethod
           </Label>
         </div>
       </RadioGroup>
-      <Button  disabled={isAvailableProduct.filter(Boolean).length!==0 || cartProducts.length<1} onClick={handlePlaceOrder} >Place Order</Button>
+      <Button  disabled={isAvailableProduct.filter(Boolean).length!==0 || cartProducts.length<1} onClick={paymentMethod==="razorpay"?()=>handleRazorPayment():()=>handlePlaceOrder()} >Place Order</Button>
     </div>
   )
 }

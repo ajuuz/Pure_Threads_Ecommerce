@@ -9,11 +9,12 @@ import { changePassword, getUserProfile, updateUserProfile } from '../Controller
 import { addAddress, deleteAddress, editAddress, getAddress, getAddresses, setDefaultAddress } from '../Controllers/UserController/addressController.js';
 import { verifyUserBlocked } from '../Middlewares/userBlockMiddleware.js';
 import { addToCart, getCartProducts, proceedToCheckout, selectSizeForProduct, updateCart } from '../Controllers/UserController/cartController.js';
-import { cancelOrder, getOrders, getParticularOrder, placeOrder } from '../Controllers/UserController/orderController.js';
+import { cancelOrder, makePayment, getOrders, getParticularOrder, placeOrder } from '../Controllers/UserController/orderController.js';
 import { validateProduct } from '../Middlewares/productCheckerMiddleware.js';
 import { addToWishlist, getWishlistProducts, removeFromWishlist,  } from '../Controllers/UserController/wishlistController.js';
 import { getAllCoupons } from '../Controllers/CommonController/couponController.js';
 import { getCheckoutAvailableCoupons } from '../Controllers/UserController/couponController.js';
+import { couponActivation } from '../Middlewares/couponMiddleWares/couponActivation.js';
 const router = express.Router();
 
 
@@ -62,11 +63,11 @@ router.patch('/wishlist/:productId',removeFromWishlist)
 
 
 // order
-router.post('/orders',validateProduct,placeOrder)
+router.post('/orders',validateProduct,couponActivation,placeOrder)
 router.get('/orders',getOrders)
 router.patch('/orders/:orderId',cancelOrder)
-router.get('/orders/:orderId',getParticularOrder)
-
+router.get('/orders/:orderId',getParticularOrder);
+router.post('/makePayment',makePayment)
 
 //coupon
 router.get('/coupons',getAllCoupons)

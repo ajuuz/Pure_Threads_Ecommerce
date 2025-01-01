@@ -20,7 +20,7 @@ const Coupon = () => {
                           {name:"description",value:coupon?.description},
                           {name:"max redeemable",value:coupon?.maxRedeemable??coupon?.couponValue},
                           {name:"minimum Purchase",value:coupon?.minimumOrderAmount},
-                          {name:"Max Usable Limit",value:coupon?.maxUsableLimit},
+                          {name:"Max Usable Limit",value:coupon?.maxUsableLimit?.isLimited?coupon?.maxUsableLimit?.limit:"No limit"},
                           {name:"Per user Limit",value:coupon?.perUserLimit}
                         ]]
         })

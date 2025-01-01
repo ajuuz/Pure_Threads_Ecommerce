@@ -29,10 +29,13 @@ const Orders = () => {
   },[])
 
 
-  const handleCancelOrder=async(index,orderId)=>{
+  const handleCancelOrder=async(index,orderId,paymentMethod,totalAmount)=>{
     try{
-      console.log(orderId)
-      const cancelOrderResult = await cancelOrder(orderId);
+      let isPaymentDone=false;
+      if(["razorpay","wallet"].includes(paymentMethod)){
+        isPaymentDone=true;
+      }
+      const cancelOrderResult = await cancelOrder(orderId,isPaymentDone,totalAmount);
       const updatedOrderArray = [...orders];
       updatedOrderArray[index].status="Cancelled";
       setOrders(updatedOrderArray)
@@ -133,10 +136,10 @@ const formatOrderDate = (isoDate) => {
                     <Truck className="w-4 h-4" />
                     <span>Estimated delivery in {deliveryDateCalculator(order?.deliveryDate)} days</span>
                   </div>
-                  {order?.status!=="Cancelled"
+                  {!["Cancelled","Delivered"].includes(order?.status)
                    &&
                   <div>
-                     <Modal handleClick={()=>handleCancelOrder(index,order?.orderId)} type="button"   dialogTitle="are you sure" dialogDescription="you can list again" alertDialogTriggerrer={ <Button  className="bg-[#DC3545] hover:bg-[#DC3545] h-8">Cancel</Button> }/>
+                     <Modal handleClick={()=>handleCancelOrder(index,order?.orderId,order?.paymentMethod,order?.totalAmount)} type="button"   dialogTitle="are you sure" dialogDescription="you can list again" alertDialogTriggerrer={ <Button  className="bg-[#DC3545] hover:bg-[#DC3545] h-8">Cancel</Button> }/>
                   </div>
                   }
                 </div>

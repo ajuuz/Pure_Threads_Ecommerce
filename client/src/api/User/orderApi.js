@@ -1,9 +1,9 @@
 import { axiosInstance } from "../axiosInstance";
 
-export const placeOrder = async(paymentMethod,deliveryAddress)=>{
+export const placeOrder = async(paymentMethod,deliveryAddress,selectedCoupon,totalAmount,paymentDetails)=>{
     try{
         console.log("working place order")
-        const response = await axiosInstance.post('/users/orders',{paymentMethod,deliveryAddress})
+        const response = await axiosInstance.post('/users/orders',{paymentMethod,deliveryAddress,selectedCoupon,totalAmount,paymentDetails})
         return response.data
     }
     catch(error)
@@ -23,10 +23,9 @@ export const getOrders = async()=>{
     }
 }
 
-export const cancelOrder=async(orderId)=>{
+export const cancelOrder=async(orderId,isPaymentDone,totalAmount)=>{
     try{
-        console.log(orderId);
-        const response = await axiosInstance.patch(`/users/orders/${orderId}`)
+        const response = await axiosInstance.patch(`/users/orders/${orderId}`,{isPaymentDone,totalAmount})
         return response.data;
     }
     catch(error){
@@ -44,3 +43,22 @@ export const getParticulartOrder=async(orderId)=>{
         throw error?.response.data && {...error?.response.data,statusCode:error.status} || error
     }
 }
+
+export const makePayment=async(amount)=>{
+    try{
+        const response= await axiosInstance("/users/makePayment",{
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            data: JSON.stringify({ amount }),
+          });
+
+          return response.data
+    }
+    catch(error)
+    {
+        throw error.response.data;
+    }
+}
+

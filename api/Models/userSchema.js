@@ -20,8 +20,13 @@ const userSchema = new mongoose.Schema({
     type:Boolean,
     required:true,
     default:true,
-   }
-
+   },
+   usedCoupons:[
+    {
+      couponCode:{type:String,},
+      usedCount:{type:Number}
+    }
+    ]
 })
 
 const UsersDB = mongoose.model('user',userSchema);

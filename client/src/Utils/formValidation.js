@@ -45,7 +45,6 @@ export const validateUserDetailsForm = (formData)=>{
 
 export const validateOtherForms = (formData)=>{
   let formErrors={};
-  console.log(formData)
   for(let i in formData)
   {
     if (i === "email") {

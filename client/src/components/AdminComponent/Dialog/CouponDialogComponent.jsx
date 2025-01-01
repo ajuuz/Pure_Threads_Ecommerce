@@ -26,28 +26,31 @@ const  CouponDialogComponent=({dialogTriggerer,dialogHeader,dialogDescription})=
         couponCode:"",
         couponValue:null,
         description:"",
-        maxRedeemable:null,
         minimumOrderAmount:null,
-        maxUsableLimit:"no limit",
         perUserLimit:null,
     })
     const handleCouponTypeClick=()=>setCouponType((prev)=>prev==="%"?"Rs":"%")
    
     const handleCouponFormData=(e)=>{
-        setCouponFormData((prev)=>({...prev,[e.target.name]:e.target.value}));
+        if(e.target.name==="maxUsableLimit") setCouponFormData((prev)=>({...prev,maxUsableLimit:{isLimited:true,limit:e.target.value}}))
+        else  setCouponFormData((prev)=>({...prev,[e.target.name]:e.target.value}));
     }
 
     const handleMaxUsableLimitField=()=>{
         setMaxUsableLimitField(prev=>!prev);
-        setCouponFormData((prev)=>({...prev, maxUsableLimit:"no limit"}))
+        setCouponFormData((prev)=>{
+            const {maxUsableLimit,...rest} = prev;
+            return rest;
+        })
     }
 
     const handleCouponSubmit = async()=>{
+        let newCoupon = couponFormData;
         if(couponType==="Rs")
         {
-            setCouponFormData((prev)=>({...prev,maxRedeemable:prev.couponValue}))
+            newCoupon.maxRedeemable=couponFormData.couponValue;
         }
-        const validation = validateOtherForms(couponFormData)
+        const validation = validateOtherForms(newCoupon)
         if(Object.values(validation).length>0)
         {
             for(let error in validation)
@@ -57,7 +60,7 @@ const  CouponDialogComponent=({dialogTriggerer,dialogHeader,dialogDescription})=
             }
         }
         try{
-            const addCouponResult = await addNewCoupon({...couponFormData,couponType});
+            const addCouponResult = await addNewCoupon({...newCoupon,couponType});
             toast.success(addCouponResult?.message)
             setOpen(false)
         }

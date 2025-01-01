@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react'
 
-import { Minus, Plus, Ticket, Trash2 } from 'lucide-react'
+import { Minus, Plus, Ticket, Trash2,CheckIcon } from 'lucide-react'
 
+//components
 import NavBar from '@/components/UserComponent/NavBar/NavBar'
 import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
@@ -11,18 +12,25 @@ import { PaymentMethods } from '@/components/UserComponent/CheckOut/PaymentMetho
 import OrderSuccess from '@/components/UserComponent/CheckOut/OrderSuccess';
 
 import { toast } from 'sonner';
-
 import { motion } from 'framer-motion';
-import { fetchCartProducts } from '@/Utils/productAvailableChecker';
-import { decrementQuantity, handleRemoveProduct, incrementQuantity } from '@/Utils/cartOperations';
-import { placeOrder } from '@/api/User/orderApi';
+
+//apis
+import { fetchCartProducts } from '@/Utils/cart/productAvailableChecker';
+import { decrementQuantity, handleRemoveProduct, incrementQuantity } from '@/Utils/cart/cartOperations';
+import {  makePayment, placeOrder } from '@/api/User/orderApi';
 import { getCheckoutAvailableCoupons } from '@/api/User/couponApi';
 import { getAddresses } from '@/api/User/addressApi'
 import { CouponCardType2 } from '@/components/UserComponent/CouponCard/CouponCard';
 import { Input } from '@/components/ui/input';
+import { totalAmountCalculator } from '@/Utils/cart/cartItemsTotalAmountCalculator';
+
+//razor pay
+import {useRazorpay} from "react-razorpay";
+
 
 const CheckOut = () => {
-
+  
+  //useStates
   const [addresses,setAddresses] = useState([])
   const [cartProducts,setCArtProducts] = useState([]);
   const [isAvailableProduct,setIsAvailableProduct] = useState([])
@@ -30,12 +38,17 @@ const CheckOut = () => {
   const [isFirstPage,setIsFirstPage] = useState(true)
   const [paymentMethod,setPaymentMethod]=useState("cod")
   const [orderSuccess,setOrderSuccess] = useState(false);
-
+  
   const [availableCoupons,setAvailableCoupons] = useState([]);
   const [showCoupons,setShowCoupons] = useState(false);
-  const [selectedCoupon,setSelectedCoupon]=useState("");
-
+  const [selectedCoupon,setSelectedCoupon]=useState(null);
+  
   const navigate = useNavigate()
+
+  //razorpay
+  const { error, isLoading, Razorpay } = useRazorpay();
+  const RAZORPAY_KEY_ID = import.meta.env.VITE_RAZORPAY_KEY_ID;
+
 
   const fetchAddresses=async()=>{
     try{
@@ -67,7 +80,12 @@ const CheckOut = () => {
     try{
       const getCheckoutAvailableCouponsResult =await getCheckoutAvailableCoupons()
       setAvailableCoupons(getCheckoutAvailableCouponsResult?.availableCoupons);
-      console.log(getCheckoutAvailableCouponsResult.availableCoupons)
+      console.log(getCheckoutAvailableCouponsResult?.availableCoupons)
+
+      if(!getCheckoutAvailableCouponsResult?.availableCoupons.some(coupon=>coupon.couponCode===selectedCoupon))
+      {
+        setSelectedCoupon(null)
+      }
     }
     catch(error)
     {
@@ -84,26 +102,83 @@ const CheckOut = () => {
   },[])
 
 
-const handlePlaceOrder=async()=>{
-  try{
-    const fetchCartProductsResult = await fetchCartProducts();
+  const handleRazorPayment = async () => {
+    try {
+      const fetchCartProductsResult = await fetchCartProducts();
     
-    if(fetchCartProductsResult.isAvailableReducer.filter(Boolean).length!==0) {
-      setIsAvailableProduct(fetchCartProductsResult.isAvailableReducer)
-      return
+      if(fetchCartProductsResult.isAvailableReducer.filter(Boolean).length!==0) {
+        setIsAvailableProduct(fetchCartProductsResult.isAvailableReducer)
+        return
+      }
+
+      // Make the API call to backend
+      const order = await makePayment(5000)
+      console.log(order)
+
+      const options = {
+        key: RAZORPAY_KEY_ID,
+        amount: order.amount,
+        currency: order.currency,
+        name: "Pure Threads", 
+        description: "Payment for your order", 
+        order_id: order.id,
+
+        //verify payment
+        // after making the payment 
+        handler: async (response) => {
+          try {
+            const paymentDetails={
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature
+            }
+
+            await handlePlaceOrder(paymentDetails)
+          } catch (err) {
+            // Add onPaymentUnSuccessfull function here
+            toast.error("Payment failed: " + err.message);
+          }
+        },
+        prefill: {
+          name: "Ajmal EA", // add customer details
+          email: "john@example.com", // add customer details
+        },
+        notes: {
+          address: "Pure Threads",
+        },
+        theme: {
+    // you can change the gateway color from here according to your
+    // application theme
+          color: "#3399cc",
+        },
+      };
+      const rzpay = new Razorpay(options);
+      // this will open razorpay window for take the payment in the frontend
+      // under the hood it use inbuild javascript windows api 
+      rzpay.open(options);
+    } catch (err) {
+      toast.error("Error creating order: " + err.message);
     }
-    console.log("working")
-    
+  };
+
+
+const handlePlaceOrder=async(paymentDetails)=>{
+  try{
     if(paymentMethod==="cod")
       {
+        const fetchCartProductsResult = await fetchCartProducts();
+        if(fetchCartProductsResult.isAvailableReducer.filter(Boolean).length!==0) {
+          setIsAvailableProduct(fetchCartProductsResult.isAvailableReducer)
+          return
+        }
+      }
         const deliveryAddress = addresses[selectedAddressIndex]
-        const placeOrderResult = await placeOrder(paymentMethod,deliveryAddress)
-        if(placeOrderResult.success)
+        const placeOrderResult = await placeOrder(paymentMethod,deliveryAddress,selectedCoupon,totalAmountCalculator(cartProducts,selectedCoupon),paymentDetails)
+      if(placeOrderResult.success)
       {
         setOrderSuccess(placeOrderResult.orderData)
         console.log(placeOrderResult.orderData)
       }
-    }
     else{
       toast.info("other payment methods are currently on work. will release soon")
     }
@@ -125,7 +200,14 @@ const handlePlaceOrder=async()=>{
           {/* Order Summary */}
           
           <div className='col-span-2'>
-              <OrderSummaryComponent cartProducts={cartProducts} setCArtProducts={setCArtProducts} isAvailableProduct={isAvailableProduct}  setIsAvailableProduct={setIsAvailableProduct} fetchCheckoutAvailableCoupons={fetchCheckoutAvailableCoupons}/>
+              <OrderSummaryComponent 
+              cartProducts={cartProducts}
+              setCArtProducts={setCArtProducts} 
+              isAvailableProduct={isAvailableProduct} 
+              setIsAvailableProduct={setIsAvailableProduct} 
+              fetchCheckoutAvailableCoupons={fetchCheckoutAvailableCoupons}
+              selectedCoupon={selectedCoupon}
+              />
 
               <div className='flex gap-5 mb-5'>
                 <Input className="flex-1" placeHolder="Enter the coupon code..."/>
@@ -145,8 +227,8 @@ const handlePlaceOrder=async()=>{
           {/* Delivery Points */}
           <div className="md:col-span-2">
             {isFirstPage
-            ?<CheckOutAddress addresses={addresses} selectedAddressIndex={selectedAddressIndex} setSelectedAddressIndex={setSelectedAddressIndex}/>
-            :<PaymentMethods isAvailableProduct={isAvailableProduct} cartProducts={cartProducts} setPaymentMethod={setPaymentMethod} handlePlaceOrder={handlePlaceOrder}/>
+            ?<CheckOutAddress  addresses={addresses}  selectedAddressIndex={selectedAddressIndex}  setSelectedAddressIndex={setSelectedAddressIndex}/>
+            :<PaymentMethods  isAvailableProduct={isAvailableProduct} cartProducts={cartProducts}  paymentMethod={paymentMethod}  setPaymentMethod={setPaymentMethod}  handlePlaceOrder={handlePlaceOrder} handleRazorPayment={handleRazorPayment}/>
             }
               {/* next side div */}
               <div className='flex gap-5'>
@@ -166,6 +248,7 @@ export default CheckOut
 
 
 const ViewCouponComponent = ({showCoupons,availableCoupons,selectedCoupon,setSelectedCoupon})=>{
+  console.log(selectedCoupon);
   return(
     <div>
       <motion.div
@@ -183,7 +266,7 @@ const ViewCouponComponent = ({showCoupons,availableCoupons,selectedCoupon,setSel
   )
 }
 
-const OrderSummaryComponent = ({cartProducts,setCArtProducts,isAvailableProduct,setIsAvailableProduct,fetchCheckoutAvailableCoupons})=>{
+const OrderSummaryComponent = ({cartProducts,setCArtProducts,isAvailableProduct,setIsAvailableProduct,fetchCheckoutAvailableCoupons,selectedCoupon})=>{
   return(
     <div className=" md:col-span-2">
             <h2 className="text-xl font-semibold mb-4">Order summary &#x2022; {cartProducts.length} items</h2>
@@ -234,7 +317,23 @@ const OrderSummaryComponent = ({cartProducts,setCArtProducts,isAvailableProduct,
             )}
             </div>
             <div className='flex flex-col py-3 gap-2'>
-              <p className="text-lg font-bold text-muted-foreground">Total Amount : ₹{cartProducts.reduce((acc,curr)=>acc+=(curr?.product?.salesPrice * curr?.quantity),0)}</p>
+              <p className=" flex items-center gap-2">
+                <span className='text-lg font-bold text-muted-foreground'>
+                  Total Amount : ₹{totalAmountCalculator(cartProducts,selectedCoupon)} 
+                </span>
+                {selectedCoupon 
+                && 
+                <div className='flex items-center gap-4'>
+                  <span className='text-lg font-bold text-muted-foreground line-through'>₹{totalAmountCalculator(cartProducts)}</span>
+                  <div className='bg-slate-200 font-semibold text-muted-foreground rounded-lg flex items-center gap-1 h-fit'>
+                    <span className='ps-2 flex gap-1'>{selectedCoupon?.couponCode}<div className='bg-green-400 rounded-3xl'><CheckIcon className='text-white scale-50'/></div></span>
+                    <Badge className="p-2">
+                      {selectedCoupon?.couponValue +" "+selectedCoupon?.couponType} off
+                    </Badge>
+                  </div>
+                </div>
+                }
+              </p>
             </div>
           </div>
   )

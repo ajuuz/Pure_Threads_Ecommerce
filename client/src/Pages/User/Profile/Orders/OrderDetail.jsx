@@ -20,6 +20,7 @@ const OrderDetail=()=> {
             try{
                 const orderResult = await getParticulartOrder(orderId)
                 setOrder(orderResult.order)
+                console.log(orderResult.order)
             }catch(error){
                 console.log(error.message)
             }
@@ -68,7 +69,7 @@ const OrderDetail=()=> {
             <h3 className="font-medium text-gray-800 mb-2">Payment Method</h3>
             <p className="text-sm text-gray-600">
               {order?.paymentMethod?"Cash On Delivery":order?.paymentMethod} <br />
-              Status: <span className="text-green-500 font-medium">{order?.paymentMethod==="cod"?"pending":"paid"}</span>
+              Status: <span className={`${order?.paymentStatus==="Pending"?"text-yellow-500":order?.paymentStatus==="Failed"?"text-red-500":"text-green-500"} font-medium`}>{order?.paymentStatus}</span>
             </p>
           </div>
 

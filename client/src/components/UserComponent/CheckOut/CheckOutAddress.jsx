@@ -15,7 +15,7 @@ const navigate = useNavigate()
 
     {/* Add New Address */}
             <div className='p-6 mb-5  shadow-[rgba(0,0,0,0.1)_0px_1px_30px_1px] rounded-xl flex flex-col gap-2 justify-center items-center'>
-                <div onClick={()=>navigate('/address/add',{ state: { from: '/checkout/address'}})} className='bg-black text-white p-2 rounded-3xl '>
+                <div onClick={()=>navigate('/address/add',{ state: { from: '/checkout'}})} className='bg-black text-white p-2 rounded-3xl '>
                     <FaPlus className='text-3xl'/>
                 </div>
                 <p className='text-muted-foreground font-semibold text-xs'>ADD NEW ADDRESS</p>
@@ -31,7 +31,7 @@ const navigate = useNavigate()
                   <div className="flex justify-between">
                     <h3 className="text-lg font-semibold">{address.name}</h3>
                     <button className="text-gray-500 hover:text-gray-700">
-                      <span  onClick={()=>navigate(`/address/manage/${address._id}`,{ state: { from: '/checkout/address'}})} className="material-icons text-gray-400">Edit</span>
+                      <span  onClick={()=>navigate(`/address/manage/${address._id}`,{ state: { from: '/checkout'}})} className="material-icons text-gray-400">Edit</span>
                     </button>
                   </div>
                   <p>{address?.buildingName?address.buildingName:""}</p>

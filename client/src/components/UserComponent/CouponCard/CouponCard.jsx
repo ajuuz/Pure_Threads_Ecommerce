@@ -54,7 +54,7 @@ export const CouponCardType1=({coupon})=>{
             </div>
             <div className="flex justify-between">
               <span>Usage Limit:</span>
-              <span className="font-medium">{maxUsableLimit}</span>
+              <span className="font-medium">{maxUsableLimit?.isLimited?maxUsableLimit?.limit:"NO limit"}</span>
             </div>
             <div className="flex justify-between">
               <span>Per User Limit:</span>
@@ -79,7 +79,6 @@ export const CouponCardType1=({coupon})=>{
 export const CouponCardType2 = ({coupon,selectedCoupon,setSelectedCoupon})=>{
   return(
     <div className='bg-white  rounded-md border py-5 flex items-center'>
-  
 
       {/*inner content  */}
       <div className='flex-1 px-5 flex flex-col'>
@@ -89,7 +88,7 @@ export const CouponCardType2 = ({coupon,selectedCoupon,setSelectedCoupon})=>{
             <Ticket/>
             <p className='font-bold border-2  py-2 px-3 border-dashed bg-slate-100 rounded-md text-lg text-muted-foreground'>{coupon?.couponCode}</p>
             </div>
-          <Button disabled={coupon?.couponCode===selectedCoupon} onClick={()=>setSelectedCoupon(coupon?.couponCode)} className="w-fit  m-0">{coupon?.couponCode===selectedCoupon?"APPLIED":"APPLY"}</Button>
+          <Button disabled={coupon?.couponCode===selectedCoupon?.couponCode} onClick={()=>setSelectedCoupon({couponCode:coupon?.couponCode,couponValue:coupon?.couponValue,couponType:coupon?.couponType})} className="w-fit  m-0">{coupon?.couponCode===selectedCoupon?.couponCode?"APPLIED":"APPLY"}</Button>
 
           </div>
           <div className='flex'>
@@ -110,7 +109,7 @@ export const CouponCardType2 = ({coupon,selectedCoupon,setSelectedCoupon})=>{
           <div className='grid gap-1'>
             <p className='flex justify-between'><span>Maximum Redeemable:</span> <span>{coupon?.maxRedeemable}</span></p>
             <p className='flex justify-between'><span>Minimum Purchase:</span> <span>{coupon?.minimumOrderAmount}</span></p>
-            <p className='flex justify-between'><span>Usage Limit:</span> <span>{coupon?.maxUsableLimit}</span></p>
+            <p className='flex justify-between'><span>Usage Limit:</span> <span>{coupon?.maxUsableLimit?.isLimited?coupon?.maxUsableLimit?.limit:"No limit"}</span></p>
             <p className='flex justify-between'><span>Per User Limit:</span> <span>{coupon?.perUserLimit}</span></p>
           </div>
         </div>
