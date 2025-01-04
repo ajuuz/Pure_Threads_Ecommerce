@@ -10,6 +10,7 @@ import { verifyAdmin } from '../Middlewares/adminAuthMiddleware.js';
 import { getAllOrders, updateOrderStatus } from '../Controllers/AdminController/orderController.js';
 import { addNewCoupon } from '../Controllers/AdminController/couponController.js';
 import { getAllCoupons } from '../Controllers/CommonController/couponController.js';
+import { getSalesReport } from '../Controllers/AdminController/salesReportController.js';
 const router = express.Router();
 
 
@@ -41,4 +42,7 @@ router.patch('/orders/:orderId',updateOrderStatus)
 // coupon
 router.post('/coupons',addNewCoupon)
 router.get('/coupons',getAllCoupons)
+
+// sales Report
+router.get('/salesReport',getSalesReport)
 export default router;

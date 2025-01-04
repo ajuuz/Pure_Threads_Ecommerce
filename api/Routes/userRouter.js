@@ -3,7 +3,7 @@ import express from 'express';
 
 import { generateOtp,verifyLogin,verifyOtp,resendOtp, googleAuth, logout,forgotChangePassword, forgotVerifyEmail } from '../Controllers/UserController/authController.js';
 import { getCategories } from '../Controllers/UserController/categoryController.js';
-import { getParticularProduct, getProducts, getRelatedProduct } from '../Controllers/UserController/ProductController.js';
+import { getParticularProduct,  getRelatedProduct } from '../Controllers/UserController/ProductController.js';
 import { verifyUser } from '../Middlewares/userAuthMiddleware.js';
 import { changePassword, getUserProfile, updateUserProfile } from '../Controllers/UserController/profileController.js';
 import { addAddress, deleteAddress, editAddress, getAddress, getAddresses, setDefaultAddress } from '../Controllers/UserController/addressController.js';
@@ -15,6 +15,8 @@ import { addToWishlist, getWishlistProducts, removeFromWishlist,  } from '../Con
 import { getAllCoupons } from '../Controllers/CommonController/couponController.js';
 import { getCheckoutAvailableCoupons } from '../Controllers/UserController/couponController.js';
 import { couponActivation } from '../Middlewares/couponMiddleWares/couponActivation.js';
+import { getWallet } from '../Controllers/UserController/walletController.js';
+import { getProducts } from '../Controllers/CommonController/productController.js';
 const router = express.Router();
 
 
@@ -72,4 +74,7 @@ router.post('/makePayment',makePayment)
 //coupon
 router.get('/coupons',getAllCoupons)
 router.get('/coupons/checkoutAvailable',getCheckoutAvailableCoupons)
+
+// wallet 
+router.get('/wallet',getWallet);
 export default router;

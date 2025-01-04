@@ -15,6 +15,7 @@ import AdminPrivate from './Protected_Routing/Admin/AdminPrivate';
 import AdminLoginPrivate from './Protected_Routing/Admin/AdminLoginPrivate';
 import Orders from '@/Pages/Admin/Orders/Orders';
 import Coupon from '@/Pages/Admin/Coupon/Coupon';
+import SalesReport from '@/Pages/Admin/SalesReport/SalesReport';
 const AdminRoute = () => {
   return (
    <>
@@ -30,6 +31,7 @@ const AdminRoute = () => {
         <Route path='/customers' element={<AdminPrivate><Customer/></AdminPrivate>}/>
         <Route path='/orders' element={<Orders/>}/>
         <Route path="/coupons" element={<Coupon/>}/>
+        <Route path="/salesReports" element={<SalesReport/>}/>
     </Routes>
    </>
   )

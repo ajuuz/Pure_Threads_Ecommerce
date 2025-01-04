@@ -22,6 +22,7 @@ import VerifyEmail from '@/Pages/User/Auth/ForgotPassword/VerifyEmail';
 import ChangePassword from '@/Pages/User/Auth/ForgotPassword/ChangePassword';
 import Wishlist from '@/Pages/User/Wishlist/Wishlist';
 import Coupon from '@/Pages/User/Profile/Coupon/Coupon';
+import Wallet from '@/Pages/User/Profile/Wallet/Wallet';
 const UserRoute = () => {
   return (
     <>
@@ -44,6 +45,7 @@ const UserRoute = () => {
         <Route path="/orders/:orderId" element={<OrderDetail/>}/>
         <Route path="/wishlist" element={<Wishlist/>}/>
         <Route path="/coupons" element={<Coupon/>}/>
+        <Route path="/wallet" element={<Wallet/>}/>
     </Routes>
     </>
   )

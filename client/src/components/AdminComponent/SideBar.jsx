@@ -41,7 +41,7 @@ const SideBar = () => {
         <p className='text-lg font-semibold flex items-center justify-between cursor-pointer' onClick={()=>navigate('/admin/products')}><GiCardboardBoxClosed />Products<RxCaretRight /></p>
         <p className='text-lg font-semibold flex items-center justify-between cursor-pointer' onClick={()=>navigate('/admin/orders')}><GiCardboardBoxClosed />Orders<RxCaretRight /></p>
         <p className='text-lg font-semibold flex items-center justify-between cursor-pointer'  onClick={()=>navigate('/admin/customers')}><GiCardboardBoxClosed />Customers<RxCaretRight /></p>
-        <p className='text-lg font-semibold flex items-center justify-between cursor-pointer'><GiCardboardBoxClosed />Sales<RxCaretRight /></p>
+        <p className='text-lg font-semibold flex items-center justify-between cursor-pointer' onClick={()=>navigate('/admin/salesReports')} ><GiCardboardBoxClosed />Sales<RxCaretRight /></p>
         <p className='text-lg font-semibold flex items-center justify-between cursor-pointer'  onClick={()=>navigate('/admin/categories')}><GiCardboardBoxClosed />Categeroies<RxCaretRight /></p>
         <p className='text-lg font-semibold flex items-center justify-between cursor-pointer'><GiCardboardBoxClosed />Coupons<RxCaretRight /></p>
         <p className='text-lg font-semibold flex items-center justify-between cursor-pointer'><GiCardboardBoxClosed />Banners<RxCaretRight /></p>
