@@ -12,9 +12,11 @@ import { FaUserFriends } from "react-icons/fa";
 import { AiOutlineLogout } from "react-icons/ai";
 
 import "./SideBar.css"
+import { useSelector } from 'react-redux';
 
 const SideBar = ({current}) => {
 
+    const {user} = useSelector((state)=>state.user)
 
 const navigate = useNavigate()    
   return (
@@ -22,9 +24,9 @@ const navigate = useNavigate()
       <div>
         <div className='flex ps-14  gap-4 rounded-b-3xl  items-center shadow-lg py-8 '>
             <div className='rounded-[50px] px-4 text-white py-2 bg-black'>
-            A
+            {user?.name[0].toUpperCase()}
             </div>
-            <p className='text-xl font-medium'>Ajmal</p>
+            <p className='text-xl font-medium'>{user?.name?.toUpperCase()}</p>
         </div>
       </div>
       <div className='flex flex-col gap-6 py-6  text-[16px]'>

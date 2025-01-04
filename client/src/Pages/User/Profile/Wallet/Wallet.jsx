@@ -1,61 +1,156 @@
+
+
 import { getWallet } from '@/api/User/walletApi';
 import { Button } from '@/components/ui/button';
 import NavBar from '@/components/UserComponent/NavBar/NavBar'
 import SideBar from '@/components/UserComponent/SideBar/SideBar'
 import React, { useEffect, useState } from 'react'
 import { toast } from 'sonner';
+import { motion } from 'framer-motion';
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ArrowUpCircle, ArrowDownCircle, Activity, CreditCard, DollarSign } from 'lucide-react';
+import { FaRupeeSign } from 'react-icons/fa';
 
 const Wallet = () => {
-    const [wallet,setWallet] = useState({});
-
-    useEffect(()=>{
-        const fetchWallet=async()=>{
-            try{
-                const getWalletResult = await getWallet();
+    const [wallet, setWallet] = useState({});
+    const [isLoading, setIsLoading] = useState(true);
+    const [transactionType,setTransactionType] = useState("all")
+    useEffect(() => {
+        const fetchWallet = async () => {
+            try {
+                setIsLoading(true);
+                const getWalletResult = await getWallet(transactionType);
                 setWallet(getWalletResult.wallet);
-                console.log(getWalletResult.wallet)
-            }
-            catch(error)
-            {
-                toast.error(error.message)
+                console.log(getWalletResult.wallet);
+            } catch (error) {
+                toast.error(error.message);
+            } finally {
+                setIsLoading(false);
             }
         }
         fetchWallet();
-    },[])
-  return (
-    <div className='md:ps-[340px] ps-5  pt-32'>
-    <NavBar/>
-    <SideBar current="wallet"/>
-    <div className=" pe-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">My Wallet</h1>
-      <div className="max-w-3xl mx-auto flex flex-col gap-5">
-        <div className='flex items-center justify-between border-4 rounded border-dashed border-slate-200 bg-slate-100 p-5 h-[200px]'>
-            <div className='flex items-baseline gap-3 text-6xl font-semibold'>
-                <span>Balance:</span>
-                <span className=''>{wallet?.balance}</span>
-            </div>
-            <div>
-                <Button>Add Wallet Money</Button>
-            </div>
-        </div>
+    }, [transactionType]);
 
-        <div className='border'>
-            {wallet?.transactions?.map((transaction)=>(
-                <div className='p-3 shadow-md font-semibold'>
-                    <p>Order ID : {transaction?.orderId}</p>
-                    <p>Transaction Date : {transaction?.transactionDate}</p>
-                    <p>Transaction Status : {transaction?.transactionStatus}</p>
-                    <p>Transaction Type : {transaction?.transactionType}</p>
-                    <p>Transaction Amount : {transaction?.amount}</p>
+  const handleTabChange=(value)=>{
+    setTransactionType(value)
+    
+  }
+
+    return (
+        <div className='md:ps-[340px] ps-5 pt-32 bg-gray-100 min-h-screen'>
+            <NavBar />
+            <SideBar current="wallet" />
+            <div className="pe-8">
+                <div className="max-w-4xl mx-auto flex flex-col">
+                    <motion.header 
+                        className="bg-gradient-to-r from-black via-gray-800 to-black text-white py-10 px-8 shadow-lg rounded-2xl mb-8"
+                        initial={{ opacity: 0, y: -50 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5 }}
+                    >
+                        <div className="text-center">
+                            <h1 className="text-4xl font-bold mb-4">Your Wallet Dashboard</h1>
+                            <motion.div
+                                className="text-6xl font-light mb-6"
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ duration: 0.5, delay: 0.2 }}
+                            >
+                                Rs. {isLoading ? '...' : wallet?.balance?.toFixed(2)}
+                            </motion.div>
+                            <Button 
+                                size="lg" 
+                                className="bg-gradient-to-r from-black via-gray-800 to-black text-white hover:from-gray-800 hover:via-black hover:to-gray-800 focus:ring-2 focus:ring-gray-600 shadow-lg rounded-lg transition-transform transform hover:scale-105 active:scale-95"
+                            >
+                                <FaRupeeSign className="mr-2 h-5 w-5" /> Add Funds
+                            </Button>
+                        </div>
+                    </motion.header>
+
+                    <Tabs   onValueChange={handleTabChange} defaultValue="all" className="w-full">
+                        <TabsList className="grid w-full grid-cols-3 mb-8">
+                            <TabsTrigger  value="all">All Transactions</TabsTrigger>
+                            <TabsTrigger value="Credit">Credits</TabsTrigger>
+                            <TabsTrigger value="Debit">Debits</TabsTrigger>
+                        </TabsList>
+                        <TabsContent value="all">
+                            <TransactionList transactions={wallet?.transactions} />
+                        </TabsContent>
+                        <TabsContent value="Credit">
+                            <TransactionList 
+                                transactions={wallet?.transactions} 
+                            />
+                        </TabsContent>
+                        <TabsContent value="Debit">
+                            <TransactionList 
+                                transactions={wallet?.transactions} 
+                            />
+                        </TabsContent>
+                    </Tabs>
                 </div>
-            ))}
+            </div>
         </div>
-
-
-      </div>
-    </div>
-    </div>
-  )
+    )
 }
 
-export default Wallet
+const TransactionList = ({ transactions }) => {
+    return (
+        <Card className="rounded-xl overflow-hidden border-0 shadow-lg">
+            <CardHeader className="bg-gray-50 py-6 px-6">
+                <CardTitle className="text-2xl font-semibold text-gray-800 flex items-center">
+                    <Activity className="mr-2" /> Transaction History
+                </CardTitle>
+            </CardHeader>
+            <CardContent className="p-0">
+                <ScrollArea className="h-[400px] w-full">
+                    {transactions?.map((transaction, index) => (
+                        <TransactionItem key={transaction.id} transaction={transaction} index={index} />
+                    ))}
+                </ScrollArea>
+            </CardContent>
+        </Card>
+    );
+}
+
+const TransactionItem = ({ transaction, index }) => {
+    const isCredit = transaction.transactionType === 'Credit';
+    
+    const formatDate = (dateString) => {
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        return new Date(dateString).toLocaleDateString(undefined, options);
+    };
+
+    return (
+        <motion.div
+            className="py-4 px-6 border-b last:border-b-0 hover:bg-gray-50 transition-colors"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: index * 0.05 }}
+        >
+            <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center mr-4 ${
+                        isCredit ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'
+                    }`}>
+                        {isCredit ? <ArrowUpCircle className="w-6 h-6" /> : <ArrowDownCircle className="w-6 h-6" />}
+                    </div>
+                    <div>
+                        <p className="font-semibold text-gray-800">{transaction.orderId}</p>
+                        <p className="text-sm text-gray-500">{formatDate(transaction.transactionDate)}</p>
+                    </div>
+                </div>
+                <div className="text-right">
+                    <p className={`font-bold ${isCredit ? 'text-green-600' : 'text-red-600'}`}>
+                        {isCredit ? '+' : '-'} Rs. {transaction.amount.toFixed(2)}
+                    </p>
+                    <p className="text-sm text-gray-500">{transaction.transactionStatus}</p>
+                </div>
+            </div>
+        </motion.div>
+    );
+}
+
+export default Wallet;
+

@@ -95,23 +95,19 @@ export const verifyOtp = async (req, res,next) => {
 // function for verifying login
 export const verifyLogin = async (req, res,next) => {
   const { email, password } = req.body;
-  console.log(email,password)
   try {
     const userExist = await UsersDB.findOne({ email });
     if (!userExist)return next(errorHandler(404,`No user with ${email} , Signup to create an account`))
       
       if(!userExist.isActive) return next(errorHandler(403,"you are been blocked. please contact admin"))
-
       const isPasswordCorrect = bcrypt.compareSync(password, userExist.password);
     if (!isPasswordCorrect) return next(errorHandler(401,"invalid credential , please try again"))
       
-      console.log(userExist)
         generateUserAccessToken(res,userExist);
         generateUserRefreshToken(res,userExist)
         return res.status(200).json({success: true,message: "user logged in successfully",userName:userExist.name});
 
   } catch (error) {
-    console.error(error);
     return res.status(500).json({success: false,message: "Something went wrong. Please try again."});
   }
 };

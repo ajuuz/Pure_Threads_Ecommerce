@@ -28,9 +28,9 @@ const LandingPage = () => {
                 const category=[];
                 const fit=[];
                 const sleeves=[];
-                const productsResult = await getProducts(sort,limit,currentPage,category,fit,sleeves)
-                console.log(productsResult.products.slice(0,5))
-                setNewArrivals(productsResult.products.slice(0,5))
+                const searchQuery =""
+                const productsResult = await getProducts(sort,limit,currentPage,category,fit,sleeves,searchQuery)
+                setNewArrivals(productsResult.products)
             }
             catch(error)
             {
