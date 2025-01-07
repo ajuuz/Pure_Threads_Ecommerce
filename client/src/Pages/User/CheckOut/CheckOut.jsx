@@ -102,67 +102,9 @@ const CheckOut = () => {
   },[])
 
 
-  const handleRazorPayment = async () => {
-    try {
-      const fetchCartProductsResult = await fetchCartProducts();
-    
-      if(fetchCartProductsResult.isAvailableReducer.filter(Boolean).length!==0) {
-        setIsAvailableProduct(fetchCartProductsResult.isAvailableReducer)
-        return
-      }
+  
 
-      // Make the API call to backend
-      const order = await makePayment(5000)
-      console.log(order)
-
-      const options = {
-        key: RAZORPAY_KEY_ID,
-        amount: order.amount,
-        currency: order.currency,
-        name: "Pure Threads", 
-        description: "Payment for your order", 
-        order_id: order.id,
-
-        //verify payment
-        // after making the payment 
-        handler: async (response) => {
-          try {
-            const paymentDetails={
-              razorpay_order_id: response.razorpay_order_id,
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_signature: response.razorpay_signature
-            }
-
-            await handlePlaceOrder(paymentDetails)
-          } catch (err) {
-            // Add onPaymentUnSuccessfull function here
-            toast.error("Payment failed: " + err.message);
-          }
-        },
-        prefill: {
-          name: "Ajmal EA", // add customer details
-          email: "john@example.com", // add customer details
-        },
-        notes: {
-          address: "Pure Threads",
-        },
-        theme: {
-    // you can change the gateway color from here according to your
-    // application theme
-          color: "#3399cc",
-        },
-      };
-      const rzpay = new Razorpay(options);
-      // this will open razorpay window for take the payment in the frontend
-      // under the hood it use inbuild javascript windows api 
-      rzpay.open(options);
-    } catch (err) {
-      toast.error("Error creating order: " + err.message);
-    }
-  };
-
-
-const handlePlaceOrder=async(paymentDetails)=>{
+const handlePlaceOrder=async(amount,paymentDetails)=>{
   try{
     if(paymentMethod==="cod")
       {
@@ -172,16 +114,14 @@ const handlePlaceOrder=async(paymentDetails)=>{
           return
         }
       }
+
         const deliveryAddress = addresses[selectedAddressIndex]
-        const placeOrderResult = await placeOrder(paymentMethod,deliveryAddress,selectedCoupon,totalAmountCalculator(cartProducts,selectedCoupon),paymentDetails)
+        const placeOrderResult = await placeOrder(paymentMethod,deliveryAddress,selectedCoupon,amount,paymentDetails)
       if(placeOrderResult.success)
       {
         setOrderSuccess(placeOrderResult.orderData)
-        console.log(placeOrderResult.orderData)
       }
-    else{
-      toast.info("other payment methods are currently on work. will release soon")
-    }
+    
   
   }
   catch(error)
@@ -228,7 +168,7 @@ const handlePlaceOrder=async(paymentDetails)=>{
           <div className="md:col-span-2">
             {isFirstPage
             ?<CheckOutAddress  addresses={addresses}  selectedAddressIndex={selectedAddressIndex}  setSelectedAddressIndex={setSelectedAddressIndex}/>
-            :<PaymentMethods  isAvailableProduct={isAvailableProduct} cartProducts={cartProducts}  paymentMethod={paymentMethod}  setPaymentMethod={setPaymentMethod}  handlePlaceOrder={handlePlaceOrder} handleRazorPayment={handleRazorPayment}/>
+            :<PaymentMethods  isAvailableProduct={isAvailableProduct} setIsAvailableProduct={setIsAvailableProduct} cartProducts={cartProducts}  paymentMethod={paymentMethod}  setPaymentMethod={setPaymentMethod} amount={totalAmountCalculator(cartProducts,selectedCoupon)} handlePlaceOrder={handlePlaceOrder}/>
             }
               {/* next side div */}
               <div className='flex gap-5'>

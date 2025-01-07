@@ -12,18 +12,25 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowUpCircle, ArrowDownCircle, Activity, CreditCard, DollarSign } from 'lucide-react';
 import { FaRupeeSign } from 'react-icons/fa';
+import PaginationComponent from '@/components/CommonComponent/PaginationComponent';
+import WalletDialog from '@/components/UserComponent/Dialog/walletDialog';
 
 const Wallet = () => {
     const [wallet, setWallet] = useState({});
     const [isLoading, setIsLoading] = useState(true);
     const [transactionType,setTransactionType] = useState("all")
+    const [currentPage,setCurrentPage] = useState(1);
+    const [numberOfPages,setNumberOfPages] = useState(1);
+    const [refresh,setRefresh] = useState(false);
+
     useEffect(() => {
         const fetchWallet = async () => {
             try {
                 setIsLoading(true);
-                const getWalletResult = await getWallet(transactionType);
+                const limit=5
+                const getWalletResult = await getWallet(transactionType,limit,currentPage);
                 setWallet(getWalletResult.wallet);
-                console.log(getWalletResult.wallet);
+                setNumberOfPages(getWalletResult?.wallet?.numberOfPages)
             } catch (error) {
                 toast.error(error.message);
             } finally {
@@ -31,12 +38,13 @@ const Wallet = () => {
             }
         }
         fetchWallet();
-    }, [transactionType]);
+    }, [transactionType,currentPage,refresh]);
 
   const handleTabChange=(value)=>{
     setTransactionType(value)
-    
+    setCurrentPage(1)
   }
+
 
     return (
         <div className='md:ps-[340px] ps-5 pt-32 bg-gray-100 min-h-screen'>
@@ -60,12 +68,12 @@ const Wallet = () => {
                             >
                                 Rs. {isLoading ? '...' : wallet?.balance?.toFixed(2)}
                             </motion.div>
-                            <Button 
-                                size="lg" 
-                                className="bg-gradient-to-r from-black via-gray-800 to-black text-white hover:from-gray-800 hover:via-black hover:to-gray-800 focus:ring-2 focus:ring-gray-600 shadow-lg rounded-lg transition-transform transform hover:scale-105 active:scale-95"
-                            >
-                                <FaRupeeSign className="mr-2 h-5 w-5" /> Add Funds
-                            </Button>
+                            <WalletDialog 
+                            dialogTriggerer={<Button size="lg" className="bg-gradient-to-r from-black via-gray-800 to-black text-white hover:from-gray-800 hover:via-black hover:to-gray-800 focus:ring-2 focus:ring-gray-600 shadow-lg rounded-lg transition-transform transform hover:scale-105 active:scale-95"><FaRupeeSign className="mr-2 h-5 w-5" />Add Funds</Button>}
+                            dialogTitle="Add Money to Your Wallet" 
+                            dialogDescription="Top up your wallet to shop for your favorite shirts effortlessly! Add funds now for a smoother checkout experience and exclusive offers. Stay wallet-ready and never miss out on the perfect style!"
+                            setRefresh={setRefresh}
+                            />
                         </div>
                     </motion.header>
 
@@ -90,6 +98,7 @@ const Wallet = () => {
                         </TabsContent>
                     </Tabs>
                 </div>
+                <PaginationComponent numberOfPages={numberOfPages}  currentPage={currentPage} setCurrentPage={setCurrentPage}/>
             </div>
         </div>
     )
@@ -106,7 +115,7 @@ const TransactionList = ({ transactions }) => {
             <CardContent className="p-0">
                 <ScrollArea className="h-[400px] w-full">
                     {transactions?.map((transaction, index) => (
-                        <TransactionItem key={transaction.id} transaction={transaction} index={index} />
+                        <TransactionItem key={transaction._id} transaction={transaction} index={index} />
                     ))}
                 </ScrollArea>
             </CardContent>
@@ -137,15 +146,15 @@ const TransactionItem = ({ transaction, index }) => {
                         {isCredit ? <ArrowUpCircle className="w-6 h-6" /> : <ArrowDownCircle className="w-6 h-6" />}
                     </div>
                     <div>
-                        <p className="font-semibold text-gray-800">{transaction.orderId}</p>
+                        <p className="font-semibold text-gray-800">{transaction.description}</p>
                         <p className="text-sm text-gray-500">{formatDate(transaction.transactionDate)}</p>
                     </div>
                 </div>
                 <div className="text-right">
                     <p className={`font-bold ${isCredit ? 'text-green-600' : 'text-red-600'}`}>
-                        {isCredit ? '+' : '-'} Rs. {transaction.amount.toFixed(2)}
+                        {isCredit ? '+' : '-'} Rs. {transaction?.amount?.toFixed(2)}
                     </p>
-                    <p className="text-sm text-gray-500">{transaction.transactionStatus}</p>
+                    <p className="text-sm text-gray-500">{transaction?.transactionType}</p>
                 </div>
             </div>
         </motion.div>

@@ -13,8 +13,9 @@ const walletSchema = new mongoose.Schema({
     },
     transactions: [
         {
-            orderId: {
-                type:String
+            description:{
+                type:String,
+
             },
             transactionDate: {
                 type: Date,

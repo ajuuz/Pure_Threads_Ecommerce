@@ -9,14 +9,15 @@ import { changePassword, getUserProfile, updateUserProfile } from '../Controller
 import { addAddress, deleteAddress, editAddress, getAddress, getAddresses, setDefaultAddress } from '../Controllers/UserController/addressController.js';
 import { verifyUserBlocked } from '../Middlewares/userBlockMiddleware.js';
 import { addToCart, getCartProducts, proceedToCheckout, selectSizeForProduct, updateCart } from '../Controllers/UserController/cartController.js';
-import { cancelOrder, makePayment, getOrders, getParticularOrder, placeOrder } from '../Controllers/UserController/orderController.js';
+import { cancelOrder,getOrders, getParticularOrder, placeOrder } from '../Controllers/UserController/orderController.js';
 import { validateProduct } from '../Middlewares/productCheckerMiddleware.js';
 import { addToWishlist, getWishlistProducts, removeFromWishlist,  } from '../Controllers/UserController/wishlistController.js';
 import { getAllCoupons } from '../Controllers/CommonController/couponController.js';
 import { getCheckoutAvailableCoupons } from '../Controllers/UserController/couponController.js';
 import { couponActivation } from '../Middlewares/couponMiddleWares/couponActivation.js';
-import { getWallet } from '../Controllers/UserController/walletController.js';
+import { addMoneyToWallet, getWallet } from '../Controllers/UserController/walletController.js';
 import { getProducts } from '../Controllers/CommonController/productController.js';
+import { makePayment } from '../Controllers/CommonController/razorPayController.js';
 const router = express.Router();
 
 
@@ -77,4 +78,5 @@ router.get('/coupons/checkoutAvailable',getCheckoutAvailableCoupons)
 
 // wallet 
 router.get('/wallet',getWallet);
+router.patch('/wallet',addMoneyToWallet)
 export default router;

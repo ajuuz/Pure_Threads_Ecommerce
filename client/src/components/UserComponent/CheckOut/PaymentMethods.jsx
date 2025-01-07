@@ -2,8 +2,25 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import { Wallet, CreditCard, Banknote } from 'lucide-react'
 import { Button } from "@/components/ui/button"
+import RazorPayButton from "@/components/CommonComponent/RazorPay/RazorPayButton"
+import { fetchCartProducts } from "@/Utils/cart/productAvailableChecker"
 
-export function PaymentMethods({isAvailableProduct,cartProducts,paymentMethod,setPaymentMethod,handlePlaceOrder,handleRazorPayment}) {
+export function PaymentMethods({isAvailableProduct,setIsAvailableProduct,cartProducts,paymentMethod,setPaymentMethod,amount,handlePlaceOrder}) {
+
+  const preValidationFunction=async()=>{
+    try{
+      const fetchCartProductsResult = await fetchCartProducts();
+      if(fetchCartProductsResult.isAvailableReducer.filter(Boolean).length!==0) {
+        setIsAvailableProduct(fetchCartProductsResult.isAvailableReducer)
+        return true
+      }
+    }
+    catch(error)
+    {
+      throw error?.response.data;
+    }
+  }
+
   return (
     <div>
       <h2 className="text-xl font-semibold mb-4">Payment Methods</h2>
@@ -31,7 +48,19 @@ export function PaymentMethods({isAvailableProduct,cartProducts,paymentMethod,se
           </Label>
         </div>
       </RadioGroup>
-      <Button  disabled={isAvailableProduct.filter(Boolean).length!==0 || cartProducts.length<1} onClick={paymentMethod==="razorpay"?()=>handleRazorPayment():()=>handlePlaceOrder()} >Place Order</Button>
+      {paymentMethod==="razorpay"
+      ?<RazorPayButton 
+      amount={amount} 
+      functionAfterPayment={handlePlaceOrder} 
+      paymentFor="order"
+      preValidationFunction={preValidationFunction}
+      disabled={isAvailableProduct.filter(Boolean).length!==0 || cartProducts.length<1}
+      setIsAvailableProduct={setIsAvailableProduct}
+      />
+      :<Button  
+      disabled={isAvailableProduct.filter(Boolean).length!==0 || cartProducts.length<1} 
+      onClick={()=>handlePlaceOrder(amount)} >Place Order</Button>
+      }
     </div>
   )
 }
