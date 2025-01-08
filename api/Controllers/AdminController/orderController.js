@@ -1,9 +1,10 @@
 import orderDB from "../../Models/orderSchema.js";
+import walletDB from "../../Models/walletSchema.js";
 import { errorHandler } from "../../utils/error.js";
 
 export const getAllOrders = async(req,res,next)=>{
     try{
-    const orders = await orderDB.find()
+    const orders = await orderDB.find().populate('items.product')
     if(!orders) return next(errorHandler(404,"order not found"));
     return res.status(200).json({success:true,message:"orders fetched successfully",orders})
     }catch(error){
@@ -13,7 +14,8 @@ export const getAllOrders = async(req,res,next)=>{
 
 export const updateOrderStatus = async(req,res,next)=>{
     const {orderId} = req.params
-    const {status} = req.body
+    const {userId,isPaymentDone,status} = req.body
+    console.log(req.body)
     
     if(!["Pending","Confirmed","Packed","Shipped","Delivered","Returned","Cancelled"].includes(status)) return next(errorHandler(400,"Invalid Status"))
         const updationFields={status};
@@ -21,6 +23,36 @@ export const updateOrderStatus = async(req,res,next)=>{
             const today = new Date();
             today.setDate(today.getDate() + 6);
             updationFields.deliveryDate = today
+        }
+
+        if(status==="Cancelled" && isPaymentDone)
+        {
+            const transcationDetails={
+                description:`cashback for order cancellation orderId:${orderId}`,
+                transactionDate:new Date(),
+                transactionType:"Credit",
+                transactionStatus:"Success",
+                amount:totalAmount
+            }
+
+            const wallet = await walletDB.findOne({userId})
+            if(!wallet)
+            {
+                const newWallet = new walletDB({
+                    userId,
+                    balance:totalAmount,
+                    transactions:[transcationDetails]
+                })
+                await newWallet.save();
+            }
+            else
+            {
+                wallet.balance+=totalAmount;
+                wallet.transactions.push(transcationDetails)
+                await wallet.save()
+            }
+            //payment status changing
+            paymentStatus="Refunded";
         }
 
         if(status==="Delivered")

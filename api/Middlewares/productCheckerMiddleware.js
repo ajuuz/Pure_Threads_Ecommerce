@@ -17,7 +17,14 @@ export const validateProduct =async(req,res,next)=>{
             }
           })
           req.userId=userId;
-          req.cartItems = cart.items
+          req.cartItems = cart.items.map((item)=>{
+            return {
+              product:item.product._id,
+              productPrice:item.product.salesPrice,
+              size:item.size,
+              quantity:item.quantity
+            }
+          })
           next();
     }
     catch(error){

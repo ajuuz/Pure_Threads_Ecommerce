@@ -34,6 +34,14 @@ const OrderDetail=()=> {
         return date.toLocaleDateString('en-US', options);
       };
 
+      const statusColor={
+        Pending:"text-yellow-400",
+        Success:"text-green-600",
+        Failed:"text-gray-600",
+        Refunded:"text-blue-600",
+        Cancelled:"text-red-600"
+      }
+
   return (
     <div className={`md:ps-[340px] ps-5 ${from==="admin" ?"pt-10" :"pt-32"} `}>
     {from!=="admin" && <NavBar/>}
@@ -69,7 +77,7 @@ const OrderDetail=()=> {
             <h3 className="font-medium text-gray-800 mb-2">Payment Method</h3>
             <p className="text-sm text-gray-600">
               {order?.paymentMethod?"Cash On Delivery":order?.paymentMethod} <br />
-              Status: <span className={`${order?.paymentStatus==="Pending"?"text-yellow-500":order?.paymentStatus==="Failed"?"text-red-500":"text-green-500"} font-medium`}>{order?.paymentStatus}</span>
+              Status: <span className={`${statusColor[order?.paymentStatus]} font-medium`}>{order?.paymentStatus}</span>
             </p>
           </div>
 
@@ -109,7 +117,7 @@ const OrderDetail=()=> {
                     <span className="text-blue-800 font-bold">{item?.size}</span>
                   </p>
                 </div>
-                <div className="ml-auto text-gray-800 font-semibold">₹{item?.quantity*item?.product?.salesPrice}</div>
+                <div className="ml-auto text-gray-800 font-semibold">₹{item?.quantity*item?.productPrice}</div>
             </div>)}
         </div>
 

@@ -84,7 +84,15 @@ const Orders = () => {
 
       const handleCancelOrder=async(index,order,status)=>{
         try{
-          const updateOrderStatusResult =await updateOrderStatus(order?.orderId,status);
+
+          const orderId=order?.orderId
+          const userId = order?.userId
+         
+          let isPaymentDone = false;
+          if(["razorpay","wallet"].includes(order?.paymentMethod)) isPaymentDone=true;
+
+
+          const updateOrderStatusResult =await updateOrderStatus(orderId,userId,status,isPaymentDone);
           toast.success(updateOrderStatusResult.message);
           order.status="Cancelled";
           setOrders((prev)=>{

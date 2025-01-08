@@ -101,7 +101,6 @@ const handleFilterCheckBox=(e)=>{
       }
       return updatedFilteredCheckBoxes;
     })
- console.log(filterCheckBoxes)
 }
 
 const handleFilterClick=()=>{

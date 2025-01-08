@@ -10,10 +10,10 @@ export const getAllOrders = async()=>{
     }
 }
 
-export const updateOrderStatus=async(orderId,status)=>{
+export const updateOrderStatus=async(orderId,userId,status,isPaymentDone)=>{
     try{
         console.log(orderId,status)
-        const response = await axiosInstance.patch(`/admin/orders/${orderId}`,{status})
+        const response = await axiosInstance.patch(`/admin/orders/${orderId}`,{userId,status,isPaymentDone})
         console.log(response)
         return response.data
     }catch(error){

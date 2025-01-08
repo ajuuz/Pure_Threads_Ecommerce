@@ -10,7 +10,7 @@ const orderSchema = new mongoose.Schema({
           const month = String(date.getMonth() + 1).padStart(2, '0');
           const day = String(date.getDate()).padStart(2, '0');
           const randomNum = Math.floor(Math.random() * 1000); // Random number between 0 and 999
-          return `ORD-${year}${month}${day}-${randomNum}`;
+          return `PTHREADS-${year}${month}${day}-${randomNum}`;
         },
       },
 
@@ -26,9 +26,11 @@ const orderSchema = new mongoose.Schema({
 
       items:[
         {product:{
-            type:Object,
+            type:mongoose.Schema.Types.ObjectId,
+            ref:'product',
             required:true,
             },
+        productPrice:Number,
         size:String,
         quantity:Number
         }
@@ -50,14 +52,17 @@ const orderSchema = new mongoose.Schema({
             type:Number,
             required:true
          },
+
         paymentMethod:{
             type:String,
             required:true,
         },
         paymentStatus:{
           type:String,
-          default:"Pending"
+          default:"Pending",
+          enum:["Pending","Success","Failed","Refunded","Cancelled"]
         },
+
         couponUsed:{
           couponCode:{
             type:String,

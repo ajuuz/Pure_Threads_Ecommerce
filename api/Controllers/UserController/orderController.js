@@ -14,7 +14,7 @@ dotenv.config(); // Load environment variables from .env file
 export const getOrders = async(req,res)=>{
     try{
         const userId = refreshTokenDecoder(req);
-        const orders = await orderDB.find({userId})
+        const orders = await orderDB.find({userId}).populate('items.product')
         if(!orders) return next(errorHandler(404,"orders not found"));
         return res.status(200).json({success:true,message:"orders fetched successfully",orders})
     }catch(error){
@@ -26,7 +26,7 @@ export const getOrders = async(req,res)=>{
 export const getParticularOrder = async(req,res,next)=>{
     const {orderId} = req.params
     try{
-        const order = await orderDB.findOne({orderId})
+        const order = await orderDB.findOne({orderId}).populate('items.product')
         if(!order) return next(errorHandler(404,"order not found"));
         res.status(200).json({success:true,message:"order fetched successfully",order})
     }
@@ -44,7 +44,8 @@ export const placeOrder = async(req,res,next)=>{
     const {paymentMethod,deliveryAddress,totalAmount,couponUsed,paymentDetails} = req.body;
 
     const userId = req.userId
-    const items = req.cartItems.toObject()
+    console.log(req.cartItems)
+    const items = req.cartItems
     let paymentStatus="Pending"
     try{
     if (paymentMethod === 'razorpay') {
@@ -106,7 +107,8 @@ export const cancelOrder = async(req,res,next)=>{
     const {isPaymentDone,totalAmount} = req.body;
 
     try{
-        const userId = refreshTokenDecoder(req)
+        const userId = refreshTokenDecoder(req);
+        let paymentStatus="Cancelled";
         if(isPaymentDone)
         {
             const transcationDetails={
@@ -132,10 +134,12 @@ export const cancelOrder = async(req,res,next)=>{
                 wallet.transactions.push(transcationDetails)
                 await wallet.save()
             }
+            //payment status changing
+            paymentStatus="Refunded";
         }
 
 
-        const updatedOrder = await orderDB.updateOne({orderId},{$set:{status:"Cancelled"}});
+        const updatedOrder = await orderDB.updateOne({orderId},{$set:{status:"Cancelled",paymentStatus}});
         if(!updatedOrder.matchedCount) return next(errorHandler(404,"order not found"))
         if(!updatedOrder.modifiedCount) return next(errorHandler(400,"No changes made"));
         return res.status(200).json({success:true,message:"Your Order has been Cancelled"});

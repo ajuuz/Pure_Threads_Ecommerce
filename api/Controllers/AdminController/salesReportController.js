@@ -79,6 +79,8 @@ const getSalesReportHelperFunction = async (skip = 0, limit = 0, startDate, endD
 
 export const getSalesReport=async(req,res,next)=>{
     try{
+        console.log(req.query)
+        return
         const {startDate=null,endDate=null,period="daily",page=1,limit=5}= req.query;
         const skip = (page-1)*limit;
 
