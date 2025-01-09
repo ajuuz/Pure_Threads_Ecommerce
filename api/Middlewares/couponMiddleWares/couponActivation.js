@@ -5,7 +5,7 @@ import { errorHandler } from "../../utils/error.js";
 export const couponActivation=async(req,res,next)=>{
     try{
         const userId = refreshTokenDecoder(req);
-        const {selectedCoupon} = req.body;
+        const {selectedCoupon,couponDiscount} = req.body;
         let couponUsed={couponCode:"No Coupon Used",couponValue:0,couponType:"%"};
         
         if(!selectedCoupon)
@@ -19,7 +19,8 @@ export const couponActivation=async(req,res,next)=>{
         {
             couponUsed.couponCode=selectedCoupon.couponCode;
             couponUsed.couponValue=selectedCoupon.couponValue;
-            couponUsed.couponType=selectedCoupon.couponType
+            couponUsed.couponType=selectedCoupon.couponType;
+            couponUsed.couponDiscount = couponDiscount
         }
 
         const couponDetails = await couponDB.findOne({couponCode:selectedCoupon?.couponCode,

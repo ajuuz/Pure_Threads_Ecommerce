@@ -14,19 +14,19 @@ export const getAllOrders = async(req,res,next)=>{
 
 export const updateOrderStatus = async(req,res,next)=>{
     const {orderId} = req.params
-    const {userId,isPaymentDone,status} = req.body
-    console.log(req.body)
+    const {userId,status,isPaymentDone,totalAmount} = req.body
     
     if(!["Pending","Confirmed","Packed","Shipped","Delivered","Returned","Cancelled"].includes(status)) return next(errorHandler(400,"Invalid Status"))
         const updationFields={status};
+
         if(["Cancelled","Delivered"].includes(status)){
             const today = new Date();
             today.setDate(today.getDate() + 6);
             updationFields.deliveryDate = today
         }
 
-        if(status==="Cancelled" && isPaymentDone)
-        {
+        //refunding the paid amount
+        if(status==="Cancelled" && isPaymentDone){
             const transcationDetails={
                 description:`cashback for order cancellation orderId:${orderId}`,
                 transactionDate:new Date(),
@@ -52,12 +52,12 @@ export const updateOrderStatus = async(req,res,next)=>{
                 await wallet.save()
             }
             //payment status changing
-            paymentStatus="Refunded";
+            updationFields.paymentStatus="Refunded";
+        }else if(status==="Cancelled"){
+            updationFields.paymentStatus="Cancelled"        
         }
 
-        if(status==="Delivered")
-        {
-            console.log("working")
+        if(status==="Delivered"){
             updationFields.paymentStatus="Success"
         }
 

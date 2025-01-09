@@ -9,3 +9,11 @@ export const totalAmountCalculator=(items,selectedCoupon)=>{
     }
     return totalAmount-couponDiscount;
 }
+
+export const couponDiscountCalculator=(items,selectedCoupon)=>{
+    let totalAmount=items.reduce((acc,curr)=>acc+=(curr?.product?.salesPrice*curr?.quantity),0)
+    
+    if(selectedCoupon?.couponType==="%") return totalAmount*selectedCoupon?.couponValue/100;
+    else return selectedCoupon?.couponValue
+
+}

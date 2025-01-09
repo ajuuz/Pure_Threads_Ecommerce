@@ -41,8 +41,7 @@ export const getParticularOrder = async(req,res,next)=>{
 //place order
 export const placeOrder = async(req,res,next)=>{
 
-    const {paymentMethod,deliveryAddress,totalAmount,couponUsed,paymentDetails} = req.body;
-
+    const {paymentMethod,deliveryAddress,couponUsed,totalAmount,paymentDetails} = req.body;
     const userId = req.userId
     console.log(req.cartItems)
     const items = req.cartItems
@@ -50,14 +49,15 @@ export const placeOrder = async(req,res,next)=>{
     try{
     if (paymentMethod === 'razorpay') {
         paymentVerification(paymentDetails,paymentStatus,next);
+        paymentStatus="Success"
       }
     let wallet;
     if(paymentMethod==="wallet")
     {
         wallet = await walletDB.findOne({userId})
         if(wallet.balance<totalAmount) return next(errorHandler(400,"not enough balance"))
+        paymentStatus="Success"
     }
-
         const newOrder =new orderDB({
               userId,
               deliveryAddress,

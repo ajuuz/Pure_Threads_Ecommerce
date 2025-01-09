@@ -1,9 +1,9 @@
 import { axiosInstance } from "../axiosInstance";
 
-export const placeOrder = async(paymentMethod,deliveryAddress,selectedCoupon,totalAmount,paymentDetails)=>{
+export const placeOrder = async(paymentMethod,deliveryAddress,selectedCoupon,totalAmount,couponDiscount,paymentDetails)=>{
     console.log("working")
     try{
-        const response = await axiosInstance.post('/users/orders',{paymentMethod,deliveryAddress,selectedCoupon,totalAmount,paymentDetails})
+        const response = await axiosInstance.post('/users/orders',{paymentMethod,deliveryAddress,selectedCoupon,totalAmount,couponDiscount,paymentDetails})
         return response.data
     }
     catch(error)

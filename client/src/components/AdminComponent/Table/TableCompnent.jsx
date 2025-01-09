@@ -15,7 +15,6 @@ import {
 
 const TableComponent = ({headers,body,handleCellClick}) => {
   
-
   
   return (
    <Table className="mt-10">

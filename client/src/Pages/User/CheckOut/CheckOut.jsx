@@ -17,15 +17,13 @@ import { motion } from 'framer-motion';
 //apis
 import { fetchCartProducts } from '@/Utils/cart/productAvailableChecker';
 import { decrementQuantity, handleRemoveProduct, incrementQuantity } from '@/Utils/cart/cartOperations';
-import {  makePayment, placeOrder } from '@/api/User/orderApi';
+import {  placeOrder } from '@/api/User/orderApi';
 import { getCheckoutAvailableCoupons } from '@/api/User/couponApi';
 import { getAddresses } from '@/api/User/addressApi'
 import { CouponCardType2 } from '@/components/UserComponent/CouponCard/CouponCard';
 import { Input } from '@/components/ui/input';
-import { totalAmountCalculator } from '@/Utils/cart/cartItemsTotalAmountCalculator';
+import { couponDiscountCalculator, totalAmountCalculator } from '@/Utils/cart/cartItemsTotalAmountCalculator';
 
-//razor pay
-import {useRazorpay} from "react-razorpay";
 
 
 const CheckOut = () => {
@@ -45,9 +43,7 @@ const CheckOut = () => {
   
   const navigate = useNavigate()
 
-  //razorpay
-  const { error, isLoading, Razorpay } = useRazorpay();
-  const RAZORPAY_KEY_ID = import.meta.env.VITE_RAZORPAY_KEY_ID;
+  
 
 
   const fetchAddresses=async()=>{
@@ -114,9 +110,10 @@ const handlePlaceOrder=async(amount,paymentDetails)=>{
           return
         }
       }
-
+      let couponDiscount=0;
+      if(selectedCoupon) couponDiscount=couponDiscountCalculator(cartProducts,selectedCoupon);
         const deliveryAddress = addresses[selectedAddressIndex]
-        const placeOrderResult = await placeOrder(paymentMethod,deliveryAddress,selectedCoupon,amount,paymentDetails)
+        const placeOrderResult = await placeOrder(paymentMethod,deliveryAddress,selectedCoupon,amount,couponDiscount,paymentDetails)
       if(placeOrderResult.success)
       {
         setOrderSuccess(placeOrderResult.orderData)
@@ -188,7 +185,6 @@ export default CheckOut
 
 
 const ViewCouponComponent = ({showCoupons,availableCoupons,selectedCoupon,setSelectedCoupon})=>{
-  console.log(selectedCoupon);
   return(
     <div>
       <motion.div

@@ -17,19 +17,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+
 
 //apis
 import { getSalesReport } from '@/api/Admin/salesReportApi'
 import { Input } from '@/components/ui/input'
+
+import { dateFormatter } from '@/Utils/dateFormatter/dateFormatter'
+import TableComponent from '@/components/AdminComponent/Table/TableCompnent'
 
 const SalesReport = () => {
   let [dateRange, setDateRange] = useState('')
@@ -37,8 +39,11 @@ const SalesReport = () => {
     from:"",
     to:""
   })
-
-  
+  const [totalSaleCount,setTotalSaleCount] = useState(0);
+  const [totalSaleAmount,setTotalAmount] = useState(0)
+  const [totalCouponDiscount,setTotalCouponDiscount] = useState(0)
+  const [couponStats,setCouponStats] = useState([])
+  const [orders,setOrders] = useState([])
   
   useEffect(()=>{
     const handleGenerateReport=async()=>{
@@ -47,15 +52,47 @@ const SalesReport = () => {
       const to = customDateRage.to ? customDateRage.from : null;
       try{
         const getSalesReportResult = await getSalesReport(dateRange,from,to);
-        console.log(getSalesReportResult)
+        const salesReport=getSalesReportResult?.salesReport
+        console.log(salesReport?.couponStats)
+        setTotalSaleCount(salesReport?.totalSaleCount) 
+
+        setTotalAmount(salesReport?.totalSaleAmount)
+        setCouponStats(salesReport?.couponStats.filter((coupon)=>coupon?.couponCode!="No Coupon Used"))
+
+        const totalCouponDiscount = salesReport?.couponStats.reduce((acc,curr)=>acc+=curr?.totalCouponDiscount,0)
+        setTotalCouponDiscount(totalCouponDiscount)
+
+        const transformedOrders=salesReport?.orders.map((order)=>{
+          return [order?.orderId,[
+            {name:"OrderId",value:<span className='text-muted-foreground'>{order?.orderId}</span>},
+            {name:"Order Date",value:<span className='font-semibold'>{dateFormatter(order?.createdAt)}</span>},
+            {name:"Items Count",value:<span className='font-semibold'>{order?.itemsCount}</span>},
+            {name:"Used Coupon",value:<span className='font-semibold'>{order?.couponUsed?.couponCode}</span>},
+            {name:"Customer Name",value:<span className='font-semibold'>{order?.user[0]?.name}</span>},
+            {name:"Amount",value:<span className='font-semibold'>₹ {order?.totalAmount}</span>}
+            ]]
+        })
+        setOrders(transformedOrders)
+
       }catch(error)
       {
         toast.error(error.message)
       }
     }
     handleGenerateReport()
-  })
+  },[])
 
+  const percentageCalculator=(couponUsedCount,couponStats)=>{
+    const totalCoupons = couponStats.reduce((acc,curr)=>acc+=curr?.couponUsedCount,0)
+    const percentage=((couponUsedCount/totalCoupons)*100).toFixed(2)
+    return percentage
+  }
+  const randomColorPicker=()=>{
+    const hexValue=`#${Math.floor(Math.random() * 16777215).toString(16).padStart(6, "0")}`;
+    return hexValue
+  }
+
+  const headers=["Order ID","Order Date","Items Count","Used Coupon","Customer Name","Amount"]
   return (
     <div className="AdminProduct relative ps-5 md:ps-[300px] pe-5 pt-16">
       <SideBar />
@@ -127,66 +164,59 @@ const SalesReport = () => {
             </CardContent>
           </Card>
                   
-          <div className="grid grid-cols-3 gap-6 text-center">
-            <Card className="transition-all hover:shadow-lg">
+          <div className="grid grid-cols-4 gap-6 text-center">
+            <Card className="col-span-2 transition-all hover:shadow-lg">
               <CardHeader>
                 <CardTitle className="text-sm font-medium text-muted-foreground">Overall Sales Count</CardTitle>
-                <p className="text-3xl font-bold">89</p>
+                <p className="text-3xl font-bold">{totalSaleCount}</p>
               </CardHeader>
             </Card>
-            <Card className="transition-all hover:shadow-lg">
+            <Card className="col-span-2 transition-all hover:shadow-lg">
               <CardHeader>
                 <CardTitle className="text-sm font-medium text-muted-foreground">Overall Order Amount</CardTitle>
-                <p className="text-3xl font-bold">₹108,275.00</p>
+                <p className="text-3xl font-bold">₹{totalSaleAmount?.toFixed(2)}</p>
               </CardHeader>
             </Card>
-            <Card className="transition-all hover:shadow-lg">
+            
+            <Card className="col-span-4 transition-all hover:shadow-lg">
               <CardHeader>
+              <CardHeader className="pt-3">
                 <CardTitle className="text-sm font-medium text-muted-foreground">Overall Discount</CardTitle>
-                <p className="text-3xl font-bold">₹6,021.45</p>
+                <p className="text-3xl font-bold">₹{totalCouponDiscount?.toFixed(2)}</p>
+              </CardHeader>
+                <CardTitle className="text-sm font-medium text-muted-foreground">Coupon Usage</CardTitle>
+                <div className='w-full h-5 rounded-lg flex'>
+                {couponStats.map((coupon,index)=>
+                                      <TooltipProvider>
+                                      <Tooltip>
+                                        <TooltipTrigger
+                                        style={{width:`${percentageCalculator(coupon?.couponUsedCount,couponStats)}%`,
+                                        backgroundColor:randomColorPicker()
+                                            }}  
+                                        className={`w-8 flex  items-center justify-center text-[10px] font-semibold font-mono text-white ${index===0 && "rounded-s"} ${index===couponStats.length-1 && "rounded-e"} hover:scale-105  transition-all 0.5s cursor-pointer`}
+                                        >
+                                            {coupon?.couponCode}
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                          <div>
+                                            <p  className='font-bold font-mono'>coupon Code:{coupon?.couponCode}</p>
+                                            <p  className='font-bold font-mono'>Percentage:{percentageCalculator(coupon?.couponUsedCount,couponStats)} %</p>
+                                            <p  className='font-bold font-mono'>Used Count:{coupon?.couponUsedCount} out of {couponStats.reduce((acc,curr)=>acc+=curr?.couponUsedCount,0)}</p>
+                                          </div>
+                                        </TooltipContent>
+                                      </Tooltip>
+                                    </TooltipProvider>
+                                    
+              )}
+                </div>
               </CardHeader>
             </Card>
+                
           </div>
                   
-          <Card>
-            <CardHeader>
-              <CardTitle>Orders</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Order ID</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Customer Name</TableHead>
-                    <TableHead>Order Status</TableHead>
-                    <TableHead className="text-right">Amount</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {[
-                    { id: 106, date: '31 Dec 2024', customer: 'sahal', status: 'pending', amount: 1025.00 },
-                    { id: 105, date: '31 Dec 2024', customer: 'sahal', status: 'pending', amount: 1803.65 },
-                    { id: 104, date: '31 Dec 2024', customer: 'sahal', status: 'cancelled', amount: 1250.00 },
-                    { id: 103, date: '31 Dec 2024', customer: 'sahal', status: 'pending', amount: 1366.25 },
-                    { id: 102, date: '31 Dec 2024', customer: 'sahal', status: 'pending', amount: 450.00 },
-                  ].map((order) => (
-                    <TableRow key={order.id}>
-                      <TableCell className="font-medium">{order.id}</TableCell>
-                      <TableCell>{order.date}</TableCell>
-                      <TableCell>{order.customer}</TableCell>
-                      <TableCell>
-                        <Badge variant={order.status === 'pending' ? 'secondary' : 'destructive'}>
-                          {order.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-right">₹{order.amount.toFixed(2)}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
+          
+              
+              <TableComponent body={orders} headers={headers}/>
       </div>
     </div>
   )

@@ -127,16 +127,7 @@ const Cart = () => {
           &&<section className='col-span-12 lg:col-span-4'>
           <div className='bg-white p-6 rounded-lg shadow-[rgba(0,0,0,0.1)_0px_0px_5px_1px]'>
             <h2 className='text-xl font-semibold mb-4'>Order Summary</h2>
-            <div className='space-y-2 mb-4'>
-              {/* <div className='flex justify-between'>
-                <span>Subtotal</span>
-                <span>{cartProducts.reduce((acc,curr)=>acc+=(curr?.product?.salesPrice * curr?.quantity),0)}</span>
-              </div> */}
-              {/* <div className='flex justify-between'>
-                <span>Shipping</span>
-                <span>Rs. 50.00</span>
-              </div> */}
-            </div>
+            
             <div className='border-t pt-2'>
               <div className='flex justify-between font-semibold'>
                 <span>Total</span>

@@ -64,18 +64,10 @@ const orderSchema = new mongoose.Schema({
         },
 
         couponUsed:{
-          couponCode:{
-            type:String,
-            default:"No Coupon Used",
-          },
-          couponValue:{
-            type:Number,
-            default:0
-          },
-          couponType:{
-            type:String,
-            default:"%"
-          }
+          couponCode:{  type:String,  default:"No Coupon Used",},
+          couponValue:{  type:Number,  default:0},
+          couponType:{ type:String, default:"%"},
+          couponDiscount:{ type:Number, default:0},
         }
 },{timestamps:true})
 

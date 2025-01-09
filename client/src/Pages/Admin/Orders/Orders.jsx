@@ -61,8 +61,11 @@ const Orders = () => {
 
       const handleUpdateStatus=async(index,order)=>{
             const nextStatusValue = nextStatus[order.status];
+            const orderId=order?.orderId
+            const userId=null; //since same updateOrderStatus function for both cancelling and updating other status. userId only required when cancelling to fetch the users wallet to give money back
         try{
-            const updateOrderStatusResult =await updateOrderStatus(order?.orderId,nextStatusValue)
+
+            const updateOrderStatusResult =await updateOrderStatus(orderId,userId,nextStatusValue)
             toast.success(updateOrderStatusResult.message);
             order.status=nextStatusValue;
             setOrders((prev)=>{
@@ -87,12 +90,11 @@ const Orders = () => {
 
           const orderId=order?.orderId
           const userId = order?.userId
-         
+          const totalAmount=order?.totalAmount
           let isPaymentDone = false;
           if(["razorpay","wallet"].includes(order?.paymentMethod)) isPaymentDone=true;
 
-
-          const updateOrderStatusResult =await updateOrderStatus(orderId,userId,status,isPaymentDone);
+          const updateOrderStatusResult =await updateOrderStatus(orderId,userId,status,isPaymentDone,totalAmount);
           toast.success(updateOrderStatusResult.message);
           order.status="Cancelled";
           setOrders((prev)=>{
@@ -146,7 +148,8 @@ const Orders = () => {
                                       {name:"updateStatus",value:
                                       ["Delivered","Cancelled"].includes(order.status)
                                       ?<Button disabled className={`m-0 w-fit ${order.status==="Delivered"?"bg-green-700":order.status==="Cancelled"?"bg-red-700":""}`}>{order.status==="Delivered"?"Delivered":order.status==="Cancelled"?"Cancelled":statusButton(order.status)}</Button>
-                                      :<div className='flex gap-2 justify-center'><Modal handleClick={()=>handleUpdateStatus(index,order)} dialogTitle={`Is Order ${nextStatus[order.status]}`} dialogDescription="Are you sure? By clicking continue you are gonna change the status of the order" alertDialogTriggerrer={<Button disabled={["Delivered","Cancelled"].includes(order.status)} className={`m-0 ${order.status==="Delivered"?"bg-green-700":order.status==="Cancelled"?"bg-red-700":""}`}>{order.status==="Delivered"?"Delivered":order.status==="Cancelled"?"Cancelled":statusButton(order.status)}</Button>}/>
+                                      :<div className='flex gap-2 justify-center'>
+                                        <Modal handleClick={()=>handleUpdateStatus(index,order)} dialogTitle={`Is Order ${nextStatus[order.status]}`} dialogDescription="Are you sure? By clicking continue you are gonna change the status of the order" alertDialogTriggerrer={<Button disabled={["Delivered","Cancelled"].includes(order.status)} className={`m-0 ${order.status==="Delivered"?"bg-green-700":order.status==="Cancelled"?"bg-red-700":""}`}>{order.status==="Delivered"?"Delivered":order.status==="Cancelled"?"Cancelled":statusButton(order.status)}</Button>}/>
                                         <Modal handleClick={()=>handleCancelOrder(index,order,"Cancelled")} dialogTitle="Cancel Order" dialogDescription="Are you Sure?  By clicking continue you are gonna Cancel this order." alertDialogTriggerrer={<Button disabled={["Delivered","Cancelled"].includes(order.status)} className="m-0 bg-red-700">Cancel</Button>}/>    
                                       </div>},
                                      ]]

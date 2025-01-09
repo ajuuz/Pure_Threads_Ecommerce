@@ -7,7 +7,6 @@ export const getProducts = async(req,res,next)=>{
     const sortCriteria = JSON.parse(req.query.sort);
 
     const {limit,currentPage,category,fit,sleeves,searchQuery,target} = req.query;
-    console.log(target)
     try{
         const filter = {}
         const categoryFilter={}

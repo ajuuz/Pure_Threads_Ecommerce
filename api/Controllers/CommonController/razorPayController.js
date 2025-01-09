@@ -23,7 +23,7 @@ export const makePayment=async(req,res,next)=>{
 
 
 //helper function
-export const paymentVerification=(paymentDetails,paymentStatus,next)=>{
+export const paymentVerification=(paymentDetails,next)=>{
 
      const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = paymentDetails;
     const sign = razorpay_order_id + '|' + razorpay_payment_id;
@@ -35,9 +35,5 @@ export const paymentVerification=(paymentDetails,paymentStatus,next)=>{
     if (razorpay_signature !== expectedSign) {
         console.log("working error")
       return next(errorHandler(400,"Invalid payment signature"));
-    }
-    else
-    {
-        paymentStatus="Success"
     }
 }

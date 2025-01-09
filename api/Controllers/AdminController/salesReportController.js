@@ -75,13 +75,114 @@ const getSalesReportHelperFunction = async (skip = 0, limit = 0, startDate, endD
     return { salesReport, dateSelection };
 };
 
+const dateRangeCalculator=(dateRange)=>{
+    const  rangeStart=new Date()
+    const  rangeEnd=new Date();
 
+    if(dateRange==="all"){
+        console.log("working")
+        rangeStart.setHours(0,0,0,0)
+        rangeEnd.setHours(23,59,59,59)
+    }
+    else if(dateRange==="month"){
+        rangeStart.setDate(1);
+        rangeStart.setHours(0,0,0,0);
+
+        rangeEnd.setMonth(rangeEnd.getMonth()+1)
+        rangeEnd.setDate(1);
+        rangeEnd.setHours(0,0,0,0);
+        rangeEnd.setMilliseconds(rangeEnd.getMilliseconds()-1)
+    }
+    return {rangeStart,rangeEnd}
+}
 
 export const getSalesReport=async(req,res,next)=>{
     try{
-        console.log(req.query)
-        return
-        const {startDate=null,endDate=null,period="daily",page=1,limit=5}= req.query;
+        const {dateRange,from,to} = req.query;
+       
+        const {rangeStart,rangeEnd} = dateRangeCalculator(dateRange);
+        const orders = await orderDB.aggregate([
+            {$match:{paymentStatus:"Success",createdAt:{$gte:rangeStart,$lte:rangeEnd}}},
+            {$lookup:{
+                from:"users",
+                localField:"userId",
+                foreignField:"_id",
+                as:"user"
+                }
+            },
+            {
+                $addFields:{
+                    itemsCount:{$size:"$items"}
+                }
+            },
+            {
+                $project:{
+                    deliveryAddress:0,
+                    updatedAt:0,
+                    items:0,
+                    userId:0
+                }
+            },
+            {
+                $facet: {
+                    couponStats: [
+                        {
+                            $group: {
+                                _id: "$couponUsed.couponCode", // Group by coupon code
+                                couponUsedCount: { $sum: 1 }, // Count usage of each coupon
+                                totalCouponDiscount:{$sum:"$couponUsed.couponDiscount"}
+                            }
+                        },
+                        {
+                            $project: {
+                                couponCode: "$_id", // Rename _id to couponCode
+                                couponUsedCount: 1,
+                                totalCouponDiscount: 1,
+                                _id: 0 // Exclude the original _id
+                            }
+                        }
+                    ],
+                    orders: [
+                        {
+                            $project: {
+                                _id: 1, // Retain the order ID
+                                userId: 1,
+                                status: 1,
+                                totalAmount: 1,
+                                paymentMethod: 1,
+                                paymentStatus: 1,
+                                couponUsed: 1,
+                                orderId: 1,
+                                deliveryDate: 1,
+                                createdAt: 1,
+                                user: 1,
+                                itemsCount: 1
+                            }
+                        }
+                    ],
+                    totalAmount:[
+                        {
+                            $group: {
+                            _id:null,
+                            totalAmount:{$sum:"$totalAmount"},
+                            totalCount:{$sum:1}
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                $project:{
+                    couponStats:1,
+                    orders:1,
+                    totalSaleAmount:{$arrayElemAt:["$totalAmount.totalAmount",0]},
+                    totalSaleCount:{$arrayElemAt:["$totalAmount.totalCount",0]}
+                }
+            }
+        ])
+        console.log(orders)
+        if(orders.length===0) return next(errorHandler(404,"No orders found"))
+        return res.status(200).json({success:true,message:"sales report fetched successfully",salesReport:orders[0]})
         const skip = (page-1)*limit;
 
         const {salesReport ,dateSelection } = await getSalesReportHelperFunction(skip,limit,startDate,endDate,period);
@@ -96,6 +197,7 @@ export const getSalesReport=async(req,res,next)=>{
     }
     catch(error)
     {
+        console.log(error.message)
         next(errorHandler(500,"something went wrong during fetching sales report"))
     }
 }
