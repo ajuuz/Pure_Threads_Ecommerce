@@ -100,9 +100,12 @@ export const placeOrder = async(req,res,next)=>{
     }
 }
 
+export const updateOrderStatus = async(req,res,next)=>{
+    if(req.body.target==="cancel") cancelOrder(req,res,next)
+    else returnOrderRequest(req,res,next)
+}
 
-
-export const cancelOrder = async(req,res,next)=>{
+const cancelOrder=async(req,res,next)=>{
     const {orderId} = req.params
     const {isPaymentDone,totalAmount} = req.body;
 
@@ -138,8 +141,9 @@ export const cancelOrder = async(req,res,next)=>{
             paymentStatus="Refunded";
         }
 
-
-        const updatedOrder = await orderDB.updateOne({orderId},{$set:{status:"Cancelled",paymentStatus}});
+        const cancelDate=new Date()
+        
+        const updatedOrder = await orderDB.updateOne({orderId},{$set:{status:"Cancelled",deliveryDate:cancelDate,paymentStatus}});
         if(!updatedOrder.matchedCount) return next(errorHandler(404,"order not found"))
         if(!updatedOrder.modifiedCount) return next(errorHandler(400,"No changes made"));
         return res.status(200).json({success:true,message:"Your Order has been Cancelled"});
@@ -147,6 +151,22 @@ export const cancelOrder = async(req,res,next)=>{
     catch(error)
     {
         console.log(error.message)
+        return next(errorHandler(500,"something went wrong , please try again"))
+    }
+}
+
+const returnOrderRequest=async(req,res,next)=>{
+    try{
+        const {orderId} = req.params
+        console.log(orderId)
+        const updateOrderStatus=await orderDB.updateOne({orderId},{$set:{status:"Return Requested"}})
+        if(updateOrderStatus.matchedCount===0) return next(errorHandler(404,"order not found"))
+        if(updateOrderStatus.modifiedCount===0) return next(errorHandler(400,"no updation made"))
+        return res.status(200).json({success:true,message:"you order is requested for return"})
+    }
+    catch(error)
+    {
+        console.log(error)
         return next(errorHandler(500,"something went wrong , please try again"))
     }
 }

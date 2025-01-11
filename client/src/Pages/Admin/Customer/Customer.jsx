@@ -56,7 +56,7 @@ const Customer = () => {
 
 const headers=["SNO","Customer Name","Phone","Email","State"]
   return (
-    <div className="AdminProduct relative h-[200vh] ps-5 md:ps-[300px] pe-5 pt-16">
+    <div className="AdminProduct relative ps-5 md:ps-[300px] pe-5 pt-16">
       <SideBar />
       <div>
         {/*  first div */}

@@ -9,7 +9,7 @@ import { changePassword, getUserProfile, updateUserProfile } from '../Controller
 import { addAddress, deleteAddress, editAddress, getAddress, getAddresses, setDefaultAddress } from '../Controllers/UserController/addressController.js';
 import { verifyUserBlocked } from '../Middlewares/userBlockMiddleware.js';
 import { addToCart, getCartProducts, proceedToCheckout, selectSizeForProduct, updateCart } from '../Controllers/UserController/cartController.js';
-import { cancelOrder,getOrders, getParticularOrder, placeOrder } from '../Controllers/UserController/orderController.js';
+import { getParticularOrder, placeOrder, updateOrderStatus } from '../Controllers/UserController/orderController.js';
 import { validateProduct } from '../Middlewares/productCheckerMiddleware.js';
 import { addToWishlist, getWishlistProducts, removeFromWishlist,  } from '../Controllers/UserController/wishlistController.js';
 import { getAllCoupons } from '../Controllers/CommonController/couponController.js';
@@ -18,6 +18,7 @@ import { couponActivation } from '../Middlewares/couponMiddleWares/couponActivat
 import { addMoneyToWallet, getWallet } from '../Controllers/UserController/walletController.js';
 import { getProducts } from '../Controllers/CommonController/productController.js';
 import { makePayment } from '../Controllers/CommonController/razorPayController.js';
+import { getAllOrders } from '../Controllers/CommonController/orderController.js';
 const router = express.Router();
 
 
@@ -67,8 +68,8 @@ router.patch('/wishlist/:productId',removeFromWishlist)
 
 // order
 router.post('/orders',validateProduct,couponActivation,placeOrder)
-router.get('/orders',getOrders)
-router.patch('/orders/:orderId',cancelOrder)
+router.get('/orders',getAllOrders)
+router.patch('/orders/:orderId',updateOrderStatus)
 router.get('/orders/:orderId',getParticularOrder);
 router.post('/makePayment',makePayment)
 
@@ -79,4 +80,5 @@ router.get('/coupons/checkoutAvailable',getCheckoutAvailableCoupons)
 // wallet 
 router.get('/wallet',getWallet);
 router.patch('/wallet',addMoneyToWallet)
+
 export default router;

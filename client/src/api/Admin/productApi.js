@@ -2,12 +2,10 @@ import { axiosInstance } from "../axiosInstance";
 import { uploadImage } from "./formSubmissionApi";
 
 
-export const getProducts = async()=>{
+export const getProducts = async(sort,limit,currentPage,category,fit,sleeves,searchQuery,target)=>{
     try{
 
-        const response = await axiosInstance('/admin/products',{
-            method:"GET"
-        });
+        const response = await axiosInstance.get(`/admin/products?limit=${limit}&sort=${sort}&currentPage=${currentPage}&category=${category}&fit=${fit}&sleeves=${sleeves}&searchQuery=${searchQuery}&target=admin`);
         return response.data
     }
     catch(error)

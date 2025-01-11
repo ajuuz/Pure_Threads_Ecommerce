@@ -5,7 +5,6 @@ import { ToastContainer,toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import Login from '@/Pages/Admin/Auth/Login';
-import Dashboard from '@/Pages/Admin/Dashboard/Dashboard';
 import Product from '@/Pages/Admin/Product/Product';
 import AddCategory from '@/Pages/Admin/Category/AddCategory';
 import Category from '@/Pages/Admin/Category/Category';
@@ -15,7 +14,7 @@ import AdminPrivate from './Protected_Routing/Admin/AdminPrivate';
 import AdminLoginPrivate from './Protected_Routing/Admin/AdminLoginPrivate';
 import Orders from '@/Pages/Admin/Orders/Orders';
 import Coupon from '@/Pages/Admin/Coupon/Coupon';
-import SalesReport from '@/Pages/Admin/SalesReport/SalesReport';
+import Dashboard from '@/Pages/Admin/Dashboard/Dashboard';
 const AdminRoute = () => {
   return (
    <>
@@ -31,7 +30,7 @@ const AdminRoute = () => {
         <Route path='/customers' element={<AdminPrivate><Customer/></AdminPrivate>}/>
         <Route path='/orders' element={<Orders/>}/>
         <Route path="/coupons" element={<Coupon/>}/>
-        <Route path="/salesReports" element={<SalesReport/>}/>
+        <Route path="/dashboard" element={<Dashboard/>}/>
     </Routes>
    </>
   )

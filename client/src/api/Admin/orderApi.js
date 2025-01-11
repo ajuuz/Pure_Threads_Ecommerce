@@ -20,3 +20,14 @@ export const updateOrderStatus=async(orderId,userId,status,isPaymentDone,totalAm
         throw error?.response.data && {...error?.response.data,statusCode:error.status} || error
     }
 }
+
+export const confirmReturnOrder=async(orderId,userId,totalAmount,returnConfirmation,decision)=>{
+    try{
+        const response = await axiosInstance.patch(`/admin/orders/${orderId}`,{userId,totalAmount,returnConfirmation,decision})
+        console.log(response)
+        return response.data
+    }catch(error){
+        console.log(error)
+        throw error?.response.data && {...error?.response.data,statusCode:error.status} || error
+    }
+}

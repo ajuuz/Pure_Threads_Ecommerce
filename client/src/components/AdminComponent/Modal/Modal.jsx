@@ -30,7 +30,7 @@ const Modal = ({handleClick,dialogTitle,dialogDescription,alertDialogTriggerrer}
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel className="relative top-5">Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={()=>handleClick()}>Continue</AlertDialogAction>
+            <AlertDialogAction onClick={handleClick}>Continue</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

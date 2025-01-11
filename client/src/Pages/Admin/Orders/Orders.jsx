@@ -11,7 +11,7 @@ import SideBar from '@/components/AdminComponent/SideBar'
 import { toast } from 'sonner';
 
 // apis
-import { getAllOrders, updateOrderStatus } from '@/api/Admin/orderApi';
+import { confirmReturnOrder, getAllOrders, updateOrderStatus } from '@/api/Admin/orderApi';
 import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -21,7 +21,8 @@ import Modal from '@/components/AdminComponent/Modal/Modal';
 const Orders = () => {
     // useState
     const [orders,setOrders] = useState([]);
-    
+    const [currentPage,setCurrentPage]=useState(1);
+    const [numberOfPages,setNumberOfPages] = useState(1)
 
     // router dom
     const navigate = useNavigate()
@@ -49,6 +50,10 @@ const Orders = () => {
           case 'Confirmed': return 'Mark as Packed'
           case 'Packed': return 'Mark as Shipped'
           case 'Shipped': return 'Mark as Delivered'
+          case 'Cancelled':return 'Cancelled'
+          case 'Delivered':return 'Delivered'
+          case 'Return Requested':return 'Return Requested'
+          case 'Returned' :return 'Returned'
         }
       }
 
@@ -110,6 +115,19 @@ const Orders = () => {
       }
       }
 
+      const handleReturnRequest=async(index,order,returnConfirmation,decision)=>{
+        try{
+          const orderId=order?.orderId
+          const userId = order?.userId
+          const totalAmount=order?.totalAmount
+          const confirmReturnResult = await confirmReturnOrder(orderId,userId,totalAmount,returnConfirmation,decision)
+          console.log(confirmReturnResult)
+        }
+        catch(error)
+        {
+          toast.error(error.message)
+        }
+      }
 
     useEffect(()=>{
 
@@ -146,8 +164,13 @@ const Orders = () => {
                                       {name:"payment",value:order?.paymentMethod==="cod"?"Cash On Delivery":order?.paymentMethod},
                                       {name:"status",value:<Badge  className={`${getStatusColor(order.status)} hover:${getStatusColor(order.status)}  text-white`}>{order.status}</Badge>},
                                       {name:"updateStatus",value:
-                                      ["Delivered","Cancelled"].includes(order.status)
-                                      ?<Button disabled className={`m-0 w-fit ${order.status==="Delivered"?"bg-green-700":order.status==="Cancelled"?"bg-red-700":""}`}>{order.status==="Delivered"?"Delivered":order.status==="Cancelled"?"Cancelled":statusButton(order.status)}</Button>
+                                      ["Delivered","Cancelled","Returned"].includes(order.status)
+                                      ?<Button disabled className={`m-0 w-fit ${order.status==="Delivered"?"bg-green-700":order.status==="Cancelled"?"bg-red-700":""}`}>{statusButton(order.status)}</Button>
+                                      :order?.status==="Return Requested"
+                                      ?<div className='flex gap-2 justify-center'>
+                                        <Modal handleClick={()=>handleReturnRequest(index,order,true,true)} dialogTitle="Do you Want to Confirm" dialogDescription="Are you sure? By clicking continue you are gonna confirm returning order" alertDialogTriggerrer={<Button className={`m-0`}>Approve</Button>}/>
+                                        <Modal handleClick={()=>handleReturnRequest(index,order,true,false)} dialogTitle="Do you Want to Deny" dialogDescription="Are you Sure?  By clicking continue you are gonna Deny this request." alertDialogTriggerrer={<Button disabled={["Delivered","Cancelled"].includes(order.status)} className="m-0 bg-red-700">Deny</Button>}/>    
+                                      </div>
                                       :<div className='flex gap-2 justify-center'>
                                         <Modal handleClick={()=>handleUpdateStatus(index,order)} dialogTitle={`Is Order ${nextStatus[order.status]}`} dialogDescription="Are you sure? By clicking continue you are gonna change the status of the order" alertDialogTriggerrer={<Button disabled={["Delivered","Cancelled"].includes(order.status)} className={`m-0 ${order.status==="Delivered"?"bg-green-700":order.status==="Cancelled"?"bg-red-700":""}`}>{order.status==="Delivered"?"Delivered":order.status==="Cancelled"?"Cancelled":statusButton(order.status)}</Button>}/>
                                         <Modal handleClick={()=>handleCancelOrder(index,order,"Cancelled")} dialogTitle="Cancel Order" dialogDescription="Are you Sure?  By clicking continue you are gonna Cancel this order." alertDialogTriggerrer={<Button disabled={["Delivered","Cancelled"].includes(order.status)} className="m-0 bg-red-700">Cancel</Button>}/>    
@@ -181,8 +204,8 @@ const Orders = () => {
               <CiSearch />
             </div>
           </div>
-          <div className="bg-black text-white px-4 py-2 rounded-lg">
-            <span>Filter</span>
+          <div  className="bg-black text-white px-4 py-2 rounded-lg">
+            <span>Return Requested</span>
           </div>
         </div>
 

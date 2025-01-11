@@ -17,36 +17,50 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import OfferDialogComponent from "@/components/AdminComponent/Dialog/OfferDialogComponent";
+import PaginationComponent from "@/components/CommonComponent/PaginationComponent";
 
 const Product = () => {
 
-    const [refresh,setRefresh] = useState(false)
-    const [products,setProducts]= useState([]);
+  const [products,setProducts]= useState([]);
+  const [currentPage,setCurrentPage]= useState(1)
+  const [numberOfPages,setNumberOfPages]=useState(1)
+
+  const [refresh,setRefresh] = useState(false)
+
+  const [searchQuery,setSearchQuery] = useState("")
     const navigate = useNavigate()
 
+    const fetchProducts=async ()=>{
+
+      const sort={createdAt:-1}
+      const limit=7
+      const sortCriteria=JSON.stringify(sort)
+      const category=[],fit=[],sleeves=[],target="admin";
+
+      const productsResult = await getProducts(sortCriteria,limit,currentPage,category,fit,sleeves,searchQuery,target)
+      const products = productsResult?.products
+      
+      const transformedProducts=products.map((product,index)=>{
+        let sumOfStock = product.sizes.reduce((acc,curr)=>acc+=curr.stock,0)
+       return [product._id,[{name:"sno",value:index+1},
+                        {name:"image",value:<div className='inline-block  border-black border-[3px] rounded-lg'>
+                                              <img src={product?.images[0].url} alt="category" className=" h-12 object-cover rounded-md" />
+                                            </div>},
+                        {name:"name",value:product.name},
+                        {name:"category",value:product?.categoryDetails?.name},
+                        {name:"price",value:product?.salesPrice},
+                        {name:"stock",value:sumOfStock},
+                        {name:"state",value:<Modal handleClick={()=>handleSwitchClick(product?._id)}   dialogTitle="are you sure" dialogDescription="you can list again" alertDialogTriggerrer={<Switch checked={product?.isActive} />}/>},
+                        {name:"offer",value:<><p className="font-bold">{product?.offer?.offerValue +" "+ product?.offer?.offerType} off</p><OfferDialogComponent content={product}  offerScope="Product" dialogTriggerer={<Button className="m-0">update Offer</Button>} /></>}
+                          ]]
+    })
+      setProducts(transformedProducts)
+      setNumberOfPages(productsResult?.numberOfPages);
+    }
+
     useEffect(()=>{
-      const fetchProducts=async ()=>{
-        const response = await getProducts()
-        const productDetails = response.data;
-        console.log(productDetails)
-        const transformedProducts=productDetails.map((product,index)=>{
-          let sumOfStock = product.sizes.reduce((acc,curr)=>acc+=curr.stock,0)
-         return [product._id,[{name:"sno",value:index+1},
-                          {name:"image",value:<div className='inline-block  border-black border-[3px] rounded-lg'>
-                                                <img src={product?.images[0].url} alt="category" className=" h-12 object-cover rounded-md" />
-                                              </div>},
-                          {name:"name",value:product.name},
-                          {name:"category",value:product?.category?.name},
-                          {name:"price",value:product?.salesPrice},
-                          {name:"stock",value:sumOfStock},
-                          {name:"state",value:<Modal handleClick={()=>handleSwitchClick(product?._id)}   dialogTitle="are you sure" dialogDescription="you can list again" alertDialogTriggerrer={<Switch checked={product?.isActive} />}/>},
-                          {name:"offer",value:<><p className="font-bold">{product?.offer?.offerValue +" "+ product?.offer?.offerType} off</p><OfferDialogComponent content={product}  offerScope="Product" dialogTriggerer={<Button className="m-0">update Offer</Button>} /></>}
-                            ]]
-      })
-        setProducts(transformedProducts)
-      }
       fetchProducts();
-    },[refresh])
+    },[refresh,currentPage])
 
     const handleSwitchClick =async (id)=>{
       try{
@@ -65,6 +79,16 @@ const Product = () => {
       navigate(`/admin/product/edit/${id}`)
     }
 
+    const handleSearchInputChange=(e)=>{
+      setSearchQuery(e.target.value)
+      if(e.target.value==="") fetchProducts()
+    }
+
+    const handleSearchClick=()=>{
+      fetchProducts()
+      setCurrentPage(1)
+    }
+
     const headers=["SN0","image","Product Name","category","price","stock","State","Offer"]
 
   return (
@@ -76,9 +100,14 @@ const Product = () => {
           <h1 className="text-xl font-bold">Products</h1>
           <div className="flex-1 flex items-center">
             <div className="text-white bg-black p-2 rounded-s-md">search</div>
-            <input className="border w-[100%] py-2" type="text" />
-            <div className="text-white bg-black p-3 rounded-e-md">
-              <CiSearch />
+            <input 
+            onChange={handleSearchInputChange}
+            className="border w-[100%] py-2 ps-2 placeholder:text-sm" 
+            placeholder="search any product..."
+            type="text"
+            />
+            <div onClick={handleSearchClick} className="text-white bg-black p-3 rounded-e-md">
+              <CiSearch/>
             </div>
           </div>
           <div onClick={()=>navigate('/admin/products/add')} className="bg-black text-white px-4 py-2 rounded-lg">
@@ -87,7 +116,7 @@ const Product = () => {
         </div>
         {/* product page table div */}
         <TableComponent headers={headers} body={products} handleSwitchClick={handleSwitchClick}  handleCellClick={handleProductClick} />
-       
+        <PaginationComponent numberOfPages={numberOfPages} currentPage={currentPage} setCurrentPage={setCurrentPage}/>
       </div>
     </div>
   );

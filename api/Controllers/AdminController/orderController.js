@@ -14,59 +14,83 @@ export const getAllOrders = async(req,res,next)=>{
 
 export const updateOrderStatus = async(req,res,next)=>{
     const {orderId} = req.params
-    const {userId,status,isPaymentDone,totalAmount} = req.body
-    
-    if(!["Pending","Confirmed","Packed","Shipped","Delivered","Returned","Cancelled"].includes(status)) return next(errorHandler(400,"Invalid Status"))
-        const updationFields={status};
+    const {userId,status,isPaymentDone,totalAmount,returnConfirmation,decision} = req.body
 
-        if(["Cancelled","Delivered"].includes(status)){
-            const today = new Date();
-            today.setDate(today.getDate() + 6);
-            updationFields.deliveryDate = today
+        if(!["Pending","Confirmed","Packed","Shipped","Delivered","Returned","Cancelled",undefined].includes(status)) return next(errorHandler(400,"Invalid Status"))
+        const updationFields={status};
+     
+    try{
+        //refunding the paid amount
+        if(status==="Cancelled"){
+            if(isPaymentDone){ 
+                handleWalletRefund(orderId,totalAmount,userId,next)
+                updationFields.paymentStatus="Refunded";
+            }
+            else{
+                updationFields.paymentStatus="Cancelled"    
+            }
+           updationFields.deliveryDate=new Date()
+        }
+        
+        if(status==="Delivered"){
+            updationFields.paymentStatus="Success"
+            updationFields.deliveryDate=new Date()
         }
 
-        //refunding the paid amount
-        if(status==="Cancelled" && isPaymentDone){
-            const transcationDetails={
-                description:`cashback for order cancellation orderId:${orderId}`,
-                transactionDate:new Date(),
-                transactionType:"Credit",
-                transactionStatus:"Success",
-                amount:totalAmount
-            }
-
-            const wallet = await walletDB.findOne({userId})
-            if(!wallet)
+        if(returnConfirmation)
+        {
+            if(decision)
             {
-                const newWallet = new walletDB({
-                    userId,
-                    balance:totalAmount,
-                    transactions:[transcationDetails]
-                })
-                await newWallet.save();
+                handleWalletRefund(orderId,totalAmount,userId,next);
+                updationFields.paymentStatus="Refunded"
+                updationFields.status="Returned"
             }
             else
             {
-                wallet.balance+=totalAmount;
-                wallet.transactions.push(transcationDetails)
-                await wallet.save()
+                updationFields.status="Delivered"
             }
-            //payment status changing
-            updationFields.paymentStatus="Refunded";
-        }else if(status==="Cancelled"){
-            updationFields.paymentStatus="Cancelled"        
         }
 
-        if(status==="Delivered"){
-            updationFields.paymentStatus="Success"
-        }
-
-        try{
         const updatedOrder = await orderDB.updateOne({orderId},{$set:updationFields});
         if(!updatedOrder.matchedCount) return next(errorHandler(404,"order not found"));
         if(!updatedOrder.modifiedCount) return next(errorHandler(400,"no changes made"));
         return res.status(200).json({success:true,message:"state update to "+status+" successfully"})
     }catch(error){
+        console.log(error.message)
         return next(errorHandler(500,"something went wrong please try again"))
+    }
+}
+
+
+const handleWalletRefund=async(orderId,totalAmount,userId,next)=>{
+    try{
+        const transcationDetails={
+            description:`cashback for order cancellation orderId:${orderId}`,
+            transactionDate:new Date(),
+            transactionType:"Credit",
+            transactionStatus:"Success",
+            amount:totalAmount
+        }
+    
+        const wallet = await walletDB.findOne({userId})
+        if(!wallet)
+        {
+            const newWallet = new walletDB({
+                userId,
+                balance:totalAmount,
+                transactions:[transcationDetails]
+            })
+            await newWallet.save();
+        }
+        else
+        {
+            wallet.balance+=totalAmount;
+            wallet.transactions.push(transcationDetails)
+            await wallet.save()
+        }
+    }
+    catch(error)
+    {
+        return next(errorHandler(500,error.message))
     }
 }

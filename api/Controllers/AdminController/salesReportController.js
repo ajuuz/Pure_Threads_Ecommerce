@@ -1,108 +1,89 @@
 import orderDB from "../../Models/orderSchema.js";
 import { errorHandler } from "../../utils/error.js";
+import {startOfDay,endOfDay,startOfWeek,endOfWeek,startOfMonth,endOfMonth,startOfYear,endOfYear} from 'date-fns';
+import PDFDocument from 'pdfkit';
+import ExcelJS from 'exceljs'
 
-const getSalesReportHelperFunction = async (skip = 0, limit = 0, startDate, endDate, period) => {
-    let dateSelection = {};
-    const currentDate = new Date();
+const dateRangeCalculator=(dateRange,from,to)=>{
+    const today=new Date()
+    let rangeStart,rangeEnd;
+    switch(dateRange){
+        case "today" :
+            rangeStart=startOfDay(today)
+            rangeEnd=endOfDay(today)
+            break;
+        
+        case "week":
+            rangeStart=startOfWeek(today)
+            rangeEnd=endOfWeek(today)
+            break;
 
-    // Build dateSelection query
-    if (period === "custom" && startDate && endDate) {
-        const start = new Date(startDate).setHours(0, 0, 0, 0);
-        const end = new Date(endDate).setHours(23, 59, 59, 999);
-        dateSelection = {
-            placed_at: { $gte: new Date(start), $lte: new Date(end) },
-            "order_items.order_status": { $ne: "cancelled" },
-        };
-    } else {
-        switch (period) {
-            case "daily":
-                currentDate.setHours(0, 0, 0);
-                dateSelection = {
-                    placed_at: {
-                        $gte: currentDate,
-                        $lt: new Date(),
-                    },
-                    "order_items.order_status": {
-                        $nin: ["cancelled", "returned"]
-                    }
-                }
-                break;
-            case "weekly":
-                dateSelection = {
-                    placed_at: {
-                        $gte: new Date(currentDate.setDate(currentDate.getDate() - 7)),
-                        $lt: new Date(),
-                    },
-                    "order_items.order_status": {
-                        $nin: ["cancelled", "returned"]
-                    }
-                }
-                break;
-            case "monthly":
-                dateSelection = {
-                    placed_at: {
-                        $gte: new Date(currentDate.setMonth(currentDate.getMonth() - 1)),
-                        $lt: new Date(),
-                    },
-                    "order_items.order_status": {
-                        $nin: ["cancelled", "returned"]
-                    }
-                }
-                break;
-            case "yearly":
-                dateSelection = {
-                    placed_at: {
-                        $gte: new Date(currentDate.setFullYear(currentDate.getFullYear() - 1)),
-                        $lt: new Date(),
-                    },
-                    "order_items.order_status": {
-                        $nin: ["cancelled", "returned"]
-                    }
-                }
-                break;
-            default:
-                break;
-        }
-    }
+        case "month":
+            rangeStart=startOfMonth(today)
+            rangeEnd=endOfMonth(today)
+            break;
 
-    // Return both query and results
-    const salesReport = await Order.find(dateSelection)
-        .populate('userId')
-        .populate('order_items.product')
-        .skip(skip)
-        .limit(limit);
-    
-    return { salesReport, dateSelection };
-};
+        case "year":
+            rangeStart=startOfYear(today)
+            rangeEnd=endOfYear(today)
+            break;
 
-const dateRangeCalculator=(dateRange)=>{
-    const  rangeStart=new Date()
-    const  rangeEnd=new Date();
-
-    if(dateRange==="all"){
-        console.log("working")
-        rangeStart.setHours(0,0,0,0)
-        rangeEnd.setHours(23,59,59,59)
-    }
-    else if(dateRange==="month"){
-        rangeStart.setDate(1);
-        rangeStart.setHours(0,0,0,0);
-
-        rangeEnd.setMonth(rangeEnd.getMonth()+1)
-        rangeEnd.setDate(1);
-        rangeEnd.setHours(0,0,0,0);
-        rangeEnd.setMilliseconds(rangeEnd.getMilliseconds()-1)
+        case "custom":
+            console.log(from,to)
+            const fromDate = new Date(from)
+            const toDate = new Date(to)
+            rangeStart= fromDate
+            rangeEnd=toDate
+            break;
+        
+        default:
+            rangeStart=null;
+            rangeEnd=null
+            break;
     }
     return {rangeStart,rangeEnd}
 }
 
-export const getSalesReport=async(req,res,next)=>{
+
+const fetchSalesReportData=async(req,res,next,isLimit)=>{
     try{
-        const {dateRange,from,to} = req.query;
-       
-        const {rangeStart,rangeEnd} = dateRangeCalculator(dateRange);
-        const orders = await orderDB.aggregate([
-            {$match:{paymentStatus:"Success",createdAt:{$gte:rangeStart,$lte:rangeEnd}}},
+        const {dateRange,from,to,currentPage,limit,sortCriteria} = req.query;
+        const {rangeStart,rangeEnd} = dateRangeCalculator(dateRange,from,to);
+        
+        const sort = JSON.parse(sortCriteria)
+
+        const skip = Number((currentPage-1)*limit);
+        
+        const matchFilter={paymentStatus:"Success"};
+        if(rangeStart && rangeEnd) matchFilter.createdAt={$gte:rangeStart,$lte:rangeEnd}
+
+        const ordersLimitFilter=[
+            {
+                $project: {
+                    _id: 1, // Retain the order ID
+                    userId: 1,
+                    status: 1,
+                    totalAmount: 1,
+                    paymentMethod: 1,
+                    paymentStatus: 1,
+                    couponUsed: 1,
+                    orderId: 1,
+                    deliveryDate: 1,
+                    createdAt: 1,
+                    user: 1,
+                    itemsCount: 1
+                }
+            }
+        ]
+
+        if(isLimit){
+            ordersLimitFilter.unshift({ $limit: Number(limit) },)
+            ordersLimitFilter.unshift({ $skip: skip });
+        }
+
+        const salesContent = await orderDB.aggregate([
+            {$match:matchFilter},
+            {$sort:sort},
             {$lookup:{
                 from:"users",
                 localField:"userId",
@@ -142,24 +123,7 @@ export const getSalesReport=async(req,res,next)=>{
                             }
                         }
                     ],
-                    orders: [
-                        {
-                            $project: {
-                                _id: 1, // Retain the order ID
-                                userId: 1,
-                                status: 1,
-                                totalAmount: 1,
-                                paymentMethod: 1,
-                                paymentStatus: 1,
-                                couponUsed: 1,
-                                orderId: 1,
-                                deliveryDate: 1,
-                                createdAt: 1,
-                                user: 1,
-                                itemsCount: 1
-                            }
-                        }
-                    ],
+                    orders:ordersLimitFilter,
                     totalAmount:[
                         {
                             $group: {
@@ -176,24 +140,120 @@ export const getSalesReport=async(req,res,next)=>{
                     couponStats:1,
                     orders:1,
                     totalSaleAmount:{$arrayElemAt:["$totalAmount.totalAmount",0]},
-                    totalSaleCount:{$arrayElemAt:["$totalAmount.totalCount",0]}
+                    totalSaleCount:{$arrayElemAt:["$totalAmount.totalCount",0]},
                 }
             }
         ])
-        console.log(orders)
-        if(orders.length===0) return next(errorHandler(404,"No orders found"))
-        return res.status(200).json({success:true,message:"sales report fetched successfully",salesReport:orders[0]})
-        const skip = (page-1)*limit;
+        return salesContent;
+    }
+    catch(error)
+    {
+        console.log(error)
+        return next(errorHandler(500,"something went wrong during fetching sales report"))
+    }
+}
 
-        const {salesReport ,dateSelection } = await getSalesReportHelperFunction(skip,limit,startDate,endDate,period);
+export const getSalesReport=async(req,res,next)=>{
+    try{
+        const {limit} = req.query
+        // const {dateRange,from,to,currentPage,limit,sortCriteria} = req.query;
+        // const {rangeStart,rangeEnd} = dateRangeCalculator(dateRange,from,to);
+        
+        // const sort = JSON.parse(sortCriteria)
 
-        // Fetch additional metrics
-        const totalReportCount = await orderDB.countDocuments(dateSelection);
-        const totalPage = Math.ceil(totalReportCount / limit);
-        const report = await orderDB.find(dateSelection);
+        // const matchFilter={paymentStatus:"Success"};
 
-        const totalSalesCount = report.length;
-        return res.status(200).json({success:true,message:"sales report fetched successfully",salesReport:{salesReport,totalSalesCount}})
+        // const skip = Number((currentPage-1)*limit);
+        // if(rangeStart && rangeEnd) matchFilter.createdAt={$gte:rangeStart,$lte:rangeEnd}
+        // const salesContent = await orderDB.aggregate([
+        //     {$match:matchFilter},
+        //     {$sort:sort},
+        //     {$lookup:{
+        //         from:"users",
+        //         localField:"userId",
+        //         foreignField:"_id",
+        //         as:"user"
+        //         }
+        //     },
+        //     {
+        //         $addFields:{
+        //             itemsCount:{$size:"$items"}
+        //         }
+        //     },
+        //     {
+        //         $project:{
+        //             deliveryAddress:0,
+        //             updatedAt:0,
+        //             items:0,
+        //             userId:0
+        //         }
+        //     },
+        //     {
+        //         $facet: {
+        //             couponStats: [
+        //                 {
+        //                     $group: {
+        //                         _id: "$couponUsed.couponCode", // Group by coupon code
+        //                         couponUsedCount: { $sum: 1 }, // Count usage of each coupon
+        //                         totalCouponDiscount:{$sum:"$couponUsed.couponDiscount"}
+        //                     }
+        //                 },
+        //                 {
+        //                     $project: {
+        //                         couponCode: "$_id", // Rename _id to couponCode
+        //                         couponUsedCount: 1,
+        //                         totalCouponDiscount: 1,
+        //                         _id: 0 // Exclude the original _id
+        //                     }
+        //                 }
+        //             ],
+        //             orders: [
+        //                 { $skip: skip }, // Apply skip for pagination
+        //                 { $limit: Number(limit) }, // Apply limit for pagination
+        //                 {
+        //                     $project: {
+        //                         _id: 1, // Retain the order ID
+        //                         userId: 1,
+        //                         status: 1,
+        //                         totalAmount: 1,
+        //                         paymentMethod: 1,
+        //                         paymentStatus: 1,
+        //                         couponUsed: 1,
+        //                         orderId: 1,
+        //                         deliveryDate: 1,
+        //                         createdAt: 1,
+        //                         user: 1,
+        //                         itemsCount: 1
+        //                     }
+        //                 }
+        //             ],
+        //             totalAmount:[
+        //                 {
+        //                     $group: {
+        //                     _id:null,
+        //                     totalAmount:{$sum:"$totalAmount"},
+        //                     totalCount:{$sum:1}
+        //                     }
+        //                 }
+        //             ]
+        //         }
+        //     },
+        //     {
+        //         $project:{
+        //             couponStats:1,
+        //             orders:1,
+        //             totalSaleAmount:{$arrayElemAt:["$totalAmount.totalAmount",0]},
+        //             totalSaleCount:{$arrayElemAt:["$totalAmount.totalCount",0]},
+        //         }
+        //     }
+        // ])
+                   
+        const salesContent= await fetchSalesReportData(req,res,next,true)
+        if(salesContent.length===0) return next(errorHandler(404,"No orders found"))
+        const numberOfPages=Math.ceil(salesContent[0]?.totalSaleCount/limit)
+
+        return res.status(200).json({success:true,message:"sales report fetched successfully",salesReport:salesContent[0],numberOfPages})
+        
     }
     catch(error)
     {
@@ -201,3 +261,180 @@ export const getSalesReport=async(req,res,next)=>{
         next(errorHandler(500,"something went wrong during fetching sales report"))
     }
 }
+
+
+
+export const downloadSalesResportPdf=async(req, res,next) => {
+    try {
+        const {totalCouponDiscount}=req.query;
+        const salesContent=await fetchSalesReportData(req,res,next,false)
+        const orderDetails=salesContent[0]?.orders.map((order)=>{
+            return {
+                    orderId:order?.orderId,
+                    orderDate:order?.createdAt,
+                    itemsCount:order?.itemsCount,
+                    usedCoupon:order?.couponUsed?.couponCode==="No Coupon Used"?"N/A":order?.couponUsed?.couponCode,
+                    customer:order?.user[0]?.name,
+                    amount:order?.totalAmount
+                }
+        })
+
+      const doc = new PDFDocument({
+        size: 'A4',
+        margins: { top: 50, left: 40, right: 40, bottom: 50 },
+      });
+  
+      // Set headers to download the file as PDF
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', 'attachment; filename="sales-report.pdf"');
+  
+      // Pipe the PDF document to the response
+      doc.pipe(res);
+  
+    
+  
+      // Add Title
+      doc.fontSize(20).font('Helvetica-Bold').text('Sales Report', { align: 'center' }).moveDown();
+  
+      // Add Date Range (Optional)
+      const today = new Date().toLocaleDateString();
+      doc.fontSize(12).text(`Report Date: ${today}`, { align: 'right' }).moveDown();
+  
+      // Add Table Header with Background
+      doc.rect(20, doc.y, 550, 20).fillAndStroke('#000000', '#00000');
+      doc
+      .font('Helvetica-Bold')
+        .fillColor('#ffffff')
+        .fontSize(12)
+        .text('Order ID', 55, doc.y + 5, { width: 200 })
+        .text('order Date', 135, doc.y - 15 , { width: 70 })
+        .text('Items Count', 210, doc.y - 14, { width: 100 })
+        .text('Used Coupon', 300, doc.y - 14, { width: 100 })
+        .text('Customer', 400, doc.y - 14, { width: 100 })
+        .text('Amount', 500, doc.y - 14, { width: 100 })
+      doc.moveDown();
+  
+      // Add Sales Data Rows with Alternating Colors
+      let isAlternate = false;
+      orderDetails.forEach((order) => {
+        const rowColor = isAlternate ? '#f9f9f9' : '#fff';
+        doc.rect(20, doc.y, 550, 30).fillAndStroke(rowColor, '#ddd');
+        doc
+        .font('Helvetica')
+          .fillColor('#000')
+          .fontSize(12)
+          .text(order.orderId.slice(9), 40, doc.y + 9, { width: 200 })
+          .text(order.orderDate.toLocaleDateString(), 140, doc.y - 12 , { width: 70 })
+          .text(order.itemsCount, 240, doc.y - 14, { width: 100 })
+          .text(order.usedCoupon, 330, doc.y - 14, { width: 100 })
+          .text(order.customer, 405, doc.y - 14, { width: 100 })
+          .text(order.amount, 500, doc.y - 14, { width: 100 })
+        doc.moveDown();
+        isAlternate = !isAlternate;
+      });
+  
+      doc.rect(20, doc.y, 550, 90).fillAndStroke("f9f9f9", '#ddd');
+
+
+      // Add Total Sales
+      const totalAmount = salesContent[0].totalSaleAmount
+      const totalSaleCount = salesContent[0].totalSaleCount
+      doc
+        .font('Helvetica-Bold')
+        .fontSize(14)
+        .fillColor('#fff')
+        .text(`Total Order Count : ${totalSaleCount}`, 50, doc.y + 10, { align: 'center' })
+        .text(`Total Amount : Rs. ${totalAmount}`, 50, doc.y + 10, { align: 'center' })
+        .text(`Total Discount : Rs. ${totalCouponDiscount}`, 50, doc.y + 10, { align: 'center' })
+        .moveDown();
+  
+      // Add Footer
+      doc
+        .fontSize(10)
+        .fillColor("#0000")
+        .text('Thank you for your business!', 50, doc.y + 15, { align: 'center', baseline: 'bottom' });
+  
+      // Finalize the document
+      doc.end();
+    } catch (error) {
+      console.log(error.message);
+      res.status(500).send('Error generating PDF');
+    }
+  };
+
+
+
+export const downloadSalesReportExcel= async (req, res, next) => {
+    try {
+      const { totalCouponDiscount } = req.query;
+      const salesContent = await fetchSalesReportData(req, res, next, false);
+  
+      const orderDetails = salesContent[0]?.orders.map((order) => {
+        return {
+          orderId: order?.orderId,
+          orderDate: order?.createdAt,
+          itemsCount: order?.itemsCount,
+          usedCoupon: order?.couponUsed?.couponCode === "No Coupon Used" ? "N/A" : order?.couponUsed?.couponCode,
+          customer: order?.user[0]?.name,
+          amount: order?.totalAmount,
+        };
+      });
+  
+      const totalAmount = salesContent[0].totalSaleAmount;
+      const totalSaleCount = salesContent[0].totalSaleCount;
+      console.log(totalAmount,totalSaleCount)
+  
+      // Create a workbook and add a worksheet
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet('Sales Report');
+  
+      // Add title
+      worksheet.mergeCells('A1', 'F1');
+      worksheet.getCell('A1').value = 'Sales Report';
+      worksheet.getCell('A1').font = { size: 16, bold: true };
+      worksheet.getCell('A1').alignment = { horizontal: 'center' };
+  
+      // Add headers
+      const headers = ['Order ID', 'Order Date', 'Items Count', 'Used Coupon', 'Customer', 'Amount'];
+      worksheet.addRow(headers).font = { bold: true };
+  
+      // Add rows
+      orderDetails.forEach((order) => {
+        worksheet.addRow([
+          order.orderId,
+          new Date(order.orderDate).toLocaleDateString(),
+          order.itemsCount,
+          order.usedCoupon,
+          order.customer,
+          order.amount,
+        ]);
+      });
+  
+      // Add summary at the bottom
+      worksheet.addRow([]);
+      worksheet.addRow([`Total Order Count: ${totalSaleCount}`, `Total Amount: Rs. ${totalAmount}`, `Total Discount: Rs. ${totalCouponDiscount}`]);
+  
+      // Set columns width
+      worksheet.columns = [
+        { key: 'orderId', width: 15 },
+        { key: 'orderDate', width: 15 },
+        { key: 'itemsCount', width: 15 },
+        { key: 'usedCoupon', width: 20 },
+        { key: 'customer', width: 20 },
+        { key: 'amount', width: 15 },
+      ];
+  
+      // Set response headers for file download
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      res.setHeader('Content-Disposition', 'attachment; filename="sales-report.xlsx"');
+  
+      // Write workbook to response
+      await workbook.xlsx.write(res);
+  
+      // End the response
+      res.end();
+    } catch (error) {
+      console.error(error.message);
+      res.status(500).send('Error generating Excel file');
+    }
+  };

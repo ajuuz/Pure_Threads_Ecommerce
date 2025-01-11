@@ -12,10 +12,10 @@ export const placeOrder = async(paymentMethod,deliveryAddress,selectedCoupon,tot
     }
 }
 
-export const getOrders = async()=>{
+export const getOrders = async(sortCriteria,currentPage,limit)=>{
     try{
 
-        const response = await axiosInstance.get('/users/orders')
+        const response = await axiosInstance.get(`/users/orders?target=user&sortCriteria=${sortCriteria}&currentPage=${currentPage}&limit=${limit}`)
         return response.data
     }
     catch(error){
@@ -25,10 +25,23 @@ export const getOrders = async()=>{
 
 export const cancelOrder=async(orderId,isPaymentDone,totalAmount)=>{
     try{
-        const response = await axiosInstance.patch(`/users/orders/${orderId}`,{isPaymentDone,totalAmount})
+        const target="cancel"
+        const response = await axiosInstance.patch(`/users/orders/${orderId}`,{isPaymentDone,totalAmount,target})
         return response.data;
     }
     catch(error){
+        throw error?.response.data && {...error?.response.data,statusCode:error.status} || error
+    }
+}
+
+export const returnOrder=async(orderId)=>{
+    console.log(orderId)
+    try{
+        const response = await axiosInstance.patch(`/users/orders/${orderId}`)
+        return response.data;
+    }
+    catch(error)
+    {
         throw error?.response.data && {...error?.response.data,statusCode:error.status} || error
     }
 }

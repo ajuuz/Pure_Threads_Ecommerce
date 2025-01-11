@@ -4,13 +4,14 @@ import { adminLogin, logout } from '../Controllers/AdminController/authControlle
 import { upload } from '../Cloudinary/cloudinary.js';
 import {  uploadImages } from '../Controllers/AdminController/imageUploadController.js';
 import { addCategory, editEntireCategory, getCategories, getParticularCategory, patchCategory } from '../Controllers/AdminController/categoryController.js';
-import { addProduct, editEntireProduct, getParticularProduct, getProducts, patchProduct } from '../Controllers/AdminController/productController.js';
+import { addProduct, editEntireProduct, getParticularProduct, patchProduct } from '../Controllers/AdminController/productController.js';
+import { getProducts } from '../Controllers/CommonController/productController.js';
 import { editCustomers, getCustomers } from '../Controllers/AdminController/customerController.js';
 import { verifyAdmin } from '../Middlewares/adminAuthMiddleware.js';
 import { getAllOrders, updateOrderStatus } from '../Controllers/AdminController/orderController.js';
 import { addNewCoupon } from '../Controllers/AdminController/couponController.js';
 import { getAllCoupons } from '../Controllers/CommonController/couponController.js';
-import { getSalesReport } from '../Controllers/AdminController/salesReportController.js';
+import { downloadSalesReportExcel, downloadSalesResportPdf, getSalesReport } from '../Controllers/AdminController/salesReportController.js';
 const router = express.Router();
 
 
@@ -45,4 +46,6 @@ router.get('/coupons',getAllCoupons)
 
 // sales Report
 router.get('/salesReport',getSalesReport)
+router.get('/salesReport/download/pdf',downloadSalesResportPdf)
+router.get('/salesReport/download/excel',downloadSalesReportExcel)
 export default router;

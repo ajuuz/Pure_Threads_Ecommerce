@@ -31,7 +31,7 @@ const ShopPage = () => {
     sleeves:[]
   })
   const [selectedValue,setSelectedValue] = useState({label:"newest",sort:{createdAt:-1}})
-  const [sort,setSort] = useState({createdAt:1})
+  const [sort,setSort] = useState({createdAt:-1})
   const [refresh,setRefresh] = useState(false)
   const [wishlisted,setWishlisted] = useState([])
 
@@ -49,6 +49,7 @@ const ShopPage = () => {
           const searchQuery = searchInput;
           const productsResult = await getProducts(sortCriteria,limit,currentPage,category,fit,sleeves,searchQuery)
           setProducts(productsResult.products)
+          console.log(productsResult)
           setNumberOfPages(productsResult.numberOfPages)
         }
         catch(error)
@@ -153,7 +154,7 @@ const handleSort=(value)=>{
         <aside className="border-2 hidden  lg:flex flex-col gap-1 fixed top-[100px] left-5 bg-white shadow-lg rounded-lg w-[300px] p-5">
            <FilterComponent handleSearchInput={handleSearchInput} handleFilterCheckBox={handleFilterCheckBox}  handleFilterClick={handleFilterClick}/>
         </aside>
-        <motion.div className=" grid mx-auto grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-5 md:gap-5  lg:gap-4 xl:gap-4" initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: "easeOut" }}>
+        <motion.div className="m-0 grid mx-auto grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-5 md:gap-5  lg:gap-4 xl:gap-4" initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: "easeOut" }}>
               {products.map((product)=>(
                 <Card key={product?._id} image1={product?.images[0]?.url}  product={product} withDescription={true} onCardClick={()=>onCardClick(product?._id)} isWishlisted={wishlisted.includes(product._id)} setWishlisted={setWishlisted}/>
                ))}
