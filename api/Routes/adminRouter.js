@@ -9,7 +9,7 @@ import { getProducts } from '../Controllers/CommonController/productController.j
 import { editCustomers, getCustomers } from '../Controllers/AdminController/customerController.js';
 import { verifyAdmin } from '../Middlewares/adminAuthMiddleware.js';
 import { updateOrderStatus } from '../Controllers/AdminController/orderController.js';
-import { addNewCoupon } from '../Controllers/AdminController/couponController.js';
+import { addNewCoupon, editCoupon } from '../Controllers/AdminController/couponController.js';
 import { getAllCoupons } from '../Controllers/CommonController/couponController.js';
 import { downloadSalesReportExcel, downloadSalesResportPdf, getSalesChartData, getSalesReport } from '../Controllers/AdminController/salesReportController.js';
 import { getAllOrders } from '../Controllers/CommonController/orderController.js';
@@ -42,8 +42,9 @@ router.get('/orders',verifyAdmin,getAllOrders)
 router.patch('/orders/:orderId',verifyAdmin,updateOrderStatus)
 
 // coupon
-router.post('/coupons',verifyAdmin,addNewCoupon)
 router.get('/coupons',verifyAdmin,getAllCoupons)
+router.post('/coupons',verifyAdmin,addNewCoupon)
+router.put('/coupons',verifyAdmin,editCoupon)
 
 // sales Report
 router.get('/salesReport',verifyAdmin,getSalesReport)

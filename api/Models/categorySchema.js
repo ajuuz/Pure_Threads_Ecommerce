@@ -18,12 +18,8 @@ const categorySchema = mongoose.Schema({
         }
       ],
     offer:{
-        offerValue:{type:Number,default:0,},
-        offerType:{type:String}
-    },
-    maxRedeemable:{
-        type:Number,
-        default:0
+        offerValue:{type:Number,default:0,min:[0,"Offer Value cannot be negative"]},
+        offerType:{type:String},
     },
     isActive:{
         type:Boolean,

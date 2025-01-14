@@ -8,7 +8,8 @@ const couponSchema = mongoose.Schema({
     },
     couponValue:{
         type:Number,
-        default:0
+        default:0,
+        min:[0,"coupon Value cannot be negative"]
     },
     couponType:{
         type:String,
@@ -19,11 +20,13 @@ const couponSchema = mongoose.Schema({
     },
     maxRedeemable:{
         type:Number,
-        default:0
+        default:0,
+        min:[0,"max Redeemable cannot be negative"]
     },
     minimumOrderAmount:{
         type:Number,
-        default:0
+        default:0,
+        min:[0,"minimum order amount cannot be negative"]
     },
     maxUsableLimit:{
         isLimited:{
@@ -32,12 +35,14 @@ const couponSchema = mongoose.Schema({
         },
         limit:{
             type:Number,
-            default:0
+            default:0,
+            min:[0,"Limit cannot be negative"]
         }
     },
     perUserLimit:{
         type:Number,
-        default:0
+        default:0,
+        min:[0,"per User Limit cannot be negative"]
     }
 })
 

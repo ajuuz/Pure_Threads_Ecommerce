@@ -2,6 +2,7 @@ import { getAllCoupons } from '@/api/Admin/couponApi'
 import CouponDialogComponent from '@/components/AdminComponent/Dialog/CouponDialogComponent'
 import SideBar from '@/components/AdminComponent/SideBar'
 import TableComponent from '@/components/AdminComponent/Table/TableCompnent'
+import { Button } from '@/components/ui/button'
 import React, { useEffect, useState } from 'react'
 import { CiSearch } from 'react-icons/ci'
 import { toast } from 'sonner'
@@ -21,7 +22,8 @@ const Coupon = () => {
                           {name:"max redeemable",value:coupon?.maxRedeemable??coupon?.couponValue},
                           {name:"minimum Purchase",value:coupon?.minimumOrderAmount},
                           {name:"Max Usable Limit",value:coupon?.maxUsableLimit?.isLimited?coupon?.maxUsableLimit?.limit:"No limit"},
-                          {name:"Per user Limit",value:coupon?.perUserLimit}
+                          {name:"Per user Limit",value:coupon?.perUserLimit},
+                          {name:"Action",value:<CouponDialogComponent dialogTriggerer="View & Edit" dialogHeader="Add New Coupon" dialogDescription="her you can add new coupon" coupon={coupon}/>}
                         ]]
         })
         setCoupons(transformedCoupons)
@@ -34,7 +36,7 @@ const Coupon = () => {
     fetchCoupons();
   },[])
 
-  const headers = ["SNO","Coupon Code","coupon value","description","Max Redeemable","minimum Purchase","Max Usable Limit","Per user Limit"]
+  const headers = ["SNO","Coupon Code","coupon value","description","Max Redeemable","minimum Purchase","Max Usable Limit","Per user Limit","Action"]
   return (
     <div className="AdminAddCategory relative ps-5 md:ps-[300px] pe-5 pt-16">
       <SideBar />

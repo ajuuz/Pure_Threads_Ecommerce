@@ -75,14 +75,22 @@ export const patchCategory=async(req,res,next)=>{
     if(req.body?.offerType)
     {
         const offer = req.body
-        await categoryDB.updateOne({_id:categoryId},{offer:offer})
+        if(offer.offerType==="%" && offer.offerValue>100) return next(errorHandler(400,"Offer Value should be between 0-100%"))
+            
+        await categoryDB.updateOne({_id:categoryId},{offer:offer},{ runValidators: true })
         .then((updatedCategory)=>{
             if(updatedCategory.matchedCount===0) return next(errorHandler(404,"category not found"));
             if(updatedCategory.modifiedCount===0) return next(errorHandler(400,"no updation made"));
             return res.status(200).json({success:true,message:"category offer updated successfully"});
         })
         .catch((error)=>{
-            console.log(error.message)
+            if(error.name==="ValidationError"){
+                const {type,path}=Object.values(error.errors)[0].properties;
+                console.log(path)
+                if(type==="min"){
+                    if(path==="offer.offerValue") return next(errorHandler(400,"Offer value cannot be negative"))
+                }
+            }
             return next(errorHandler(500,"something went wrong please try again"));
         })
     }

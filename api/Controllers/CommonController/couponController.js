@@ -5,7 +5,6 @@ export const getAllCoupons = async(req,res,next)=>{
     const {isActive} = req.query
     let filter = {}
     if(isActive!==undefined) filter.isActive =isActive
-    console.log(filter)
     try{
         const coupons = await couponDB.find();
         if(!coupons) return next(errorHandler(404,"failed to fetch coupons"))
