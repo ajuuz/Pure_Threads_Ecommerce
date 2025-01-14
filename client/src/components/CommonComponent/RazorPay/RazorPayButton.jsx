@@ -1,6 +1,6 @@
 import { makePayment } from '@/api/User/orderApi';
 import { Button } from '@/components/ui/button';
-import { fetchCartProducts } from '@/Utils/cart/productAvailableChecker';
+
 import React from 'react'
 import { useRazorpay } from 'react-razorpay';
 import { toast } from 'sonner';
@@ -18,7 +18,7 @@ const RazorPayButton = ({amount,functionAfterPayment,paymentFor,preValidationFun
             const error = await preValidationFunction()
             if(error) return
           }
-          else
+          else if(paymentFor==="wallet")
           {
             const error = preValidationFunction();
             if(error) return
@@ -51,6 +51,17 @@ const RazorPayButton = ({amount,functionAfterPayment,paymentFor,preValidationFun
                 // Add onPaymentUnSuccessfull function here
                 toast.error("Payment failed: " + err.message);
               }
+            },
+            modal:{
+              ondismiss: paymentFor==="order" && async function () {
+                try {
+                  const paymentDetails=null
+                  const isPaymentFailed=true;
+                  await functionAfterPayment(amount,paymentDetails,isPaymentFailed)
+                } catch (err) {
+                  toast.error("Payment failed: " + err.message);
+                }
+            },
             },
             prefill: {
               name: "Ajmal EA", // add customer details

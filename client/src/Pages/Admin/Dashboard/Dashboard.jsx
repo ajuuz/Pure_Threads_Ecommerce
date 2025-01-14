@@ -33,6 +33,7 @@ import { Input } from '@/components/ui/input'
 import { dateFormatter } from '@/Utils/dateFormatter/dateFormatter'
 import TableComponent from '@/components/AdminComponent/Table/TableCompnent'
 import PaginationComponent from '@/components/CommonComponent/PaginationComponent'
+import SalesChart from '@/components/AdminComponent/SalesChart/SalesChart'
 
 const Dashboard = () => {
   let [dateRange, setDateRange] = useState('')
@@ -61,7 +62,6 @@ const Dashboard = () => {
     try{
       const getSalesReportResult = await getSalesReport(dateRange,customDateRage.from,customDateRage?.to,currentPage,limit,sortCriteria);
       const salesReport=getSalesReportResult?.salesReport
-      console.log(salesReport?.orders)
       setTotalSaleCount(salesReport?.totalSaleCount) 
 
       setTotalAmount(salesReport?.totalSaleAmount)
@@ -160,6 +160,8 @@ const Dashboard = () => {
       console.error('Error downloading the sales report:', error);
     }
   }
+
+  
 
   const headers=["Order ID","Order Date","Items Count","Used Coupon","Customer Name","Amount"]
   return (
@@ -276,12 +278,14 @@ const Dashboard = () => {
                                       </Tooltip>
                                     </TooltipProvider>
                                     
-              )}
-                </div>
+                                  )}
+                           </div>
               </CardHeader>
             </Card>
-                
+
           </div>
+              <SalesChart  />
+                
               <TableComponent body={orders} headers={headers}/>
               <PaginationComponent numberOfPages={numberOfPages} currentPage={currentPage} setCurrentPage={setCurrentPage}/>
       </div>

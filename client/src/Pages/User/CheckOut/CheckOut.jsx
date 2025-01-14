@@ -23,6 +23,7 @@ import { getAddresses } from '@/api/User/addressApi'
 import { CouponCardType2 } from '@/components/UserComponent/CouponCard/CouponCard';
 import { Input } from '@/components/ui/input';
 import { couponDiscountCalculator, totalAmountCalculator } from '@/Utils/cart/cartItemsTotalAmountCalculator';
+import { FaExclamation } from 'react-icons/fa';
 
 
 
@@ -100,7 +101,7 @@ const CheckOut = () => {
 
   
 
-const handlePlaceOrder=async(amount,paymentDetails)=>{
+const handlePlaceOrder=async(amount,paymentDetails,isPaymentFailed)=>{
   try{
     if(paymentMethod==="cod")
       {
@@ -113,7 +114,7 @@ const handlePlaceOrder=async(amount,paymentDetails)=>{
       let couponDiscount=0;
       if(selectedCoupon) couponDiscount=couponDiscountCalculator(cartProducts,selectedCoupon);
         const deliveryAddress = addresses[selectedAddressIndex]
-        const placeOrderResult = await placeOrder(paymentMethod,deliveryAddress,selectedCoupon,amount,couponDiscount,paymentDetails)
+        const placeOrderResult = await placeOrder(paymentMethod,deliveryAddress,selectedCoupon,amount,couponDiscount,paymentDetails,isPaymentFailed)
       if(placeOrderResult.success)
       {
         setOrderSuccess(placeOrderResult.orderData)
@@ -167,9 +168,10 @@ const handlePlaceOrder=async(amount,paymentDetails)=>{
             ?<CheckOutAddress  addresses={addresses}  selectedAddressIndex={selectedAddressIndex}  setSelectedAddressIndex={setSelectedAddressIndex}/>
             :<PaymentMethods  isAvailableProduct={isAvailableProduct} setIsAvailableProduct={setIsAvailableProduct} cartProducts={cartProducts}  paymentMethod={paymentMethod}  setPaymentMethod={setPaymentMethod} amount={totalAmountCalculator(cartProducts,selectedCoupon)} handlePlaceOrder={handlePlaceOrder}/>
             }
+            
               {/* next side div */}
               <div className='flex gap-5'>
-                <Button onClick={()=>setIsFirstPage(!isFirstPage)} className="bg-gray-300 text-black w-[50%] hover:text-white hover:bg-gray-400">{isFirstPage?"Next":"Back"}</Button>
+                <Button  onClick={()=>setIsFirstPage(!isFirstPage)} className= " bg-gray-300 text-black w-[50%] hover:text-white hover:bg-gray-400">{isFirstPage?"Next":"Back"}</Button>
               </div>
 
           </div>

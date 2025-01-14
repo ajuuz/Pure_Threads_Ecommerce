@@ -5,7 +5,9 @@ import productDB from "../../Models/productSchema.js";
 import walletDB from "../../Models/walletSchema.js";
 import { errorHandler } from "../../utils/error.js";
 import { refreshTokenDecoder } from "../../utils/jwtTokens/decodeRefreshToken.js";
-import crypto from "crypto"
+
+import PDFDocument from 'pdfkit';
+
 import dotenv from "dotenv"
 import { paymentVerification } from "../CommonController/razorPayController.js";
 dotenv.config(); // Load environment variables from .env file
@@ -41,42 +43,54 @@ export const getParticularOrder = async(req,res,next)=>{
 //place order
 export const placeOrder = async(req,res,next)=>{
 
-    const {paymentMethod,deliveryAddress,couponUsed,totalAmount,paymentDetails} = req.body;
+    const {paymentMethod,deliveryAddress,couponUsed,totalAmount} = req.body; //details need for all payment method place order
+    const {paymentDetails} = req.body //only when payment made using razorpay (success)
+    const {isPaymentFailed} = req.body //only when razor payment fails
     const userId = req.userId
-    console.log(req.cartItems)
     const items = req.cartItems
-    let paymentStatus="Pending"
+    let paymentStatus=req.body.paymentStatus||"Pending"
+
+        const newOrderDetails={
+            userId,
+            deliveryAddress,
+            items,
+            paymentMethod,
+            paymentStatus,
+            totalAmount,
+            couponUsed
+        }
     try{
-    if (paymentMethod === 'razorpay') {
-        paymentVerification(paymentDetails,paymentStatus,next);
-        paymentStatus="Success"
+    if (paymentMethod === 'razorpay'){
+        if(!isPaymentFailed) { //payment success
+        paymentVerification(paymentDetails,next);
+        newOrderDetails.paymentStatus="Success"
+      }else{
+        newOrderDetails.expiryDate=new Date() //for expiry of failed order
       }
+    }
+
     let wallet;
     if(paymentMethod==="wallet")
     {
         wallet = await walletDB.findOne({userId})
         if(wallet.balance<totalAmount) return next(errorHandler(400,"not enough balance"))
-        paymentStatus="Success"
+        newOrderDetails.paymentStatus="Success"
     }
-        const newOrder =new orderDB({
-              userId,
-              deliveryAddress,
-              items,
-              paymentMethod,
-              paymentStatus,
-              totalAmount,
-              couponUsed
-        })
+        const newOrder =new orderDB(newOrderDetails)
         await newOrder.save()
         
         //making updation after placing order  - cart,product , if(wallet) updating wallet
         await cartDB.updateOne({userId},{$set:{items:[]}})
-        for(let item of items)
+
+        if(!isPaymentFailed)
         {
-            const productId = item.product._id;
-            const quantityPurchased = item.quantity;
-            const sizePurchased = item.size;
-            await productDB.updateOne({_id:productId},{$inc:{'sizes.$[s].stock':-quantityPurchased}},{arrayFilters:[{'s.size':sizePurchased}]},{ runValidators: true })
+            for(let item of items)
+                {
+                    const productId = item.product._id;
+                    const quantityPurchased = item.quantity;
+                    const sizePurchased = item.size;
+                    await productDB.updateOne({_id:productId},{$inc:{'sizes.$[s].stock':-quantityPurchased}},{arrayFilters:[{'s.size':sizePurchased}]},{ runValidators: true })
+                }
         }
 
         if(paymentMethod==="wallet") {
@@ -92,11 +106,42 @@ export const placeOrder = async(req,res,next)=>{
             await wallet.save()
         }
 
-        res.status(201).json({success:true,message:"order Placed Successfully",orderData:{orderId:newOrder.orderId,deliveryAddress,deliveryDate:newOrder.deliveryDate,totalAmount:newOrder.totalAmount,paymentMethod:newOrder.paymentMethod,createdAt:newOrder.createdAt}})
+        res.status(201).json({success:true,message:"order Placed Successfully",orderData:{orderId:newOrder.orderId,deliveryAddress,deliveryDate:newOrder.deliveryDate,totalAmount:newOrder.totalAmount,paymentMethod:newOrder.paymentMethod,paymentStatus:newOrder.paymentStatus,createdAt:newOrder.createdAt}})
     }
     catch(error){
         console.log(error.message)
        return next(errorHandler(500,"something went wrong"))
+    }
+}
+
+
+export const orderRepayment=async(req,res,next)=>{
+    try{
+        const {orderId,paymentDetails}=req.body;
+        const items = req.cartItems
+        console.log(items)
+        //verifying payment
+        paymentVerification(paymentDetails,next);
+        const paymentStatus="Success"
+
+        for(let item of items)
+        {
+            const productId = item.product._id;
+            const quantityPurchased = item.quantity;
+            const sizePurchased = item.size;
+            await productDB.updateOne({_id:productId},{$inc:{'sizes.$[s].stock':-quantityPurchased}},{arrayFilters:[{'s.size':sizePurchased}]},{ runValidators: true })
+        }
+
+        const updateOrderPaymentStatus=await orderDB.updateOne({orderId},{$set:{paymentStatus},$unset:{expiryDate:""}})
+        if(updateOrderPaymentStatus.matchedCount===0) return next(errorHandler(404,"order not found"))
+        if(updateOrderPaymentStatus.modifiedCount===0) return next(errorHandler(400,"no updation made"));
+        return res.status(200).json({success:true,message:"Order Placed Succesfully"})
+
+    }
+    catch(error)
+    {
+        console.log(error.message)
+        return next(errorHandler(500,"something went wrong"))
     }
 }
 
@@ -174,3 +219,119 @@ const returnOrderRequest=async(req,res,next)=>{
 
 
 
+export const downloadInvoice=async(req,res,next)=>{
+    try {
+        console.log("working")
+        const { orderId } = req.params
+        // Assuming you have a function to fetch order details
+        const orderDetails = await orderDB.findOne({orderId})
+        
+    
+        const doc = new PDFDocument({
+          size: 'A4',
+          margins: { top: 50, left: 40, right: 40, bottom: 50 },
+        })
+    
+        // Set headers for PDF download
+        res.setHeader('Content-Type', 'application/pdf')
+        res.setHeader('Content-Disposition', `attachment; filename="order-${orderId}.pdf"`)
+        doc.pipe(res)
+    
+        // Header Section
+        doc
+          .fontSize(24)
+          .font('Helvetica-Bold')
+          .text('Order Invoice', { align: 'center' })
+          .fontSize(14)
+          .font('Helvetica')
+          .text('Thank you for your purchase', { align: 'center' })
+          .moveDown(2)
+    
+        // Order Details Section
+        doc
+          .font('Helvetica-Bold')
+          .fontSize(18)
+          .text('Order Details')
+          .moveDown(0.5)
+        
+        doc
+          .font('Helvetica')
+          .fontSize(12)
+          .text(`Order ID: ${orderDetails.orderId}`, { continued: true })
+          .text(`Order Date: ${new Date(orderDetails.createdAt).toLocaleString()}`, { align: 'right' })
+          .moveDown(2)
+    
+        // Delivery Expected Section
+        doc
+          .font('Helvetica-Bold')
+          .fontSize(18)
+          .text('Delivery Expected By')
+          .moveDown(0.5)
+        
+        doc
+          .font('Helvetica')
+          .fontSize(12)
+          .text(new Date(orderDetails.deliveryDate).toLocaleDateString())
+          .moveDown(2)
+    
+        // Delivery Address Section
+        doc
+          .font('Helvetica-Bold')
+          .fontSize(18)
+          .text('Delivery Address')
+          .moveDown(0.5)
+        
+        doc
+          .font('Helvetica')
+          .fontSize(12)
+          .text(orderDetails.deliveryAddress.name)
+          .text(orderDetails.deliveryAddress.address)
+          .text(orderDetails.deliveryAddress.buildingName)
+          .text(`${orderDetails.deliveryAddress.city}, ${orderDetails.deliveryAddress.state}`)
+          .text(orderDetails.deliveryAddress.pincode)
+          .moveDown(2)
+    
+        // Payment Details Section
+        doc
+          .font('Helvetica-Bold')
+          .fontSize(18)
+          .text('Payment Details')
+          .moveDown(0.5)
+    
+        // Add a line for shipping fee
+        doc
+          .font('Helvetica')
+          .fontSize(12)
+          .text('Shipping Fee:', { continued: true })
+          .text(`Rs.${0}`, { align: 'right' })
+          .moveDown(0.5)
+    
+        // Add a line for total amount
+        doc
+          .font('Helvetica-Bold')
+          .fontSize(14)
+          .text('Total Amount:', { continued: true })
+          .text(`Rs.${orderDetails.totalAmount}`, { align: 'right' })
+          .moveDown(2)
+    
+        // Add a bottom border
+        doc
+          .moveTo(40, doc.y)
+          .lineTo(doc.page.width - 40, doc.y)
+          .stroke()
+    
+        // Footer
+        doc
+          .moveDown()
+          .fontSize(10)
+          .font('Helvetica')
+          .text('Thank you for shopping with us!', { align: 'center' })
+    
+        // Finalize the PDF
+        doc.end()
+    
+      } catch (error) {
+        console.error('Error generating invoice:', error)
+        res.status(500).send('Error generating invoice PDF')
+      }
+}

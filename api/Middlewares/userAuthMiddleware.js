@@ -8,8 +8,8 @@ export const verifyUser = async (req,res,next)=>{
     if(accessToken)
     {
         try{
-            jwt.verify(accessToken,process.env.ACCESS_TOKEN_SECRET);
-            const userId = refreshTokenDecoder(req)
+            const decode=jwt.verify(accessToken,process.env.ACCESS_TOKEN_SECRET);
+            const userId = decode.id;
             req.userId = userId
             next()
         }
@@ -40,7 +40,7 @@ const handleRefreshToken = async(req,res,next,refreshToken)=>{
                 sameSite: "strict",
                 maxAge: 1 * 60 * 1000,
             });
-            const userId = refreshTokenDecoder(req)
+            const userId = decodeRefresh.id
             req.userId = userId
             next();
         }

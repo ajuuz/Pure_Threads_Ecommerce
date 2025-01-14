@@ -110,7 +110,7 @@ const WalletDialog = ({dialogTriggerer,dialogTitle,dialogDescription,setRefresh}
         </div>
       </div>
       <DialogFooter>
-        <RazorPayButton amount={amount} functionAfterPayment={handleAddMoneyToWallet} buttonContent="ADD AMOUNT" preValidationFunction={preValidationFunction}/>
+        <RazorPayButton amount={amount} functionAfterPayment={handleAddMoneyToWallet} paymentFor="wallet" buttonContent="ADD AMOUNT" preValidationFunction={preValidationFunction}/>
       </DialogFooter>
     </DialogContent>
   </Dialog>

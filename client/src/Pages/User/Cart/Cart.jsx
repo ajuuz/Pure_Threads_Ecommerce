@@ -3,7 +3,6 @@ import NavBar from '@/components/UserComponent/NavBar/NavBar'
 import React, { useEffect, useState } from 'react'
 import { Minus, Plus, ShoppingCart, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { proceedToCheckout,updateCart } from '@/api/User/cartApi'
 
 import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
@@ -24,7 +23,6 @@ const Cart = () => {
     const fetchProductAndValidate=async()=>{
       try{
         const fetchCartProductsResult=await fetchCartProducts();
-        console.log(fetchCartProductsResult)
         setCArtProducts(fetchCartProductsResult.fetchedProductArray)
         setIsAvailableProduct(fetchCartProductsResult.isAvailableReducer)
       }

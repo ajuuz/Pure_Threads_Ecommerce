@@ -16,6 +16,7 @@ import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import Modal from '@/components/AdminComponent/Modal/Modal';
+import PaginationComponent from '@/components/CommonComponent/PaginationComponent';
 
 
 const Orders = () => {
@@ -23,7 +24,8 @@ const Orders = () => {
     const [orders,setOrders] = useState([]);
     const [currentPage,setCurrentPage]=useState(1);
     const [numberOfPages,setNumberOfPages] = useState(1)
-
+    const [sort,setSort] = useState({createdAt:-1})
+    const [tab,setTab]=useState("successOrders")
     // router dom
     const navigate = useNavigate()
 
@@ -132,17 +134,21 @@ const Orders = () => {
     useEffect(()=>{
 
         const fetchOrders = async()=>{
+
+          const limit=10;
+          const sortCriteria=JSON.stringify(sort)
             try{
-                const ordersResult = await getAllOrders();
+                const ordersResult = await getAllOrders(sortCriteria,currentPage,limit,tab);
+
                 const transformedOrders = ordersResult?.orders.map((order,index)=>{
                     return [order._id,[{name:"Order ID",value:order?.orderId},
                                        {name:"products",value:<div onClick={()=>navigate(`/orders/${order?.orderId}`,{state:{from:"admin"}})} className='flex justify-center'>
                                         {order.items.slice(0, 3).map((item, index) => (
                                         <div className='relative'>
-                                          <div key={item?._id} className={`relative rounded-full overflow-hidden border-2 border-white w-10 h-10 ${index !== 0 ? '-ml-4' : ''}`} style={{zIndex: 3 - index}}>
+                                          <div key={item?.product} className={`relative rounded-full overflow-hidden border-2 border-white w-10 h-10 ${index !== 0 ? '-ml-4' : ''}`} style={{zIndex: 3 - index}}>
                                             <img
-                                              src={item?.product?.images[0]?.url}
-                                              alt={item?.product?.name}
+                                              src={item?.productDetails?.images[0]?.url}
+                                              alt={item?.productDetails?.name}
                                               layout="fill"
                                               // objectFit="cover"
                                             />
@@ -159,7 +165,7 @@ const Orders = () => {
                                         )}
                                       </div>},
                                       {name:"date",value:formatOrderDate(order?.createdAt)},
-                                      {name:"customer",value:"customer"},
+                                      {name:"customer",value:order?.user[0]?.name},
                                       {name:"total",value:order?.totalAmount},
                                       {name:"payment",value:order?.paymentMethod==="cod"?"Cash On Delivery":order?.paymentMethod},
                                       {name:"status",value:<Badge  className={`${getStatusColor(order.status)} hover:${getStatusColor(order.status)}  text-white`}>{order.status}</Badge>},
@@ -178,13 +184,14 @@ const Orders = () => {
                                      ]]
                 })
                 setOrders(transformedOrders);
-                console.log(transformedOrders)
+
+                setNumberOfPages(ordersResult.numberOfPages)
             }catch(error){
-                toast.error(error.message);
+              console.log(error)
             }
         }
         fetchOrders()
-    },[])
+    },[currentPage,tab])
 
    
 
@@ -204,13 +211,13 @@ const Orders = () => {
               <CiSearch />
             </div>
           </div>
-          <div  className="bg-black text-white px-4 py-2 rounded-lg">
+          <div onClick={tab==="successOrders"?()=>setTab("returnOrders"):()=>setTab("successOrders")} className="cursor-pointer bg-black text-white px-4 py-2 rounded-lg">
             <span>Return Requested</span>
           </div>
         </div>
 
     <TableComponent headers={headers} body={orders}/>
-
+    <PaginationComponent currentPage={currentPage} setCurrentPage={setCurrentPage} numberOfPages={numberOfPages}/>
     </div>
   )
 }

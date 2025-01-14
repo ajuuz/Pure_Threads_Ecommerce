@@ -3,10 +3,13 @@ import { motion } from "framer-motion";
 
 import { FaCheck } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { IoClose } from "react-icons/io5";
 
 
 const OrderSuccess=({orderData})=> {
 
+  const isPaymentFailed=orderData?.paymentStatus==="Failed";
+  console.log(isPaymentFailed)
   const navigate = useNavigate()
 
     const formatDate = (date,dateOnly) => {
@@ -51,12 +54,12 @@ const OrderSuccess=({orderData})=> {
             transition={{ type: "spring", stiffness: 100 }}
             className="flex items-center justify-center w-16 h-16 mx-auto mb-4 bg-black rounded-full"
           >
-            <span className="text-white text-4xl font-bold"><FaCheck/></span>
+            <span className="text-white text-4xl font-bold">{isPaymentFailed?<IoClose/>:<FaCheck/>}</span>
           </motion.div>
           <h2 className="text-2xl font-semibold  tracking-wider">
-            Order Successfully Placed!
+            {isPaymentFailed?"Payment has been failed!!":"Order Successfully Placed!"}
           </h2>
-          <p className=" mt-2">Thank you for your purchase</p>
+            <p className=" mt-2">{isPaymentFailed ? "Order has been Created you can pay your money within 3 days to place order":"Thank you for your purchase"}</p>
         </div>
 
         {/* Order Details */}
@@ -90,10 +93,14 @@ const OrderSuccess=({orderData})=> {
           transition={{ delay: 0.4, duration: 0.6 }}
           className="mt-6"
         >
-          <h3 className="text-lg font-medium  mb-2">
-            Delivery Expected By
-          </h3>
-          <p className=" font-semibold">{formatDate(orderData.deliveryDate,true)}</p>
+          {!isPaymentFailed &&
+          <>
+              <h3 className="text-lg font-medium  mb-2">
+              Delivery Expected By
+              </h3>
+              <p className=" font-semibold">{formatDate(orderData.deliveryDate,true)}</p>
+          </>
+          }
 
           <h3 className="text-lg font-medium  mt-4 mb-2">
             Delivery Address

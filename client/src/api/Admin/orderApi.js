@@ -1,8 +1,8 @@
 import { axiosInstance } from "../axiosInstance";
 
-export const getAllOrders = async()=>{
+export const getAllOrders = async(sortCriteria,currentPage,limit,tab)=>{
     try{
-        const response = await axiosInstance.get('/admin/orders');
+        const response = await axiosInstance.get(`/admin/orders?target=admin&sortCriteria=${sortCriteria}&currentPage=${currentPage}&limit=${limit}&tab=${tab}`);
         return response?.data
     }
     catch(error){

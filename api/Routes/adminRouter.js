@@ -8,10 +8,11 @@ import { addProduct, editEntireProduct, getParticularProduct, patchProduct } fro
 import { getProducts } from '../Controllers/CommonController/productController.js';
 import { editCustomers, getCustomers } from '../Controllers/AdminController/customerController.js';
 import { verifyAdmin } from '../Middlewares/adminAuthMiddleware.js';
-import { getAllOrders, updateOrderStatus } from '../Controllers/AdminController/orderController.js';
+import { updateOrderStatus } from '../Controllers/AdminController/orderController.js';
 import { addNewCoupon } from '../Controllers/AdminController/couponController.js';
 import { getAllCoupons } from '../Controllers/CommonController/couponController.js';
-import { downloadSalesReportExcel, downloadSalesResportPdf, getSalesReport } from '../Controllers/AdminController/salesReportController.js';
+import { downloadSalesReportExcel, downloadSalesResportPdf, getSalesChartData, getSalesReport } from '../Controllers/AdminController/salesReportController.js';
+import { getAllOrders } from '../Controllers/CommonController/orderController.js';
 const router = express.Router();
 
 
@@ -37,15 +38,16 @@ router.get('/customers',verifyAdmin,getCustomers)
 router.patch('/customers',verifyAdmin,editCustomers)
 
 // orders
-router.get('/orders',getAllOrders)
-router.patch('/orders/:orderId',updateOrderStatus)
+router.get('/orders',verifyAdmin,getAllOrders)
+router.patch('/orders/:orderId',verifyAdmin,updateOrderStatus)
 
 // coupon
-router.post('/coupons',addNewCoupon)
-router.get('/coupons',getAllCoupons)
+router.post('/coupons',verifyAdmin,addNewCoupon)
+router.get('/coupons',verifyAdmin,getAllCoupons)
 
 // sales Report
-router.get('/salesReport',getSalesReport)
-router.get('/salesReport/download/pdf',downloadSalesResportPdf)
-router.get('/salesReport/download/excel',downloadSalesReportExcel)
+router.get('/salesReport',verifyAdmin,getSalesReport)
+router.get('/salesReport/download/pdf',verifyAdmin,downloadSalesResportPdf)
+router.get('/salesReport/download/excel',verifyAdmin,downloadSalesReportExcel)
+router.get('/salesReport/chart',verifyAdmin,getSalesChartData)
 export default router;

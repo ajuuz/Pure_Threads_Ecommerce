@@ -28,9 +28,9 @@ const AdminRoute = () => {
         <Route path='/categories/add' element={<AdminPrivate><AddCategory/></AdminPrivate>}/>
         <Route path='/category/edit/:id' element={<AdminPrivate><AddCategory/></AdminPrivate>}/>
         <Route path='/customers' element={<AdminPrivate><Customer/></AdminPrivate>}/>
-        <Route path='/orders' element={<Orders/>}/>
-        <Route path="/coupons" element={<Coupon/>}/>
-        <Route path="/dashboard" element={<Dashboard/>}/>
+        <Route path='/orders' element={<AdminPrivate><Orders/></AdminPrivate>}/>
+        <Route path="/coupons" element={<AdminPrivate><Coupon/></AdminPrivate>}/>
+        <Route path="/dashboard" element={<AdminPrivate><Dashboard/></AdminPrivate>}/>
     </Routes>
    </>
   )

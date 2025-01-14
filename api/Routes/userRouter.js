@@ -9,7 +9,7 @@ import { changePassword, getUserProfile, updateUserProfile } from '../Controller
 import { addAddress, deleteAddress, editAddress, getAddress, getAddresses, setDefaultAddress } from '../Controllers/UserController/addressController.js';
 import { verifyUserBlocked } from '../Middlewares/userBlockMiddleware.js';
 import { addToCart, getCartProducts, proceedToCheckout, selectSizeForProduct, updateCart } from '../Controllers/UserController/cartController.js';
-import { getParticularOrder, placeOrder, updateOrderStatus } from '../Controllers/UserController/orderController.js';
+import { downloadInvoice, getParticularOrder, orderRepayment, placeOrder, updateOrderStatus } from '../Controllers/UserController/orderController.js';
 import { validateProduct } from '../Middlewares/productCheckerMiddleware.js';
 import { addToWishlist, getWishlistProducts, removeFromWishlist,  } from '../Controllers/UserController/wishlistController.js';
 import { getAllCoupons } from '../Controllers/CommonController/couponController.js';
@@ -55,7 +55,7 @@ router.patch('/address/:id',verifyUser,verifyUserBlocked,setDefaultAddress)
 
 //cart
 router.post('/cart/selectSize',selectSizeForProduct);
-router.post('/cart',addToCart)
+router.post('/cart',verifyUser,verifyUserBlocked,addToCart)
 router.get('/cart',getCartProducts)
 router.patch('/cart',updateCart);
 router.post('/proceedToCheckout',proceedToCheckout)
@@ -68,10 +68,12 @@ router.patch('/wishlist/:productId',removeFromWishlist)
 
 // order
 router.post('/orders',validateProduct,couponActivation,placeOrder)
-router.get('/orders',getAllOrders)
+router.patch('/orders/repayment',validateProduct,couponActivation,orderRepayment)
+router.get('/orders',verifyUser,verifyUserBlocked,getAllOrders)
 router.patch('/orders/:orderId',updateOrderStatus)
 router.get('/orders/:orderId',getParticularOrder);
 router.post('/makePayment',makePayment)
+router.get('/order/invoice/:orderId',downloadInvoice)
 
 //coupon
 router.get('/coupons',getAllCoupons)

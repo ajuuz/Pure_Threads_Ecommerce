@@ -62,12 +62,15 @@ const orderSchema = new mongoose.Schema({
           default:"Pending",
           enum:["Pending","Success","Failed","Refunded","Cancelled"]
         },
-
         couponUsed:{
           couponCode:{  type:String,  default:"No Coupon Used",},
           couponValue:{  type:Number,  default:0},
           couponType:{ type:String, default:"%"},
           couponDiscount:{ type:Number, default:0},
+        },
+        expiryDate:{ //only for payment failed orders
+          type:Date,
+          index:{expires:259200} //3 days
         }
 },{timestamps:true})
 

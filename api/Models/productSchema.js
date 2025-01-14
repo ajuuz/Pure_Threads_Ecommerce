@@ -12,20 +12,22 @@ const productSchema = mongoose.Schema({
     },
     regularPrice:{
         type:Number,
-        required:true
+        required:true,
+        min:[0,"Regular price cannot be negative"],
     },
     salesPrice:{
         type:Number,
-        required:true
+        required:true,
+        min:[0,"Sales price cannot be negative"]
     },
     takenOffer:{
         offerValue:{type:Number,default:0},
         offerType:{type:String}
     },
     offer:{
-        offerValue:{type:Number,default:0},
+        offerValue:{type:Number,default:0,min:[0,"Offer value cannot be negative"]},
         offerType:{type:String},
-        offerPrice:{type:Number}
+        offerPrice:{type:Number,min:[0,"Offer price cannot be negative"]}
     },
     isActive:{
         type:Boolean,
@@ -54,7 +56,7 @@ const productSchema = mongoose.Schema({
    sizes: [
     {
         size: { type: String, required: true },
-        stock: { type: Number, required: true ,min:0},
+        stock: { type: Number, required: true ,min:[0,"Stock cannot be negative"]},
         _id:false,
     }],
     color:{
@@ -74,8 +76,7 @@ const productSchema = mongoose.Schema({
     default:[]
    },
 },
-{ timestamps: true }  
-)
+{ timestamps: true })
 
 
 productSchema.pre("updateOne", async function (next) {
@@ -90,11 +91,9 @@ productSchema.pre("updateOne", async function (next) {
         
         let productSalesPrice=update.offer.offerPrice;
         let categorySalesPrice;
-            console.log(category?.offer?.offerValue)
         categorySalesPrice = regularPrice - regularPrice*(category?.offer?.offerValue)/100 
 
         const salesPrice = Math.min(categorySalesPrice,productSalesPrice)
-        console.log(categorySalesPrice,productSalesPrice)
 
         if(salesPrice<0){
             const error = new Error("Sales price cannot be negative")

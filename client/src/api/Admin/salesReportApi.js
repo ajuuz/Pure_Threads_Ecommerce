@@ -10,6 +10,18 @@ export const getSalesReport=async(dateRange,from,to,currentPage,limit,sortCriter
         throw error?.response.data && {...error?.response.data,statusCode:error.status} || error
     }
 }
+export const getSalesChartData=async(criteria,year)=>{
+    try{
+        const response = await axiosInstance.get(`/admin/salesReport/chart?criteria=${criteria}&year=${year}`)
+        return response?.data
+    }
+    catch(error){
+        throw error?.response.data && {...error?.response.data,statusCode:error.status} || error
+    }
+}
+
+
+
 
 export const downloadSalesReportPdf=async(dateRange,from,to,currentPage,limit,sortCriteria,totalCouponDiscount)=>{
     try{

@@ -1,6 +1,5 @@
 import axios from "axios";
 import { toast } from "sonner";
-import { Navigate } from "react-router-dom";
 import { store } from "@/Redux/store";
 import { UserLogout } from "@/Redux/userSlice";
 

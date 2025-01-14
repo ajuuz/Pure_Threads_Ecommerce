@@ -58,8 +58,8 @@ export function PaymentMethods({isAvailableProduct,setIsAvailableProduct,cartPro
       setIsAvailableProduct={setIsAvailableProduct}
       />
       :<Button  
-      disabled={isAvailableProduct.filter(Boolean).length!==0 || cartProducts.length<1} 
-      onClick={()=>handlePlaceOrder(amount)} >Place Order</Button>
+      disabled={isAvailableProduct.filter(Boolean).length!==0 || cartProducts.length<1 || (paymentMethod==="cod" && amount<1500)} 
+      onClick={()=>handlePlaceOrder(amount)} >{paymentMethod==="cod" && amount<1500?"Cash On Delivery is available only for 1500 above purchase":"Place Order"}</Button>
       }
     </div>
   )

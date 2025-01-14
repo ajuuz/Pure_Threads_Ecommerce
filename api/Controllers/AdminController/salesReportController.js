@@ -363,7 +363,7 @@ export const downloadSalesResportPdf=async(req, res,next) => {
   };
 
 
-
+                             
 export const downloadSalesReportExcel= async (req, res, next) => {
     try {
       const { totalCouponDiscount } = req.query;
@@ -438,3 +438,57 @@ export const downloadSalesReportExcel= async (req, res, next) => {
       res.status(500).send('Error generating Excel file');
     }
   };
+
+
+export const getSalesChartData=async(req,res,next)=>{
+    const {criteria,year} = req.query;
+    console.log(criteria,year)
+    let groupingId={};
+    let projectFields={}
+    let matchFilter={paymentStatus:"Success"}
+    if (criteria === "month") {
+        matchFilter.$expr={ 
+            $eq: [{ $year: "$createdAt" }, Number(year)]  // Directly match the year 2025
+          }
+        groupingId = { year: { $year: "$createdAt" }, month: { $month: "$createdAt" } };
+        projectFields={year:"$_id.year",label:"$_id.month",totalSaleAmount:"$totalSales",totalCount:"$totalCount",_id:0}
+    } else if (criteria === "year") {
+        groupingId = { year: { $year: "$createdAt" } };
+        projectFields={label:"$_id.year",totalSaleAmount:"$totalSales",totalCount:"$totalCount",_id:0}
+    }
+    else if(criteria==="week")
+        {
+            matchFilter.$expr={ 
+                $eq: [{ $year: "$createdAt" }, Number(year)]  // Directly match the year 2025
+              }
+            groupingId = { year: { $year: "$createdAt" }, week: { $week: "$createdAt" } };
+            projectFields={year:"$_id.year",label:"$_id.week",totalSaleAmount:"$totalSales",totalCount:"$totalCount",_id:0}
+    }
+    try{
+        const chartData=await orderDB.aggregate(
+          [
+                {
+                 $match:matchFilter
+                },
+                {
+                 $group:{
+                     _id:groupingId,
+                     totalSales: { $sum: "$totalAmount" },
+                     totalCount:{$sum:1}
+                 }
+                },
+                {
+                    $project:projectFields
+                }
+                
+          ]
+        )
+        if(chartData.length===0) return next(errorHandler(400,"no orders found"))
+        return res.status(200).json({success:true,message:"data fetched succesfully",chartData})
+    }
+    catch(error)
+    {
+        console.log(error.message)
+        next(errorHandler(500,"something went wrong during fetching sales report chart"))
+    }
+}

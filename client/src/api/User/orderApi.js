@@ -1,9 +1,9 @@
 import { axiosInstance } from "../axiosInstance";
 
-export const placeOrder = async(paymentMethod,deliveryAddress,selectedCoupon,totalAmount,couponDiscount,paymentDetails)=>{
+export const placeOrder = async(paymentMethod,deliveryAddress,selectedCoupon,totalAmount,couponDiscount,paymentDetails,isPaymentFailed)=>{
     console.log("working")
     try{
-        const response = await axiosInstance.post('/users/orders',{paymentMethod,deliveryAddress,selectedCoupon,totalAmount,couponDiscount,paymentDetails})
+        const response = await axiosInstance.post('/users/orders',{paymentMethod,deliveryAddress,selectedCoupon,totalAmount,couponDiscount,paymentDetails,isPaymentFailed})
         return response.data
     }
     catch(error)
@@ -12,10 +12,22 @@ export const placeOrder = async(paymentMethod,deliveryAddress,selectedCoupon,tot
     }
 }
 
-export const getOrders = async(sortCriteria,currentPage,limit)=>{
+export const orderRepayment = async(orderId,selectedCoupon,paymentDetails)=>{
     try{
 
-        const response = await axiosInstance.get(`/users/orders?target=user&sortCriteria=${sortCriteria}&currentPage=${currentPage}&limit=${limit}`)
+        const isRepayment=true;
+        const response = await axiosInstance.patch('/users/orders/repayment',{isRepayment,orderId,selectedCoupon,paymentDetails})
+        return response.data;
+    }
+    catch(error)
+    {
+        throw error?.response.data && {...error?.response.data,statusCode:error.status} || error
+    }
+}
+
+export const getOrders = async(sortCriteria,currentPage,limit,tab)=>{
+    try{
+        const response = await axiosInstance.get(`/users/orders?target=user&sortCriteria=${sortCriteria}&currentPage=${currentPage}&limit=${limit}&tab=${tab}`)
         return response.data
     }
     catch(error){
@@ -72,7 +84,27 @@ export const makePayment=async(amount)=>{
     }
     catch(error)
     {
-        throw error.response.data;
+        throw error?.response.data && {...error?.response.data,statusCode:error.status} || error
     }
 }
 
+
+
+export const downloadInvoice=async(orderId)=>{
+    try{
+        const response = await fetch(import.meta.env.VITE_API_URL+`/users/order/invoice/${orderId}`, {
+            method: 'GET',
+          });
+    
+          if (!response.ok) {
+            throw new Error('Failed to download invoice');
+          }
+
+          return response
+    }
+    catch(error)
+    {
+        console.log(error)
+        throw error?.response.data && {...error?.response.data,statusCode:error.status} || error
+    }
+}

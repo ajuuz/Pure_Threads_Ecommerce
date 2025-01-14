@@ -3,6 +3,14 @@ import UsersDB from "../../Models/userSchema.js";
 import { refreshTokenDecoder } from "../../utils/jwtTokens/decodeRefreshToken.js";
 import { errorHandler } from "../../utils/error.js";
 export const couponActivation=async(req,res,next)=>{
+    const {isPaymentFailed} = req.body;
+    
+    if(isPaymentFailed){
+        req.body.paymentStatus="Failed"
+        next();
+        return
+    }
+
     try{
         const userId = refreshTokenDecoder(req);
         const {selectedCoupon,couponDiscount} = req.body;
@@ -14,9 +22,9 @@ export const couponActivation=async(req,res,next)=>{
             next();
             return
         }
-
+        
         if(selectedCoupon)
-        {
+            {
             couponUsed.couponCode=selectedCoupon.couponCode;
             couponUsed.couponValue=selectedCoupon.couponValue;
             couponUsed.couponType=selectedCoupon.couponType;
@@ -51,6 +59,7 @@ export const couponActivation=async(req,res,next)=>{
     }
     catch(error)
     {
+        console.log(error.message)
         return next(errorHandler(500,"something went wrong during activation of coupon"))
     }
 }

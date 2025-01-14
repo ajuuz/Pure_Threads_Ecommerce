@@ -79,9 +79,14 @@ export const editEntireProduct=async(req,res,next)=>{
     }
     catch(error)
     {
-        if(Object.values(error.errors)[0].properties.type==="min")
+        if(error?.name==="ValidationError")
         {
-           return next(errorHandler(500,"stock cannot be less than zero (0)"))
+            const {type,path}=Object.values(error.errors)[0].properties;
+            if(type==="min"){
+                if(path==="stock") return next(errorHandler(400,"stock cannot be less than zero (0)"))
+                else if(path==="regularPrice") return next(errorHandler(400,"regular Price cannot be negative"))
+                else if(path==="salesPrice") return next(errorHandler(400,"sales price cannot be negative"))
+            }
         }
        return next(errorHandler(500,"something went wrong during gettting products"))
     }
@@ -142,15 +147,16 @@ const changeProductState=async(productId,res,next)=>{
 
 const updateProductOffer = async(productId,offer,res,next)=>{
     try{
-        const product = await productDB.updateOne({_id:productId},{offer:offer});
+        const product = await productDB.updateOne({_id:productId},{offer:offer},{ runValidators: true });
         if(product.matchedCount===0) next(errorHandler(404,"product not found"));
         if(product.modifiedCount===0) next(errorHandler(400,"no updation made"));
 
         return res.status(200).json({success:true,message:"offer updated successfully"});
         
     }catch(error){
-        console.log(error)
+        if (error.name === "ValidationError") return next(errorHandler(400,"offer value cannot be negaive"));
+
         if(error.name==="negativePrice") return next(errorHandler(400,error.message))
         return  next(errorHandler(500,"something went wrong during gettting products"))
     }
-}
+}                

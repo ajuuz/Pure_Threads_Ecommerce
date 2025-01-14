@@ -39,13 +39,13 @@ const UserRoute = () => {
         <Route path='/address' element={<UserPrivate><Address/></UserPrivate>}/>
         <Route path="/address/add" element={<UserPrivate><ManageAddress/></UserPrivate>}/>
         <Route path="/address/manage/:id" element={<UserPrivate><ManageAddress/></UserPrivate>}/>
-        <Route path="/cart" element={<Cart/>}/>
-        <Route path="/checkout" element={<CheckOut/>}/>
-        <Route path="/orders" element={<Orders/>}/>
-        <Route path="/orders/:orderId" element={<OrderDetail/>}/>
-        <Route path="/wishlist" element={<Wishlist/>}/>
-        <Route path="/coupons" element={<Coupon/>}/>
-        <Route path="/wallet" element={<Wallet/>}/>
+        <Route path="/cart" element={<UserPrivate><Cart/></UserPrivate>}/>
+        <Route path="/checkout" element={<UserPrivate><CheckOut/></UserPrivate>}/>
+        <Route path="/orders" element={<UserPrivate><Orders/></UserPrivate>}/>
+        <Route path="/orders/:orderId" element={<UserPrivate><OrderDetail/></UserPrivate>}/>
+        <Route path="/wishlist" element={<UserPrivate><Wishlist/></UserPrivate>}/>
+        <Route path="/coupons" element={<UserPrivate><Coupon/></UserPrivate>}/>
+        <Route path="/wallet" element={<UserPrivate><Wallet/></UserPrivate>}/>
     </Routes>
     </>
   )

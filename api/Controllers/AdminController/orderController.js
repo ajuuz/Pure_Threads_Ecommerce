@@ -4,7 +4,7 @@ import { errorHandler } from "../../utils/error.js";
 
 export const getAllOrders = async(req,res,next)=>{
     try{
-    const orders = await orderDB.find().populate('items.product')
+    const orders = await orderDB.find({paymentStatus:{$ne:"Failed"}}).populate('items.product')
     if(!orders) return next(errorHandler(404,"order not found"));
     return res.status(200).json({success:true,message:"orders fetched successfully",orders})
     }catch(error){
