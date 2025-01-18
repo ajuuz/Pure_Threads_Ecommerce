@@ -167,7 +167,7 @@ const Orders = () => {
                                       {name:"date",value:formatOrderDate(order?.createdAt)},
                                       {name:"customer",value:order?.user[0]?.name},
                                       {name:"total",value:order?.totalAmount},
-                                      {name:"payment",value:order?.paymentMethod==="cod"?"Cash On Delivery":order?.paymentMethod},
+                                      {name:"payment",value:order?.paymentMethod==="cod"?"Cash On Delivery":order?.paymentMethod==="razorpay"?"Online":"Wallet"},
                                       {name:"status",value:<Badge  className={`${getStatusColor(order.status)} hover:${getStatusColor(order.status)}  text-white`}>{order.status}</Badge>},
                                       {name:"updateStatus",value:
                                       ["Delivered","Cancelled","Returned"].includes(order.status)
@@ -203,7 +203,7 @@ const Orders = () => {
       
        {/*  first div */}
        <div className=" flex items-center justify-around gap-7">
-          <h1 className="text-xl font-bold">Customers</h1>
+          <h1 className="text-xl font-bold">Orders</h1>
           <div className="flex-1 flex items-center">
             <div className="text-white bg-black p-2 rounded-s-md">search</div>
             <input className="border w-[100%] py-2" type="text" />

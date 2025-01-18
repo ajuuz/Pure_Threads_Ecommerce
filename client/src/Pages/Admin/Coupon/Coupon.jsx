@@ -10,10 +10,13 @@ import { toast } from 'sonner'
 const Coupon = () => {
 
   const [coupons,setCoupons] = useState([]);
+  const [searchInput,setSearchInput]=useState("");
+  const [refresh,setRefresh]=useState(false);
+
   useEffect(()=>{
     const fetchCoupons = async()=>{
       try{
-        const getCouponsResult = await getAllCoupons();
+        const getCouponsResult = await getAllCoupons(searchInput);
         const transformedCoupons = getCouponsResult?.coupons.map((coupon,index)=>{
           return [coupon?._id,[{name:"SNO",value:index+1},
                           {name:"coupon code",value:coupon?.couponCode},
@@ -34,7 +37,12 @@ const Coupon = () => {
       }
     }
     fetchCoupons();
-  },[])
+  },[refresh])
+
+  const handleCouponChange=(e)=>{
+    setSearchInput(e.target.value);
+    if(e.target.value==="") setRefresh(!refresh)
+  }
 
   const headers = ["SNO","Coupon Code","coupon value","description","Max Redeemable","minimum Purchase","Max Usable Limit","Per user Limit","Action"]
   return (
@@ -45,8 +53,8 @@ const Coupon = () => {
           <h1 className="text-xl font-bold">Coupons</h1>
           <div className="flex-1 flex items-center">
             <div className="text-white bg-black p-2 rounded-s-md">search</div>
-            <input className="border w-[100%] py-2" type="text" />
-            <div className="text-white bg-black p-3 rounded-e-md">
+            <input onChange={handleCouponChange} className="border w-[100%] py-2" type="text" />
+            <div onClick={()=>setRefresh(!refresh)} className="cursor-pointer text-white bg-black p-3 rounded-e-md">
               <CiSearch />
             </div>
           </div>

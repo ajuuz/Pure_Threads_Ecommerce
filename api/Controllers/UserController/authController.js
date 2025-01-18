@@ -19,6 +19,7 @@ import { errorHandler } from "../../utils/error.js";
 import { generateUserAccessToken } from "../../utils/jwtTokens/accessToken.js";
 import { generateUserRefreshToken } from "../../utils/jwtTokens/refreshToken.js";
 import { otpSender } from "../../utils/otpSender.js";
+import walletDB from "../../Models/walletSchema.js";
 
 
 
@@ -78,6 +79,12 @@ export const verifyOtp = async (req, res,next) => {
         const newUser = new UsersDB(document.FormData);
         await newUser.save();
         res.status(201).json({ success: true, message: "new account created successfully" });
+        const newWallet = new walletDB({
+          userId:newUser._id,
+          balance:0,
+          transactions:[]
+      })
+      await newWallet.save();
       }
       else{
         res.status(201).json({ success: true, message: "You can now change password" });
@@ -104,8 +111,10 @@ export const verifyLogin = async (req, res,next) => {
     if (!isPasswordCorrect) return next(errorHandler(401,"invalid credential , please try again"))
       
         generateUserAccessToken(res,userExist);
-        generateUserRefreshToken(res,userExist)
-        return res.status(200).json({success: true,message: "user logged in successfully",userName:userExist.name});
+        generateUserRefreshToken(res,userExist);
+
+        const userName=userExist.name;
+        return res.status(200).json({success: true,message: "user logged in successfully",userName});
 
   } catch (error) {
     return res.status(500).json({success: false,message: "Something went wrong. Please try again."});
@@ -148,6 +157,7 @@ export const googleAuth = async(req,res,next)=>{
     const UserExists = await UsersDB.findOne({email});
     if(UserExists)
     {
+      if(!UserExists.isActive) return next(errorHandler(403,"you are been blocked. please contact admin"))
       generateUserAccessToken(res,UserExists)
       generateUserRefreshToken(res,UserExists)
        return res.status(200).json({success:true,message:"user logged in successfully"})
@@ -219,7 +229,6 @@ export const forgotVerifyEmail = async(req,res,next)=>{
 }
 
 export const forgotChangePassword=async(req,res,next)=>{
-console.log("working")
   const {email,newPassword} = req.body;
   console.log(email,newPassword)
   try{

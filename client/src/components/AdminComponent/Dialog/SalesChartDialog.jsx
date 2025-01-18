@@ -30,6 +30,8 @@ const SalesChartDialog = ({dialogTriggerer,criteria,setYear,setCriteria}) => {
       </DialogHeader>
 
         <div className='grid grid-cols-2 gap-3'>
+            <Button onClick={()=>handleSelectYear("2022")} type="submit">2022</Button>
+            <Button onClick={()=>handleSelectYear("2023")} type="submit">2023</Button>
             <Button onClick={()=>handleSelectYear("2024")} type="submit">2024</Button>
             <Button onClick={()=>handleSelectYear("2025")} type="submit">2025</Button>
         </div>

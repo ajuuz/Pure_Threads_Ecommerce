@@ -13,6 +13,7 @@ import { addNewCoupon, editCoupon } from '../Controllers/AdminController/couponC
 import { getAllCoupons } from '../Controllers/CommonController/couponController.js';
 import { downloadSalesReportExcel, downloadSalesResportPdf, getSalesChartData, getSalesReport } from '../Controllers/AdminController/salesReportController.js';
 import { getAllOrders } from '../Controllers/CommonController/orderController.js';
+import { getUserStatus } from '../Controllers/AdminController/dashboardController.js';
 const router = express.Router();
 
 
@@ -51,4 +52,8 @@ router.get('/salesReport',verifyAdmin,getSalesReport)
 router.get('/salesReport/download/pdf',verifyAdmin,downloadSalesResportPdf)
 router.get('/salesReport/download/excel',verifyAdmin,downloadSalesReportExcel)
 router.get('/salesReport/chart',verifyAdmin,getSalesChartData)
+
+//dashboard
+router.get('/dashboard',getUserStatus)
+
 export default router;

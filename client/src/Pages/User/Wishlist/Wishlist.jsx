@@ -6,6 +6,8 @@ import './wishlist.css'
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { FaCartShopping } from 'react-icons/fa6';
+import WishlistDialog from '@/components/UserComponent/Dialog/WishlistDialog';
 
 const Wishlist = () => {
   const [wishlistProducts,setWishlistProducts] = useState([]);
@@ -47,10 +49,18 @@ const Wishlist = () => {
                     className={`flex flex-col wishlist-card wishlist-shadow hover:scale-105 cursor-pointer h-80 w-60 border-3 rounded-lg`}
                     style={{ backgroundImage: `url(${product?.images[0]?.url})`,backgroundPosition:"", backgroundSize:"contain" , }}
                     >
-                      <div className='flex  me-2 mt-2'>
+                      <div className='flex gap-2 me-2 mt-2'>
                         <div onClick={()=>navigate(`/products/${product?._id}`)} className='flex-1'></div>
-                        <div onClick={()=>{handleRemoveFromWishlist(product?._id)}} className='wishlist-trashBin text-xs  p-2 bg-white rounded-2xl opacity-0 transition-opacity duration-300 '>
-                            <FaTrashAlt className='text-red-600'/>
+                        <div className='flex flex-col gap-2'>
+                          <div onClick={()=>{handleRemoveFromWishlist(product?._id)}} className='wishlist-trashBin text-xs  p-2 bg-white rounded-2xl opacity-0 transition-opacity duration-300 '>
+                              <FaTrashAlt className='text-red-600'/>
+                          </div>
+                            <WishlistDialog product={product} dialogTriggerer={
+                              <div  className='wishlist-trashBin text-xs  p-2 bg-white rounded-2xl opacity-0 transition-opacity duration-300 '>
+                              <FaCartShopping className='text-red-600'/>
+                              </div>
+                            } dialogTitle="select size" dialogDescription="select the size that you want to add to cart"/>
+                          
                         </div>
                       </div>
                       <div onClick={()=>navigate(`/products/${product?._id}`)} className='flex  items-end h-full '>

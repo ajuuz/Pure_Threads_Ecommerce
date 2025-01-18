@@ -23,9 +23,9 @@ export const editCoupon=async(couponFormData)=>{
     }
 }
 
-export const getAllCoupons=async()=>{
+export const getAllCoupons=async(searchInput)=>{
     try{
-        const response = await axiosInstance.get('/admin/coupons')
+        const response = await axiosInstance.get(`/admin/coupons?query=${searchInput}`)
         return response.data
     }
     catch(error)

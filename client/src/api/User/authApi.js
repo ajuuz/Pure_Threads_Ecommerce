@@ -20,7 +20,7 @@ export const signupUser = async (userData)=>{
     }
     catch(error)
     {
-        console.error("auth api catch")
+        console.log(error)
         if(!error.response){
             throw error;
         }

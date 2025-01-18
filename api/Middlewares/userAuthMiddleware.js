@@ -1,8 +1,8 @@
 import jwt from "jsonwebtoken";
 import { errorHandler } from "../utils/error.js";
-import { refreshTokenDecoder } from "../utils/jwtTokens/decodeRefreshToken.js";
 
 export const verifyUser = async (req,res,next)=>{
+    console.log(req?.cookies)
     const accessToken = req?.cookies?.userAccessToken;
     const refreshToken = req?.cookies?.userRefreshToken;
     if(accessToken)

@@ -44,7 +44,7 @@ export function PaymentMethods({isAvailableProduct,setIsAvailableProduct,cartPro
           <RadioGroupItem value="razorpay" id="razorpay" />
           <Label htmlFor="razorpay" className="flex items-center gap-2">
             <CreditCard className="h-5 w-5" />
-            RazorPay
+            Online ( powered by RazorPay)
           </Label>
         </div>
       </RadioGroup>

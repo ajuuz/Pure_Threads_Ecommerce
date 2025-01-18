@@ -23,7 +23,10 @@ export const addCategory=async(req,res,next)=>{
 
 export const getCategories = async(req,res,next)=>{
     try{
-
+        const {searchQuery}=req.query;
+        const filter={};
+        if(searchQuery.trim()) filter.name={$regex:searchQuery,$options:'i'};
+      
         const categories = await categoryDB.find();
         return res.status(200).json({success:true,message:"categories fetched successfully",data:categories})
     }

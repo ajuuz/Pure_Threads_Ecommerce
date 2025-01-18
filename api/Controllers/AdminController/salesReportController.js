@@ -29,7 +29,6 @@ const dateRangeCalculator=(dateRange,from,to)=>{
             break;
 
         case "custom":
-            console.log(from,to)
             const fromDate = new Date(from)
             const toDate = new Date(to)
             rangeStart= fromDate
@@ -100,7 +99,6 @@ const fetchSalesReportData=async(req,res,next,isLimit)=>{
                 $project:{
                     deliveryAddress:0,
                     updatedAt:0,
-                    items:0,
                     userId:0
                 }
             },
@@ -132,7 +130,58 @@ const fetchSalesReportData=async(req,res,next,isLimit)=>{
                             totalCount:{$sum:1}
                             }
                         }
-                    ]
+                    ],
+                    bestSellingProducts: [
+                        { $unwind: "$items" }, // Decompose the items array into individual documents
+                        {
+                            $lookup: {
+                              from: "products",
+                              localField: "items.product",
+                              foreignField: "_id",
+                              as: "productDetails"
+                            }
+                        },
+                        { $unwind: "$productDetails" },
+                        {
+                          $group: {
+                            _id: "$items.product", // Group by product ID
+                            productName: { $first: "$productDetails.name" },
+                            soldCount: { $sum: "$items.quantity" },
+                          }
+                        },
+                        { $sort: { soldCount: -1 } }, // Sort by quantity sold (descending)
+                        { $limit: 5 } // Get the top product
+                      ],
+                      bestSellingCategories: [
+                        { $unwind: "$items" },
+                        {
+                            $lookup: {
+                                from: "products",
+                                localField: "items.product",
+                                foreignField: "_id",
+                                as: "productDetails"
+                            }
+                        },
+                        { $unwind: "$productDetails" }, // Flatten the product details
+                        {
+                            $lookup: {
+                                from: "categories", // Assuming your categories collection is named 'categories'
+                                localField: "productDetails.category", // Link using the category ID
+                                foreignField: "_id",
+                                as: "categoryDetails"
+                            }
+                        },
+                        { $unwind: "$categoryDetails" }, // Flatten the category details
+                        {
+                            $group: {
+                                _id: "$productDetails.category", // Group by category ID
+                                categoryName: { $first: "$categoryDetails.name" }, // Get the category name
+                                soldCount: { $sum: 1 }, // Sum the quantity sold
+                            }
+                        },
+                        { $sort: { soldCount: -1 } }, // Sort by total sales amount (descending)
+                        { $limit: 5 } // Get the top category
+                      ]
                 }
             },
             {
@@ -141,6 +190,8 @@ const fetchSalesReportData=async(req,res,next,isLimit)=>{
                     orders:1,
                     totalSaleAmount:{$arrayElemAt:["$totalAmount.totalAmount",0]},
                     totalSaleCount:{$arrayElemAt:["$totalAmount.totalCount",0]},
+                    bestSellingProducts:1,
+                    bestSellingCategories:1
                 }
             }
         ])

@@ -1,9 +1,6 @@
 
 import NavBar from '@/components/UserComponent/NavBar/NavBar'
 import { useEffect, useState } from 'react'
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Truck, CreditCard } from 'lucide-react'
 import SideBar from '@/components/UserComponent/SideBar/SideBar'
 import { cancelOrder, getOrders, returnOrder } from '@/api/User/orderApi'
 import { Button } from '@/components/ui/button'

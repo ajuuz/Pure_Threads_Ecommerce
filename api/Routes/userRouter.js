@@ -19,6 +19,7 @@ import { addMoneyToWallet, getWallet } from '../Controllers/UserController/walle
 import { getProducts } from '../Controllers/CommonController/productController.js';
 import { makePayment } from '../Controllers/CommonController/razorPayController.js';
 import { getAllOrders } from '../Controllers/CommonController/orderController.js';
+import { applyRefferal, getRefferalCode } from '../Controllers/UserController/refferalController.js';
 const router = express.Router();
 
 
@@ -56,31 +57,37 @@ router.patch('/address/:id',verifyUser,verifyUserBlocked,setDefaultAddress)
 //cart
 router.post('/cart/selectSize',selectSizeForProduct);
 router.post('/cart',verifyUser,verifyUserBlocked,addToCart)
-router.get('/cart',getCartProducts)
-router.patch('/cart',updateCart);
-router.post('/proceedToCheckout',proceedToCheckout)
+router.get('/cart',verifyUser,verifyUserBlocked,getCartProducts)
+router.patch('/cart',verifyUser,verifyUserBlocked,updateCart);
+router.post('/proceedToCheckout',verifyUser,verifyUserBlocked,proceedToCheckout)
 
 //wishlist
-router.post('/wishlist/:productId',addToWishlist)
-router.get('/wishlist',getWishlistProducts)
-router.patch('/wishlist/:productId',removeFromWishlist)
+router.post('/wishlist/:productId',verifyUser,verifyUserBlocked,addToWishlist)
+router.get('/wishlist',verifyUser,verifyUserBlocked,getWishlistProducts)
+router.patch('/wishlist/:productId',verifyUser,verifyUserBlocked,removeFromWishlist)
 
 
 // order
-router.post('/orders',validateProduct,couponActivation,placeOrder)
-router.patch('/orders/repayment',validateProduct,couponActivation,orderRepayment)
+router.post('/orders',verifyUser,verifyUserBlocked,validateProduct,couponActivation,placeOrder)
+router.patch('/orders/repayment',verifyUser,verifyUserBlocked,validateProduct,couponActivation,orderRepayment)
 router.get('/orders',verifyUser,verifyUserBlocked,getAllOrders)
-router.patch('/orders/:orderId',updateOrderStatus)
-router.get('/orders/:orderId',getParticularOrder);
-router.post('/makePayment',makePayment)
-router.get('/order/invoice/:orderId',downloadInvoice)
+router.patch('/orders/:orderId',verifyUser,verifyUserBlocked,updateOrderStatus)
+router.get('/orders/:orderId',verifyUser,verifyUserBlocked,getParticularOrder);
+router.post('/makePayment',verifyUser,verifyUserBlocked,makePayment)
+router.get('/order/invoice/:orderId',verifyUser,verifyUserBlocked,downloadInvoice)
 
 //coupon
-router.get('/coupons',getAllCoupons)
-router.get('/coupons/checkoutAvailable',getCheckoutAvailableCoupons)
+router.get('/coupons',verifyUser,verifyUserBlocked,getAllCoupons)
+router.get('/coupons/checkoutAvailable',verifyUser,verifyUserBlocked,getCheckoutAvailableCoupons)
 
 // wallet 
-router.get('/wallet',getWallet);
-router.patch('/wallet',addMoneyToWallet)
+router.get('/wallet',verifyUser,verifyUserBlocked,getWallet);
+router.patch('/wallet',verifyUser,verifyUserBlocked,addMoneyToWallet)
+
+//refferal
+router.get('/refferal',verifyUser,verifyUserBlocked,getRefferalCode)
+router.post('/refferal',verifyUser,verifyUserBlocked,applyRefferal)
+
+
 
 export default router;

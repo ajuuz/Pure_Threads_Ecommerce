@@ -66,14 +66,8 @@ const navigate = useNavigate()
                 <div className='flex flex-1 gap-6 items-center'><FaHeart className='text-xl'/>Wishlist</div>
             <div className={`bg-black   w-5 h-5  ${current==="wishlist" ? "visible":"invisible"}`}></div>
         </div>
-
-        <div onClick={()=>navigate('/chagePassword')} className='flex gap-10 justify-between items-center'>
-            <div className={`bg-black   w-5 h-5  ${current==="password" ? "visible":"invisible"}`}></div>
-                <div className='whitespace-nowrap flex flex-1 gap-6 items-center'><RiLockPasswordFill className='text-xl'/>Change Password</div>
-            <div className={`bg-black   w-5 h-5  ${current==="password" ? "visible":"invisible"}`}></div>
-        </div>
         
-        <div onClick={()=>navigate('/')} className='flex gap-10 justify-between items-center'>
+        <div onClick={()=>navigate('/refferal')} className='flex gap-10 justify-between items-center'>
             <div className={`bg-black   w-5 h-5  ${current==="refferal" ? "visible":"invisible"}`}></div>
                 <div className='flex flex-1 gap-6 items-center'><FaUserFriends className='text-xl'/>Refferal Code</div>
             <div className={`bg-black   w-5 h-5  ${current==="refferal" ? "visible":"invisible"}`}></div>

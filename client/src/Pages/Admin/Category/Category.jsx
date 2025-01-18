@@ -19,12 +19,13 @@ import OfferDialogComponent from '@/components/AdminComponent/Dialog/OfferDialog
 const Category = () => {
     const [refresh,setRefresh] = useState(true);
     const [categories,setCategories] = useState([])
+    const [searchQuery,setSearchQuery]=useState("")
 
     const navigate= useNavigate()
 
     useEffect(()=>{
             const fetchCategory = async()=>{
-            const response = await getCategories();
+            const response = await getCategories(searchQuery);
             const categoriesDetails=response.data;
             const transformedCategoriesDetails = categoriesDetails.map((category,index)=>{
             return [category._id,[{name:"sno",value:index+1},
@@ -59,6 +60,13 @@ const Category = () => {
         }
     }
 
+    const handleCategoryChange=(e)=>{
+      setSearchQuery(e.target.value)
+      if(e.target.value===""){
+        setRefresh(!refresh)
+      }
+    }
+
     const headers=["SN0","image","Category Name","description","State","Offer"]
   return (
     <div className="AdminAddCategory relative ps-5 md:ps-[300px] pe-5 pt-16">
@@ -69,8 +77,8 @@ const Category = () => {
           <h1 className="text-xl font-bold">Categories</h1>
           <div className="flex-1 flex items-center">
             <div className="text-white bg-black p-2 rounded-s-md">search</div>
-            <input className="border w-[100%] py-2" type="text" />
-            <div className="text-white bg-black p-3 rounded-e-md">
+            <input onChange={handleCategoryChange} className="border w-[100%] py-2" type="text" />
+            <div onClick={()=>setRefresh(!refresh)} className="cursor-pointer text-white bg-black p-3 rounded-e-md">
               <CiSearch />
             </div>
           </div>

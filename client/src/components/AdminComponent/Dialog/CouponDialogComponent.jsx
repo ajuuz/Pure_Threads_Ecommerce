@@ -79,6 +79,7 @@ const  CouponDialogComponent=({dialogTriggerer,dialogHeader,dialogDescription,co
         {
             newCoupon.maxRedeemable=couponFormData.couponValue;
         }
+
         const validationErrors = Object.values(couponValidation(newCoupon))
         if(validationErrors.length>0){
           for(let error of validationErrors)
@@ -110,7 +111,7 @@ const  CouponDialogComponent=({dialogTriggerer,dialogHeader,dialogDescription,co
           }}
         newCoupon.couponType=couponType
         try{
-          const editCouponResult = await editCoupon({...newCoupon});
+          const editCouponResult = await editCoupon(newCoupon);
           toast.success(editCouponResult?.message)
           setOpen(false)
       }

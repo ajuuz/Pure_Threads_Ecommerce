@@ -1,7 +1,6 @@
 import React from 'react'
 
 import { Routes, Route } from "react-router-dom";
-import { ToastContainer,toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import Login from '@/Pages/Admin/Auth/Login';
@@ -14,6 +13,7 @@ import AdminPrivate from './Protected_Routing/Admin/AdminPrivate';
 import AdminLoginPrivate from './Protected_Routing/Admin/AdminLoginPrivate';
 import Orders from '@/Pages/Admin/Orders/Orders';
 import Coupon from '@/Pages/Admin/Coupon/Coupon';
+import SalesReport from '@/Pages/Admin/SalesReport/SalesReport';
 import Dashboard from '@/Pages/Admin/Dashboard/Dashboard';
 const AdminRoute = () => {
   return (
@@ -30,7 +30,7 @@ const AdminRoute = () => {
         <Route path='/customers' element={<AdminPrivate><Customer/></AdminPrivate>}/>
         <Route path='/orders' element={<AdminPrivate><Orders/></AdminPrivate>}/>
         <Route path="/coupons" element={<AdminPrivate><Coupon/></AdminPrivate>}/>
-        <Route path="/dashboard" element={<AdminPrivate><Dashboard/></AdminPrivate>}/>
+        <Route path="/salesReport" element={<AdminPrivate><SalesReport/></AdminPrivate>}/>
     </Routes>
    </>
   )

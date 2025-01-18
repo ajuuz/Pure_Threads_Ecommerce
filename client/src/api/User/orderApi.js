@@ -94,6 +94,7 @@ export const downloadInvoice=async(orderId)=>{
     try{
         const response = await fetch(import.meta.env.VITE_API_URL+`/users/order/invoice/${orderId}`, {
             method: 'GET',
+            credentials:"include",
           });
     
           if (!response.ok) {

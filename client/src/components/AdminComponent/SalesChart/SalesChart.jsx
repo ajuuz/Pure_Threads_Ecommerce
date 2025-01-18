@@ -13,7 +13,8 @@ const SalesChart = () => {
 
     const [criteria,setCriteria]= useState("year");
     const [data,setData] = useState([])
-    const [year,setYear] = useState("")
+    const currentYear = new Date().getFullYear()
+    const [year,setYear] = useState(currentYear)
 
     useEffect(()=>{
         const fetchSalesChartData=async()=>{
@@ -71,7 +72,7 @@ const SalesChart = () => {
       y: {
         title: {
           display: true,
-          text: "Sales Amount ($)",
+          text: "Sales Amount (Rs)",
         },
         beginAtZero: true,
       },
@@ -84,6 +85,7 @@ const SalesChart = () => {
       <div className="h-96">
         <Bar data={chartData} options={options} />
       </div>
+      <p className="text-center bg-gray-400 text-white">{criteria!="year" && year}</p>
       <div className=" flex justify-center gap-3">
         <Button onClick={()=>setCriteria("year")}>Year</Button>
         <SalesChartDialog  setYear={setYear} criteria="month" setCriteria={setCriteria}  dialogTriggerer={<Button>Month</Button>} />

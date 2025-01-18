@@ -139,7 +139,7 @@ export const OrderCard = ({order,setOrders,index,handleCancelOrder,handleReturnO
                 <div className="flex justify-between items-center text-sm">
                   <div className="flex items-center gap-2">
                     <CreditCard className="w-4 h-4 text-gray-500" />
-                    <span>{order?.paymentMethod==="cod"?"Cash On Delivery":order?.paymentMethod}</span>
+                    <span>{order?.paymentMethod==="cod"?"Cash On Delivery":order?.paymentMethod==="razorpay"?"Online":"Wallet"}</span>
                   </div>
                   <div className="font-semibold">
                     Total: Rs{order.totalAmount.toFixed(2)}

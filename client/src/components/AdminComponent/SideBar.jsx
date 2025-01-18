@@ -37,11 +37,12 @@ const SideBar = () => {
     <div className='sidebar hidden md:block fixed top-0 left-0 shadow-lg pt-5 ps-7 pe-12' >
       <h1 className='font-bold text-2xl '>PURE THREADS</h1>
       <div className='flex flex-col gap-6 mt-16'>
-        <p className='text-lg font-semibold flex items-center justify-between cursor-pointer' onClick={()=>navigate('/admin/dashboard')}><GiCardboardBoxClosed />Dashboard<RxCaretRight /></p>
+        <p className='text-lg font-semibold flex items-center justify-between cursor-pointer'  onClick={()=>navigate('/admin')}><GiCardboardBoxClosed />Dashboard<RxCaretRight /></p>
         <p className='text-lg font-semibold flex items-center justify-between cursor-pointer' onClick={()=>navigate('/admin/products')}><GiCardboardBoxClosed />Products<RxCaretRight /></p>
         <p className='text-lg font-semibold flex items-center justify-between cursor-pointer' onClick={()=>navigate('/admin/orders')}><GiCardboardBoxClosed />Orders<RxCaretRight /></p>
         <p className='text-lg font-semibold flex items-center justify-between cursor-pointer'  onClick={()=>navigate('/admin/customers')}><GiCardboardBoxClosed />Customers<RxCaretRight /></p>
         <p className='text-lg font-semibold flex items-center justify-between cursor-pointer'  onClick={()=>navigate('/admin/categories')}><GiCardboardBoxClosed />Categeroies<RxCaretRight /></p>
+        <p className='text-lg font-semibold flex items-center justify-between cursor-pointer' onClick={()=>navigate('/admin/salesReport')}><GiCardboardBoxClosed />sales Report<RxCaretRight /></p>
         <p className='text-lg font-semibold flex items-center justify-between cursor-pointer'  onClick={()=>navigate('/admin/coupons')}><GiCardboardBoxClosed />Coupons<RxCaretRight /></p>
         <p className='text-lg font-semibold flex items-center justify-between cursor-pointer'><GiCardboardBoxClosed />Banners<RxCaretRight /></p>
       </div>

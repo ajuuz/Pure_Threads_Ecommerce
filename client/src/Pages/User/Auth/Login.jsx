@@ -58,12 +58,10 @@ const handleSubmitForm=async(e)=>{
     }
     try{
      const response = await loginUser(formData);
-     console.log(response);
      toast.success(response.message);
-    dispatch(UserLogin({name:response.userName}))
-    //  navigate('/')
-    }
-    catch(error){
+     dispatch(UserLogin({name:response.userName}))
+     navigate('/')
+    }catch(error){
       if(error?.statusCode===403) return
       console.log("login error",error)
       toast.error(error?.message || "Login failed. Please try again.");
@@ -84,7 +82,7 @@ const googleSignin = async()=>{
       dispatch(UserLogin({name:result?.user.displayName,email:result?.user.email}))
   }
   catch(err){
-      console.error(err)
+      // toast.error(err.message)
   }
 }
 

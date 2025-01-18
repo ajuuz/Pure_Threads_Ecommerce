@@ -1,11 +1,11 @@
 import { axiosInstance } from "../axiosInstance";
 import { uploadImage } from "./formSubmissionApi";
 
-export const getCategories = async ()=>{
+export const getCategories = async (searchQuery)=>{
     try{
         const response = await axiosInstance({
             method:'GET',
-            url:'admin/categories'
+            url:`admin/categories?searchQuery=${searchQuery}`
         })
         return response.data;
     }

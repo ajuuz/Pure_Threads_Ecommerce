@@ -1,13 +1,14 @@
 import jwt from "jsonwebtoken";
 import { errorHandler } from "../utils/error.js";
+import { error } from "console";
 
 export const  verifyAdmin = async(req,res,next)=>{
 
     const accessToken = req.cookies.adminAccessToken;
     const refreshToken = req.cookies.adminRefreshToken;
-
     if(accessToken)
     {
+        console.log("access")
         try{
              jwt.verify(accessToken,process.env.ACCESS_TOKEN_SECRET);
              next();
@@ -48,7 +49,6 @@ const handleRefreshToken=async (refreshToken,req,res,next)=>{
     }
     else
     {
-        console.log("you are not authorized")
         res.status(401).json({ message: "No access token and no refresh token provided" });
     }
 }

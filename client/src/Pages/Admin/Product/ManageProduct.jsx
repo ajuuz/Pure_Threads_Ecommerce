@@ -64,6 +64,7 @@ useEffect(()=>{
           {
           const particularProductResult = await getParticularProduct(id);
           setFormData(particularProductResult.product);
+          console.log(particularProductResult.product)
           const imageURLs = particularProductResult.product.images.map(image=>image.url)
           setImages(imageURLs)
           setCroppedImage(imageURLs)
@@ -78,6 +79,7 @@ useEffect(()=>{
   }
     const fetchCategory=async()=>{
     const categoriesResult=await getCategories();
+    console.log(categoriesResult)
     setCategories(categoriesResult.data);
     }
     fetchCategory();

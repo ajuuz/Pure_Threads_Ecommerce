@@ -9,7 +9,7 @@ import Card from "@/components/UserComponent/Card/Card";
 import Footer from "@/components/UserComponent/Footer/Footer";
 import { getProducts } from "@/api/User/productApi";
 import { getCategories } from "@/api/User/CategoryApi";
-import { useNavigate } from "react-router-dom";
+import {  useNavigate } from "react-router-dom";
 
 const LandingPage = () => {
 
@@ -18,38 +18,41 @@ const LandingPage = () => {
     const [categories,setCategories] = useState([])
 
     const navigate = useNavigate()
+    
+    const fetchProducts=async()=>{
+        try{
+            const sort=JSON.stringify({createdAt:-1})
+            const limit = 5;
+            const currentPage=1
+            const category=[];
+            const fit=[];
+            const sleeves=[];
+            const searchQuery =""
+            const productsResult = await getProducts(sort,limit,currentPage,category,fit,sleeves,searchQuery)
+            setNewArrivals(productsResult.products)
+        }
+        catch(error)
+        {
+            console.log(error)
+        } 
+    }
+
+    const fetchCategories=async()=>{
+        try{
+            const categoriesResult = await getCategories();
+            setCategories(categoriesResult.categories)
+        }
+        catch(error)
+        {
+            console.log(error.message)
+        }
+    }
+
+   
 
     useEffect(()=>{
-        const fetchProducts=async()=>{
-            try{
-                const sort=JSON.stringify({createdAt:-1})
-                const limit = 5;
-                const currentPage=1
-                const category=[];
-                const fit=[];
-                const sleeves=[];
-                const searchQuery =""
-                const productsResult = await getProducts(sort,limit,currentPage,category,fit,sleeves,searchQuery)
-                setNewArrivals(productsResult.products)
-            }
-            catch(error)
-            {
-                console.log(error)
-            } 
-        }
         fetchProducts();
-        const fetchCategories=async()=>{
-            try{
-                const categoriesResult = await getCategories();
-                setCategories(categoriesResult.categories)
-            }
-            catch(error)
-            {
-                console.log(error.message)
-            }
-        }
         fetchCategories()
-
     },[])
 
     //    functions
@@ -63,7 +66,6 @@ const onCardClick=(id)=>{
       <div className="p-8">
       <Carousel/>
       </div>
-
        <div className="mt-5">
            <div className="flex flex-col items-center">
             <h2 className="font-serif text-center text-xl">NEW ARRIVALS</h2>
