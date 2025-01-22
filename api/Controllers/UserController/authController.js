@@ -83,7 +83,7 @@ export const verifyOtp = async (req, res,next) => {
           userId:newUser._id,
           balance:0,
           transactions:[]
-      })
+        })
       await newWallet.save();
       }
       else{

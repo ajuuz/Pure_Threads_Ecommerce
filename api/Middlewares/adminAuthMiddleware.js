@@ -8,7 +8,6 @@ export const  verifyAdmin = async(req,res,next)=>{
     const refreshToken = req.cookies.adminRefreshToken;
     if(accessToken)
     {
-        console.log("access")
         try{
              jwt.verify(accessToken,process.env.ACCESS_TOKEN_SECRET);
              next();

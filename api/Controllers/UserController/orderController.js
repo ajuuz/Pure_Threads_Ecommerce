@@ -1,4 +1,3 @@
-import { razorpay } from "../../config/RazorPay.js";
 import cartDB from "../../Models/cartSchema.js";
 import orderDB from "../../Models/orderSchema.js";
 import productDB from "../../Models/productSchema.js";
@@ -10,17 +9,33 @@ import PDFDocument from 'pdfkit';
 
 import dotenv from "dotenv"
 import { paymentVerification } from "../CommonController/razorPayController.js";
+import failedOrderDB from "../../Models/failedOrderSchema.js";
+import UsersDB from "../../Models/userSchema.js";
+import couponDB from "../../Models/couponSchema.js";
 dotenv.config(); // Load environment variables from .env file
 
 
-export const getOrders = async(req,res)=>{
+export const getAllOrders = async(req,res)=>{
     try{
         const userId = refreshTokenDecoder(req);
-        const orders = await orderDB.find({userId}).populate('items.product')
-        if(!orders) return next(errorHandler(404,"orders not found"));
-        return res.status(200).json({success:true,message:"orders fetched successfully",orders})
+        const {sortCriteria,currentPage,limit,status}=req.query; //status means failed or successfull order
+        const sort = JSON.parse(sortCriteria)
+        const skip=(currentPage-1)*limit;
+        let collection=orderDB
+        if(status==="failed") collection=failedOrderDB;
+        const orders=await Promise.all([
+          await collection.countDocuments({userId}),
+          await collection.find({userId}).sort(sort).skip(skip).limit(limit).populate('items.product'),
+          await failedOrderDB.countDocuments({userId}),
+          await orderDB.countDocuments({userId})
+      ])
+
+      const numberOfPages=Math.ceil(orders[0]/limit)
+        return res.status(200).json({success:true,message:"orders fetched successfully",numberOfPages,orders:orders[1],failedOrdersCount:orders[2],ordersCount:orders[3]})
     }catch(error){
-        console.log(error.message)
+      if(error.name==="MongoServerError"){
+        return next(errorHandler(500,"Database error occured while fetching failed orders"));
+    }
         return next(errorHandler(500,"something went wrong"))
     }
 }
@@ -45,10 +60,12 @@ export const placeOrder = async(req,res,next)=>{
 
     const {paymentMethod,deliveryAddress,couponUsed,totalAmount} = req.body; //details need for all payment method place order
     const {paymentDetails} = req.body //only when payment made using razorpay (success)
-    const {isPaymentFailed} = req.body //only when razor payment fails
     const userId = req.userId
     const items = req.cartItems
-    let paymentStatus=req.body.paymentStatus||"Pending"
+    const {isCouponUsableLimit,couponExistInUser}=req.body //for coupon count management
+    const {failedOrderId}=req.body;
+
+    let paymentStatus="Pending"
 
         const newOrderDetails={
             userId,
@@ -61,37 +78,35 @@ export const placeOrder = async(req,res,next)=>{
         }
     try{
     if (paymentMethod === 'razorpay'){
-        if(!isPaymentFailed) { //payment success
         paymentVerification(paymentDetails,next);
         newOrderDetails.paymentStatus="Success"
-      }else{
-        newOrderDetails.expiryDate=new Date() //for expiry of failed order
-      }
     }
 
     let wallet;
     if(paymentMethod==="wallet")
     {
         wallet = await walletDB.findOne({userId})
-        if(wallet.balance<totalAmount) return next(errorHandler(400,"not enough balance"))
+        if(wallet.balance<totalAmount){
+          return next(errorHandler(400,"not enough balance"))
+        }
         newOrderDetails.paymentStatus="Success"
     }
-        const newOrder =new orderDB(newOrderDetails)
-        await newOrder.save()
+    const newOrder =new orderDB(newOrderDetails)
+    await newOrder.save()
+
+    const updateTasks=[];
+    
         
         //making updation after placing order  - cart,product , if(wallet) updating wallet
-        await cartDB.updateOne({userId},{$set:{items:[]}})
+        updateTasks.push(cartDB.updateOne({userId},{$set:{items:[]}}))
 
-        if(!isPaymentFailed)
-        {
-            for(let item of items)
-                {
-                    const productId = item.product._id;
-                    const quantityPurchased = item.quantity;
-                    const sizePurchased = item.size;
-                    await productDB.updateOne({_id:productId},{$inc:{'sizes.$[s].stock':-quantityPurchased}},{arrayFilters:[{'s.size':sizePurchased}]},{ runValidators: true })
-                }
-        }
+        items.forEach((item)=>{
+          const productId = item.product._id;
+          const quantityPurchased = item.quantity;
+          const sizePurchased = item.size;
+          updateTasks.push(productDB.updateOne({_id:productId},{$inc:{'sizes.$[s].stock':-quantityPurchased}},{arrayFilters:[{'s.size':sizePurchased}]},{ runValidators: true }))
+        })
+       
 
         if(paymentMethod==="wallet") {
             const transcationDetails={
@@ -103,23 +118,125 @@ export const placeOrder = async(req,res,next)=>{
             }
             wallet.balance=wallet.balance-totalAmount;
             wallet.transactions.push(transcationDetails);
-            await wallet.save()
+            updateTasks.push(wallet.save())
         }
 
-        res.status(201).json({success:true,message:"order Placed Successfully",orderData:{orderId:newOrder.orderId,deliveryAddress,deliveryDate:newOrder.deliveryDate,totalAmount:newOrder.totalAmount,paymentMethod:newOrder.paymentMethod,paymentStatus:newOrder.paymentStatus,createdAt:newOrder.createdAt}})
+        if(couponUsed?.couponCode!=="No Coupon Used"){
+          if(isCouponUsableLimit){
+            updateTasks.push(couponDB.updateOne({couponCode:couponUsed?.couponCode},{$inc:{'maxUsableLimit.limit':-1}}))
+          }
+
+          if(couponExistInUser){
+            updateTasks.push(UsersDB.updateOne({_id:userId},{$inc:{'usedCoupons.$[coupon].usedCount':1}},{arrayFilters:[{'coupon.couponCode':couponUsed?.couponCode}]}))
+          }else{
+            updateTasks.push(UsersDB.updateOne({_id:userId},{$push:{usedCoupons:{couponCode:couponUsed.couponCode,usedCount:1}}}))
+          }
+        }
+
+        if(failedOrderId)
+        {
+          updateTasks.push(failedOrderDB.deleteOne({_id:failedOrderId}))
+        }
+
+        await Promise.all(updateTasks)
+
+        res.status(201).json({success:true,message:"order Placed Successfully",orderData:{orderId:newOrder.orderId,deliveryDate:newOrder.deliveryDate,paymentStatus:newOrder.paymentStatus,createdAt:newOrder.createdAt}})
     }
     catch(error){
-        console.log(error.message)
+        console.log(error)
        return next(errorHandler(500,"something went wrong"))
     }
 }
+// //place order
+// export const placeOrder = async(req,res,next)=>{
+
+//     const {paymentMethod,deliveryAddress,couponUsed,totalAmount} = req.body; //details need for all payment method place order
+//     const {paymentDetails} = req.body //only when payment made using razorpay (success)
+//     const userId = req.userId
+//     const items = req.cartItems
+//     const {isCouponUsableLimit,couponExistInUser}=req.body //for coupon count management
+
+//     let paymentStatus="Pending"
+
+//         const newOrderDetails={
+//             userId,
+//             deliveryAddress,
+//             items,
+//             paymentMethod,
+//             paymentStatus,
+//             totalAmount,
+//             couponUsed
+//         }
+//     try{
+//     if (paymentMethod === 'razorpay'){
+//         paymentVerification(paymentDetails,next);
+//         newOrderDetails.paymentStatus="Success"
+//     }
+
+//     let wallet;
+//     if(paymentMethod==="wallet")
+//     {
+//         wallet = await walletDB.findOne({userId})
+//         if(wallet.balance<totalAmount){
+//           return next(errorHandler(400,"not enough balance"))
+//         }
+//         newOrderDetails.paymentStatus="Success"
+//     }
+//     const newOrder =new orderDB(newOrderDetails)
+//     await newOrder.save()
+
+//     const updateTasks=[];
+    
+        
+//         //making updation after placing order  - cart,product , if(wallet) updating wallet
+//         await cartDB.updateOne({userId},{$set:{items:[]}})
+
+//         for(let item of items)
+//             {
+//                 const productId = item.product._id;
+//                 const quantityPurchased = item.quantity;
+//                 const sizePurchased = item.size;
+//                 await productDB.updateOne({_id:productId},{$inc:{'sizes.$[s].stock':-quantityPurchased}},{arrayFilters:[{'s.size':sizePurchased}]},{ runValidators: true })
+//             }
+
+//         if(paymentMethod==="wallet") {
+//             const transcationDetails={
+//                 description:`spend ${totalAmount} for order (${newOrder.orderId})`,
+//                 transactionDate:new Date(),
+//                 transactionType:"Debit",
+//                 transactionStatus:"Success",
+//                 amount:totalAmount
+//             }
+//             wallet.balance=wallet.balance-totalAmount;
+//             wallet.transactions.push(transcationDetails);
+//             await wallet.save()
+//         }
+
+//         if(couponUsed?.couponCode!=="No Coupon Used"){
+//           if(isCouponUsableLimit) await couponDB.updateOne({couponCode:couponUsed?.couponCode},{$inc:{'maxUsableLimit.limit':-1}})
+
+//           if(couponExistInUser){
+//             await UsersDB.updateOne({_id:userId},{$inc:{'usedCoupons.$[coupon].usedCount':1}},{arrayFilters:[{'coupon.couponCode':couponUsed?.couponCode}]})
+//           }else{
+//             await UsersDB.updateOne({_id:userId},{$push:{usedCoupons:{couponCode:couponUsed.couponCode,usedCount:1}}})
+//           }
+//         }
+
+//         res.status(201).json({success:true,message:"order Placed Successfully",orderData:{orderId:newOrder.orderId,deliveryDate:newOrder.deliveryDate,paymentStatus:newOrder.paymentStatus,createdAt:newOrder.createdAt}})
+//     }
+//     catch(error){
+//         console.log(error)
+//        return next(errorHandler(500,"something went wrong"))
+//     }
+// }
+
 
 
 export const orderRepayment=async(req,res,next)=>{
     try{
         const {orderId,paymentDetails}=req.body;
         const items = req.cartItems
-        console.log(items)
+
         //verifying payment
         paymentVerification(paymentDetails,next);
         const paymentStatus="Success"

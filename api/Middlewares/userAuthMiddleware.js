@@ -2,7 +2,6 @@ import jwt from "jsonwebtoken";
 import { errorHandler } from "../utils/error.js";
 
 export const verifyUser = async (req,res,next)=>{
-    console.log(req?.cookies)
     const accessToken = req?.cookies?.userAccessToken;
     const refreshToken = req?.cookies?.userRefreshToken;
     if(accessToken)

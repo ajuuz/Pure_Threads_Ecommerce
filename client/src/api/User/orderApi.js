@@ -1,9 +1,19 @@
 import { axiosInstance } from "../axiosInstance";
 
-export const placeOrder = async(paymentMethod,deliveryAddress,selectedCoupon,totalAmount,couponDiscount,paymentDetails,isPaymentFailed)=>{
-    console.log("working")
+export const placeOrder = async(paymentMethod,deliveryAddress,selectedCoupon,totalAmount,couponDiscount,paymentDetails,failedOrderId)=>{
     try{
-        const response = await axiosInstance.post('/users/orders',{paymentMethod,deliveryAddress,selectedCoupon,totalAmount,couponDiscount,paymentDetails,isPaymentFailed})
+        const response = await axiosInstance.post('/users/orders',{paymentMethod,deliveryAddress,selectedCoupon,totalAmount,couponDiscount,paymentDetails,failedOrderId})
+        return response.data
+    }
+    catch(error)
+    {
+        throw error?.response.data && {...error?.response.data,statusCode:error.status} || error
+    }
+}
+
+export const placeFailedOrder=async(paymentMethod,deliveryAddress,selectedCoupon,totalAmount,couponDiscount)=>{
+    try{
+        const response = await axiosInstance.post('/users/failedOrders',{paymentMethod,deliveryAddress,selectedCoupon,totalAmount,couponDiscount})
         return response.data
     }
     catch(error)
@@ -25,9 +35,9 @@ export const orderRepayment = async(orderId,selectedCoupon,paymentDetails)=>{
     }
 }
 
-export const getOrders = async(sortCriteria,currentPage,limit,tab)=>{
+export const getOrders = async(sortCriteria,currentPage,limit,status)=>{
     try{
-        const response = await axiosInstance.get(`/users/orders?target=user&sortCriteria=${sortCriteria}&currentPage=${currentPage}&limit=${limit}&tab=${tab}`)
+        const response = await axiosInstance.get(`/users/orders?sortCriteria=${sortCriteria}&currentPage=${currentPage}&limit=${limit}&status=${status}`)
         return response.data
     }
     catch(error){
@@ -70,7 +80,6 @@ export const getParticulartOrder=async(orderId)=>{
 }
 
 export const makePayment=async(amount)=>{
-    console.log(amount)
     try{
         const response= await axiosInstance("/users/makePayment",{
             method: "POST",
@@ -78,6 +87,24 @@ export const makePayment=async(amount)=>{
               "Content-Type": "application/json",
             },
             data: JSON.stringify({ amount }),
+          });
+
+          return response.data
+    }
+    catch(error)
+    {
+        throw error?.response.data && {...error?.response.data,statusCode:error.status} || error
+    }
+}
+
+export const verifyPayment=async(paymentDetails)=>{
+    try{
+        const response= await axiosInstance("/users/verifyPayment",{
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            data: paymentDetails,
           });
 
           return response.data

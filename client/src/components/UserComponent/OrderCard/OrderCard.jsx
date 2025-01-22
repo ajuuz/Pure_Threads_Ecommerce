@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { IoCash } from 'react-icons/io5'
 import RazorPayButton from '@/components/CommonComponent/RazorPay/RazorPayButton'
 import { toast } from 'sonner'
-import { downloadInvoice, orderRepayment } from '@/api/User/orderApi'
+import { cancelOrder, downloadInvoice, orderRepayment, placeOrder, returnOrder } from '@/api/User/orderApi'
 
 const getStatusColor = (status) => {
     switch (status) {
@@ -49,27 +49,58 @@ const formatDate = (isoDate) => {
 
 
 
-export const OrderCard = ({order,setOrders,index,handleCancelOrder,handleReturnOrder}) => {
+export const OrderCard = ({order,orders,setOrders,index}) => {
 
 
     const isFailedOrder=order?.paymentStatus==="Failed"?true:false;
     const navigate=useNavigate()
 
-    const handleRepayPayment=async(_,paymentDetails)=>{
+      const handleCancelOrder=async()=>{
         try{
-            console.log(_,paymentDetails)
-            const orderId=order?.orderId;
-            let selectedCoupon=null;
-            if(order.couponUsed.couponCode!=="No Coupon Used")
-            {
-               selectedCoupon={
-                couponCode:order.couponUsed.couponCode,
-                couponValue:order.couponUsed.couponValue,
-                couponType:order.couponUsed.couponType
-              }
-            }
-            const repaymentResult=await orderRepayment(orderId,selectedCoupon,paymentDetails);
-            setOrders((prev)=>prev.filter((order)=>order.orderId!==orderId))
+          let isPaymentDone=false;
+          const orderId=order?.orderId;
+          const paymentMethod=order?.paymentMethod;
+          const totalAmount=order?.totalAmount;
+          if(["razorpay","wallet"].includes(paymentMethod)){
+            isPaymentDone=true;
+          }
+          const cancelOrderResult = await cancelOrder(orderId,isPaymentDone,totalAmount);
+          const updatedOrderArray = [...orders];
+          updatedOrderArray[index].status="Cancelled";
+          updatedOrderArray[index].deliveryDate=new Date()
+          setOrders(updatedOrderArray)
+          toast.success(cancelOrderResult.message)
+        }
+        catch(error){
+          toast.error(error.message)
+        }
+      }
+    
+      const handleReturnOrder=async()=>{
+        try{
+          const orderId=order?.orderId;
+          const retrunOrderResult = await returnOrder (orderId);
+          const updatedOrderArray = [...orders];
+          updatedOrderArray[index].status="Return Requested";
+          setOrders(updatedOrderArray)
+          toast.success(retrunOrderResult.message)
+        }
+        catch(error){
+          toast.error(error.message)
+        }
+      }
+
+    const handleRepayPayment=async(paymentDetails)=>{
+        try{
+            const orderId=order?._id;
+            const paymentMethod=order?.paymentMethod;
+            const deliveryAddress=order?.deliveryAddress;
+            const selectedCoupon=order?.couponUsed;
+            const totalAmount=order?.totalAmount;
+            const couponDiscount=order?.couponUsed?.couponDiscount;
+           
+            const repaymentResult=await placeOrder(paymentMethod,deliveryAddress,selectedCoupon,totalAmount,couponDiscount,paymentDetails,orderId);
+            setOrders((prev)=>prev.filter((order,ind)=>ind!==index))
             toast.success(repaymentResult.message)
         }
         catch(error)
@@ -108,7 +139,7 @@ export const OrderCard = ({order,setOrders,index,handleCancelOrder,handleReturnO
                 <div className="flex justify-between items-center mb-4">
                   <div>
                     <h2 className="text-lg font-semibold">{order.orderId}</h2>
-                    <p className="text-sm text-gray-500">Ordered Date : {formatDate(order.createdAt)}</p>
+                    <p className="text-sm text-gray-500">Ordered Date : {isFailedOrder?"Date will be set only after payment":formatDate(order.createdAt)}</p>
                   </div>
                   <Badge  className={`${getStatusColor(order.status)} hover:${getStatusColor(order.status)}  text-white`}>{order.status}</Badge>
                   
@@ -116,9 +147,9 @@ export const OrderCard = ({order,setOrders,index,handleCancelOrder,handleReturnO
                 <div onClick={()=>navigate(`/orders/${order?.orderId}`,{state:{from:"user"}})} className="flex items-center mb-4">
                   {order.items.slice(0, 3).map((item, index) => (
                     <div className='relative'>
-                      <div key={item?.product} className={`relative rounded-full overflow-hidden border-2 border-white w-16 h-16 ${index !== 0 ? '-ml-4' : ''}`} style={{zIndex: 3 - index}}>
+                      <div key={item?._id} className={`relative rounded-full overflow-hidden border-2 border-white w-16 h-16 ${index !== 0 ? '-ml-4' : ''}`} style={{zIndex: 3 - index}}>
                         <img
-                          src={item?.productDetails?.images[0]?.url}
+                          src={item?.product?.images[0]?.url}
                           alt={item?.product?.name}
                           layout="fill"
                           objectFit="cover"
@@ -157,7 +188,7 @@ export const OrderCard = ({order,setOrders,index,handleCancelOrder,handleReturnO
                         !["Shipped","Cancelled","Delivered","Return Requested","Returned"].includes(order?.status)
                         ?<div className='flex gap-4 items-center'>
                           <Button onClick={handleDownloadInvoice}>Download Invoice</Button>
-                          <Modal handleClick={()=>handleCancelOrder(index,order?.orderId,order?.paymentMethod,order?.totalAmount)} type="button"   dialogTitle="Are you sure? Do you want to Cancel" dialogDescription="you cant revert this again" alertDialogTriggerrer={ <Button  className="bg-[#DC3545] hover:bg-[#DC3545] h-8">Cancel</Button> }/>
+                          <Modal handleClick={()=>handleCancelOrder()} type="button"   dialogTitle="Are you sure? Do you want to Cancel" dialogDescription="you cant revert this again" alertDialogTriggerrer={ <Button  className="bg-[#DC3545] hover:bg-[#DC3545] h-8">Cancel</Button> }/>
                         </div>
                         :order?.status==="Delivered"
                         ?

@@ -17,7 +17,7 @@ import { motion } from 'framer-motion';
 //apis
 import { fetchCartProducts } from '@/Utils/cart/productAvailableChecker';
 import { decrementQuantity, handleRemoveProduct, incrementQuantity } from '@/Utils/cart/cartOperations';
-import {  placeOrder } from '@/api/User/orderApi';
+import {  placeFailedOrder, placeOrder } from '@/api/User/orderApi';
 import { getCheckoutAvailableCoupons } from '@/api/User/couponApi';
 import { getAddresses } from '@/api/User/addressApi'
 import { CouponCardType2 } from '@/components/UserComponent/CouponCard/CouponCard';
@@ -101,7 +101,7 @@ const CheckOut = () => {
 
   
 
-const handlePlaceOrder=async(amount,paymentDetails,isPaymentFailed)=>{
+const handlePlaceOrder=async(paymentDetails)=>{
   try{
     if(paymentMethod==="cod")
       {
@@ -111,16 +111,17 @@ const handlePlaceOrder=async(amount,paymentDetails,isPaymentFailed)=>{
           return
         }
       }
+      const totalAmount=totalAmountCalculator(cartProducts,selectedCoupon)
       let couponDiscount=0;
-      if(selectedCoupon) couponDiscount=couponDiscountCalculator(cartProducts,selectedCoupon);
-        const deliveryAddress = addresses[selectedAddressIndex]
-        const placeOrderResult = await placeOrder(paymentMethod,deliveryAddress,selectedCoupon,amount,couponDiscount,paymentDetails,isPaymentFailed)
-      if(placeOrderResult.success)
-      {
-        setOrderSuccess(placeOrderResult.orderData)
+      let couponCode="No Coupon Used";
+      if(selectedCoupon){
+        couponDiscount=couponDiscountCalculator(cartProducts,selectedCoupon);
+        couponCode=selectedCoupon.couponCode
       }
-    
-  
+        const deliveryAddress = addresses[selectedAddressIndex]
+        const placeOrderResult = await placeOrder(paymentMethod,deliveryAddress,selectedCoupon,totalAmount,couponDiscount,paymentDetails)
+        const orderDetails={...placeOrderResult?.orderData,deliveryAddress,totalAmount,paymentMethod,couponCode,couponDiscount}
+        setOrderSuccess(orderDetails)
   }
   catch(error)
   {
@@ -128,6 +129,29 @@ const handlePlaceOrder=async(amount,paymentDetails,isPaymentFailed)=>{
     toast.error(error.message);
   }
 }
+
+
+const handleFailedOrder=async()=>{
+   try{
+
+    const totalAmount=totalAmountCalculator(cartProducts,selectedCoupon)
+    let couponDiscount=0;
+    let couponCode="No Coupon Used";
+    if(selectedCoupon){
+      couponDiscount=couponDiscountCalculator(cartProducts,selectedCoupon);
+      couponCode=selectedCoupon.couponCode
+    }
+    const deliveryAddress = addresses[selectedAddressIndex]
+    if(!deliveryAddress) return toast.error("select a delivery address");
+     await placeFailedOrder(paymentMethod,deliveryAddress,selectedCoupon,totalAmount,couponDiscount);
+     const paymentStatus="Failed"
+     const orderDetails={deliveryAddress,totalAmount,paymentMethod,paymentStatus,couponCode,couponDiscount}
+      setOrderSuccess(orderDetails)
+   }catch(error)
+   {
+     toast.error(error.message)
+   }
+  }
 
   return (
     <div className="min-h-screen  relative pt-32">
@@ -166,7 +190,7 @@ const handlePlaceOrder=async(amount,paymentDetails,isPaymentFailed)=>{
           <div className="md:col-span-2">
             {isFirstPage
             ?<CheckOutAddress  addresses={addresses}  selectedAddressIndex={selectedAddressIndex}  setSelectedAddressIndex={setSelectedAddressIndex}/>
-            :<PaymentMethods  isAvailableProduct={isAvailableProduct} setIsAvailableProduct={setIsAvailableProduct} cartProducts={cartProducts}  paymentMethod={paymentMethod}  setPaymentMethod={setPaymentMethod} amount={totalAmountCalculator(cartProducts,selectedCoupon)} handlePlaceOrder={handlePlaceOrder}/>
+            :<PaymentMethods  isAvailableProduct={isAvailableProduct} setIsAvailableProduct={setIsAvailableProduct} cartProducts={cartProducts}  paymentMethod={paymentMethod}  setPaymentMethod={setPaymentMethod} amount={totalAmountCalculator(cartProducts,selectedCoupon)} handlePlaceOrder={handlePlaceOrder} handleFailedOrder={handleFailedOrder}/>
             }
             
               {/* next side div */}

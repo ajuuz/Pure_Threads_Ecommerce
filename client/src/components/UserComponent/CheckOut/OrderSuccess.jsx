@@ -9,7 +9,6 @@ import { IoClose } from "react-icons/io5";
 const OrderSuccess=({orderData})=> {
 
   const isPaymentFailed=orderData?.paymentStatus==="Failed";
-  console.log(isPaymentFailed)
   const navigate = useNavigate()
 
     const formatDate = (date,dateOnly) => {
@@ -63,11 +62,13 @@ const OrderSuccess=({orderData})=> {
         </div>
 
         {/* Order Details */}
+        {
+          !isPaymentFailed &&
         <motion.div
-          initial={{ opacity: 0, x: -30 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.2, duration: 0.6 }}
-          className="mt-6"
+        initial={{ opacity: 0, x: -30 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ delay: 0.2, duration: 0.6 }}
+        className="mt-6"
         >
           <h3 className="text-lg font-medium  mb-2">
             Order Details
@@ -85,6 +86,7 @@ const OrderSuccess=({orderData})=> {
             </span>
           </div>
         </motion.div>
+        }
 
         {/* Delivery Details */}
         <motion.div
@@ -101,19 +103,48 @@ const OrderSuccess=({orderData})=> {
               <p className=" font-semibold">{formatDate(orderData.deliveryDate,true)}</p>
           </>
           }
-
-          <h3 className="text-lg font-medium  mt-4 mb-2">
-            Delivery Address
-          </h3>
-          <div className=" leading-relaxed">
-          <h2 className='font-bold'>{orderData?.deliveryAddress?.name||"John Doe"}</h2>
-            <p>{orderData?.deliveryAddress?.buildingName||""}</p>
-            <p className='truncate'>{`${orderData?.deliveryAddress?.address||""},${orderData?.deliveryAddress?.district||""}`}</p>
-            <p>{`${orderData?.deliveryAddress?.landMark||""},${orderData?.deliveryAddress?.city||""}`}</p>
-            <p>{orderData?.deliveryAddress?.pinCode||""}</p>
-            <p>{orderData?.deliveryAddress?.state||""}</p>
-          </div>
         </motion.div>
+
+        <div className="grid grid-cols-2">
+            <div>
+                <h3 className="text-lg font-medium  mt-4 mb-2">
+                  Delivery Address
+                </h3>
+                <div className=" leading-relaxed">
+                <h2 className='font-bold'>{orderData?.deliveryAddress?.name||"John Doe"}</h2>
+                  <p>{orderData?.deliveryAddress?.buildingName||""}</p>
+                  <p className='truncate'>{`${orderData?.deliveryAddress?.address||""},${orderData?.deliveryAddress?.district||""}`}</p>
+                  <p>{`${orderData?.deliveryAddress?.landMark||""},${orderData?.deliveryAddress?.city||""}`}</p>
+                  <p>{orderData?.deliveryAddress?.pinCode||""}</p>
+                  <p>{orderData?.deliveryAddress?.state||""}</p>
+                </div>
+            </div>
+
+            {/* Payment Details */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.6, duration: 0.6 }}
+                className="mt-6"
+              >
+                <h3 className="text-lg font-medium  mb-2">
+                  Payment Details
+                </h3>
+                <div className="flex justify-between  mb-2">
+                  <span>Payment Method:</span>
+                  <span className="font-semibold ">{orderData.paymentMethod}</span>
+                </div>
+                <div className="flex justify-between  mb-2">
+                  <span>Payment Status:</span>
+                  <span className="font-semibold ">{orderData.paymentStatus}</span>
+                </div>
+                <div className="flex justify-between ">
+                  <span>Coupon:</span>
+                  <span className="font-semibold ">{orderData.couponCode}</span>
+                </div>
+              </motion.div>
+        </div>
+
 
         {/* Payment Details */}
         <motion.div
@@ -123,11 +154,19 @@ const OrderSuccess=({orderData})=> {
           className="mt-6"
         >
           <h3 className="text-lg font-medium  mb-2">
-            Payment Details
+            Summary
           </h3>
           <div className="flex justify-between  mb-2">
-            <span>Shipping Fee:</span>
-            <span className="font-semibold ">₹0</span>
+            <span>Subtotal:</span>
+            <span className="font-semibold ">₹{orderData?.totalAmount+orderData?.couponDiscount}</span>
+          </div>
+          <div className="flex justify-between  mb-2">
+            <span>Delivery Charge:</span>
+            <span className="font-semibold ">- ₹0</span>
+          </div>
+          <div className="flex justify-between  mb-2">
+            <span>Coupon Discount:</span>
+            <span className="font-semibold ">- ₹{orderData.couponDiscount}</span>
           </div>
           <div className="flex justify-between ">
             <span>Total Amount:</span>
@@ -138,7 +177,10 @@ const OrderSuccess=({orderData})=> {
         {/* Buttons */}
         <div className="flex justify-between mt-6">
           <motion.button
-            onClick={()=>navigate('/orders')}
+            onClick={isPaymentFailed
+              ?()=>navigate('/orders',{state:{orderStatus:"failed"}})
+              :()=>navigate('/orders')
+            }
             whileHover={{ scale: 1.05 }}
             className="bg-black text-white hover:bg-gray-900 px-4 py-2 rounded"
           >

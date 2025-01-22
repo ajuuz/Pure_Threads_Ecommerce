@@ -1,4 +1,5 @@
 import cartDB from "../Models/cartSchema.js";
+import failedOrderDB from "../Models/failedOrderSchema.js";
 import orderDB from "../Models/orderSchema.js";
 import { errorHandler } from "../utils/error.js";
 import { refreshTokenDecoder } from "../utils/jwtTokens/decodeRefreshToken.js";
@@ -11,12 +12,11 @@ export const validateProduct =async(req,res,next)=>{
 
         if(paymentMethod==="cod" && totalAmount<1500) return next(errorHandler(400,"cash on delivery available only for above 1500 purchase"))
 
-        const {isRepayment,orderId}=req.body;//repayment of order if falied payment
-
+        const {failedOrderId}=req.body;//repayment of order if falied payment
         let items=[]
         let order;
-        if(isRepayment){
-          order=await orderDB.findOne({orderId},{items:1,couponUsed:1}).populate({path:'items.product',populate:{path:'category',select:'name -_id'}});
+        if(failedOrderId){
+          order=await failedOrderDB.findOne({_id:failedOrderId},{items:1,couponUsed:1}).populate({path:'items.product',populate:{path:'category',select:'name -_id'}});
           items=order.items;
         }
         else{
@@ -36,7 +36,6 @@ export const validateProduct =async(req,res,next)=>{
             }
           })
           req.userId=userId;
-
           
             req.cartItems = items.map((item)=>{
               return {
@@ -46,8 +45,6 @@ export const validateProduct =async(req,res,next)=>{
                 quantity:item.quantity
               }
             })
-          
-          
                     
           next();
     }

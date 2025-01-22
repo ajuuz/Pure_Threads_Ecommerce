@@ -1,18 +1,6 @@
 import mongoose from "mongoose";
 
-const orderSchema = new mongoose.Schema({
-    orderId: {
-        type: String,
-        unique: true,
-        default: function () {
-          const date = new Date();
-          const year = date.getFullYear();
-          const month = String(date.getMonth() + 1).padStart(2, '0');
-          const day = String(date.getDate()).padStart(2, '0');
-          const randomNum = Math.floor(Math.random() * 1000); // Random number between 0 and 999
-          return `PTHREADS-${year}${month}${day}-${randomNum}`;
-        },
-      },
+const failedOrderSchema = new mongoose.Schema({
 
       userId: { 
         type: mongoose.Schema.Types.ObjectId,
@@ -35,19 +23,11 @@ const orderSchema = new mongoose.Schema({
         quantity:Number
         }
         ],
-
         status: { 
             type: String,
             default: 'Pending'
          },
-         deliveryDate: {
-            type: Date,
-            default: () => {
-              const today = new Date();
-              today.setDate(today.getDate() + 6);
-              return today;
-            }
-          },
+        
          totalAmount:{
             type:Number,
             required:true
@@ -59,8 +39,7 @@ const orderSchema = new mongoose.Schema({
         },
         paymentStatus:{
           type:String,
-          default:"Pending",
-          enum:["Pending","Success","Failed","Refunded","Cancelled"]
+          default:"Failed",
         },
         couponUsed:{
           couponCode:{  type:String,  default:"No Coupon Used",},
@@ -68,8 +47,11 @@ const orderSchema = new mongoose.Schema({
           couponType:{ type:String, default:"%"},
           couponDiscount:{ type:Number, default:0},
         },
-        
-},{timestamps:true})
+        expiryDate:{ //only for payment failed orders
+          type:Date,
+          index:{expires:259200} //3 days
+        }
+})
 
-const orderDB = mongoose.model('order',orderSchema);
-export default orderDB;
+const failedOrderDB = mongoose.model('failedorder',failedOrderSchema);
+export default failedOrderDB;

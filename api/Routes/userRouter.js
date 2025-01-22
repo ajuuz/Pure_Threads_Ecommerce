@@ -9,7 +9,7 @@ import { changePassword, getUserProfile, updateUserProfile } from '../Controller
 import { addAddress, deleteAddress, editAddress, getAddress, getAddresses, setDefaultAddress } from '../Controllers/UserController/addressController.js';
 import { verifyUserBlocked } from '../Middlewares/userBlockMiddleware.js';
 import { addToCart, getCartProducts, proceedToCheckout, selectSizeForProduct, updateCart } from '../Controllers/UserController/cartController.js';
-import { downloadInvoice, getParticularOrder, orderRepayment, placeOrder, updateOrderStatus } from '../Controllers/UserController/orderController.js';
+import { downloadInvoice, getAllOrders, getParticularOrder, orderRepayment, placeOrder, updateOrderStatus } from '../Controllers/UserController/orderController.js';
 import { validateProduct } from '../Middlewares/productCheckerMiddleware.js';
 import { addToWishlist, getWishlistProducts, removeFromWishlist,  } from '../Controllers/UserController/wishlistController.js';
 import { getAllCoupons } from '../Controllers/CommonController/couponController.js';
@@ -17,9 +17,11 @@ import { getCheckoutAvailableCoupons } from '../Controllers/UserController/coupo
 import { couponActivation } from '../Middlewares/couponMiddleWares/couponActivation.js';
 import { addMoneyToWallet, getWallet } from '../Controllers/UserController/walletController.js';
 import { getProducts } from '../Controllers/CommonController/productController.js';
-import { makePayment } from '../Controllers/CommonController/razorPayController.js';
-import { getAllOrders } from '../Controllers/CommonController/orderController.js';
+import { makePayment, paymentVerification } from '../Controllers/CommonController/razorPayController.js';
 import { applyRefferal, getRefferalCode } from '../Controllers/UserController/refferalController.js';
+
+import { placeFailedOrder } from '../Controllers/UserController/failedOrderController.js';
+
 const router = express.Router();
 
 
@@ -69,13 +71,17 @@ router.patch('/wishlist/:productId',verifyUser,verifyUserBlocked,removeFromWishl
 
 // order
 router.post('/orders',verifyUser,verifyUserBlocked,validateProduct,couponActivation,placeOrder)
-router.patch('/orders/repayment',verifyUser,verifyUserBlocked,validateProduct,couponActivation,orderRepayment)
 router.get('/orders',verifyUser,verifyUserBlocked,getAllOrders)
-router.patch('/orders/:orderId',verifyUser,verifyUserBlocked,updateOrderStatus)
 router.get('/orders/:orderId',verifyUser,verifyUserBlocked,getParticularOrder);
-router.post('/makePayment',verifyUser,verifyUserBlocked,makePayment)
+router.patch('/orders/:orderId',verifyUser,verifyUserBlocked,updateOrderStatus)
+router.patch('/orders/repayment',verifyUser,verifyUserBlocked,validateProduct,couponActivation,orderRepayment)
 router.get('/order/invoice/:orderId',verifyUser,verifyUserBlocked,downloadInvoice)
 
+//failed orders
+router.post('/failedOrders',verifyUser,verifyUserBlocked,validateProduct,couponActivation,placeFailedOrder)
+
+router.post('/makePayment',verifyUser,verifyUserBlocked,makePayment)
+router.post('/verifyPayment',verifyUser,verifyUserBlocked,paymentVerification)
 //coupon
 router.get('/coupons',verifyUser,verifyUserBlocked,getAllCoupons)
 router.get('/coupons/checkoutAvailable',verifyUser,verifyUserBlocked,getCheckoutAvailableCoupons)

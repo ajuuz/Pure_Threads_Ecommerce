@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import RazorPayButton from "@/components/CommonComponent/RazorPay/RazorPayButton"
 import { fetchCartProducts } from "@/Utils/cart/productAvailableChecker"
 
-export function PaymentMethods({isAvailableProduct,setIsAvailableProduct,cartProducts,paymentMethod,setPaymentMethod,amount,handlePlaceOrder}) {
+export function PaymentMethods({isAvailableProduct,setIsAvailableProduct,cartProducts,paymentMethod,setPaymentMethod,amount,handlePlaceOrder,handleFailedOrder}) {
 
   const preValidationFunction=async()=>{
     try{
@@ -52,6 +52,7 @@ export function PaymentMethods({isAvailableProduct,setIsAvailableProduct,cartPro
       ?<RazorPayButton 
       amount={amount} 
       functionAfterPayment={handlePlaceOrder} 
+      handleFailedOrder={handleFailedOrder}
       paymentFor="order"
       preValidationFunction={preValidationFunction}
       disabled={isAvailableProduct.filter(Boolean).length!==0 || cartProducts.length<1}
@@ -59,7 +60,7 @@ export function PaymentMethods({isAvailableProduct,setIsAvailableProduct,cartPro
       />
       :<Button  
       disabled={isAvailableProduct.filter(Boolean).length!==0 || cartProducts.length<1 || (paymentMethod==="cod" && amount<1500)} 
-      onClick={()=>handlePlaceOrder(amount)} >{paymentMethod==="cod" && amount<1500?"Cash On Delivery is available only for 1500 above purchase":"Place Order"}</Button>
+      onClick={()=>handlePlaceOrder()} >{paymentMethod==="cod" && amount<1500?"Cash On Delivery is available only for 1500 above purchase":"Place Order"}</Button>
       }
     </div>
   )

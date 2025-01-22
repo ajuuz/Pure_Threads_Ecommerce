@@ -3,13 +3,16 @@ import { Button } from '@/components/ui/button';
 
 import React from 'react'
 import { useRazorpay } from 'react-razorpay';
+import { useSelector } from 'react-redux';
 import { toast } from 'sonner';
 
 
-const RazorPayButton = ({amount,functionAfterPayment,paymentFor,preValidationFunction,disabled,buttonContent}) => {
+const RazorPayButton = ({amount,functionAfterPayment,handleFailedOrder,paymentFor,preValidationFunction,disabled,buttonContent}) => {
       //razorpay
       const { error, isLoading, Razorpay } = useRazorpay();
       const RAZORPAY_KEY_ID = import.meta.env.VITE_RAZORPAY_KEY_ID;
+
+      const {user}=useSelector((state)=>state.user)
     
     const handleRazorPayment = async () => {
         try {
@@ -35,7 +38,9 @@ const RazorPayButton = ({amount,functionAfterPayment,paymentFor,preValidationFun
             name: "Pure Threads", 
             description: "Payment for your order", 
             order_id: order.id,
-    
+            retry: {
+              enabled: false, // This should disable retry
+            },
             //verify payment
             // after making the payment 
             handler: async (response) => {
@@ -46,39 +51,31 @@ const RazorPayButton = ({amount,functionAfterPayment,paymentFor,preValidationFun
                   razorpay_signature: response.razorpay_signature
                 }
     
-                await functionAfterPayment(amount,paymentDetails)
+                await functionAfterPayment(paymentDetails)
               } catch (err) {
                 // Add onPaymentUnSuccessfull function here
                 toast.error("Payment failed: " + err.message);
               }
             },
-            modal:{
-              ondismiss: paymentFor==="order" && async function () {
-                try {
-                  const paymentDetails=null
-                  const isPaymentFailed=true;
-                  await functionAfterPayment(amount,paymentDetails,isPaymentFailed)
-                } catch (err) {
-                  toast.error("Payment failed: " + err.message);
-                }
-            },
-            },
+          
             prefill: {
-              name: "Ajmal EA", // add customer details
-              email: "john@example.com", // add customer details
+              name: user.name, // add customer details
+              email: user.email, // add customer details
             },
             notes: {
               address: "Pure Threads",
             },
             theme: {
-        // you can change the gateway color from here according to your
-        // application theme
               color: "#3399cc",
             },
           };
           const rzpay = new Razorpay(options);
-          // this will open razorpay window for take the payment in the frontend
-          // under the hood it use inbuild javascript windows api 
+          // open razorpay window for take the payment
+          if(paymentFor==="order")
+          {
+            rzpay.on('payment.failed',handleFailedOrder);
+          }
+
           rzpay.open(options);
         } catch (err) {
           toast.error("Error creating order: " + err.message);
@@ -90,7 +87,8 @@ const RazorPayButton = ({amount,functionAfterPayment,paymentFor,preValidationFun
   return (
     <Button 
     disabled={disabled} 
-    onClick={handleRazorPayment}>{buttonContent?buttonContent:"Pay with RozorPay"}</Button>
+    onClick={handleRazorPayment}>{buttonContent?buttonContent:"Pay with RozorPay"}
+    </Button>
   )
 }
 

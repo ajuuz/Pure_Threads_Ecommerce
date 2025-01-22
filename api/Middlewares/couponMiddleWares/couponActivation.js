@@ -3,20 +3,14 @@ import UsersDB from "../../Models/userSchema.js";
 import { refreshTokenDecoder } from "../../utils/jwtTokens/decodeRefreshToken.js";
 import { errorHandler } from "../../utils/error.js";
 export const couponActivation=async(req,res,next)=>{
-    const {isPaymentFailed} = req.body;
     
-    if(isPaymentFailed){
-        req.body.paymentStatus="Failed"
-        next();
-        return
-    }
 
     try{
         const userId = refreshTokenDecoder(req);
         const {selectedCoupon,couponDiscount} = req.body;
-        let couponUsed={couponCode:"No Coupon Used",couponValue:0,couponType:"%"};
+        let couponUsed={couponCode:"No Coupon Used",couponValue:0,couponType:"%",couponDiscount:0};
         
-        if(!selectedCoupon)
+        if(!selectedCoupon || selectedCoupon.couponCode==="No Coupon Used")
         {
             req.body.couponUsed=couponUsed;
             next();
@@ -43,18 +37,23 @@ export const couponActivation=async(req,res,next)=>{
 
         if(couponExist && couponExist?.usedCount>=couponDetails?.perUserLimit) return next(errorHandler(400,"your usage limit for this coupon is finished"))
         
-        if(couponDetails?.maxUsableLimit?.isLimited){
-            await couponDB.updateOne({couponCode:couponDetails?.couponCode},{$inc:{"maxUsableLimit.limit":-1}})
-        }
 
-        if(couponExist){
-            couponExist.usedCount++;
-        }
-        else{
-            user?.usedCoupons.push({couponCode:couponDetails.couponCode,usedCount:1})
-        }
-        await user.save()
+        const isCouponUsableLimit=couponDetails?.maxUsableLimit?.isLimited;
         req.body.couponUsed=couponUsed
+        req.body.isCouponUsableLimit=isCouponUsableLimit;
+        req.body.couponExistInUser=couponExist?true:false
+        // if(couponDetails?.maxUsableLimit?.isLimited){
+        //     await couponDB.updateOne({couponCode:couponDetails?.couponCode},{$inc:{"maxUsableLimit.limit":-1}})
+        // }
+
+
+        // if(couponExist){
+        //     couponExist.usedCount++;
+        // }
+        // else{
+        //     user?.usedCoupons.push({couponCode:couponDetails.couponCode,usedCount:1})
+        // }
+        // await user.save()
         next();
     }
     catch(error)
