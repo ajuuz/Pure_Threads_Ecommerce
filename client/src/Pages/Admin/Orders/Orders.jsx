@@ -195,7 +195,7 @@ const Orders = () => {
 
    
 
-    const headers = ["Order ID","Products","Date","Customer","Total","Payment","status","Update Status"]
+    const headers = ["ORDER ID","PRODUCTS","DATE","CUSTOMERS","TOTAL","PAYMENT","STATUS","UPDATE STATUS"]
 
   return (
     <div className="AdminProduct relative ps-5 md:ps-[300px] pe-5 pt-16">

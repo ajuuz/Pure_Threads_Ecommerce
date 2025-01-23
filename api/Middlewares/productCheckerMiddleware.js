@@ -10,7 +10,7 @@ export const validateProduct =async(req,res,next)=>{
 
         const {paymentMethod,totalAmount} = req.body; 
 
-        if(paymentMethod==="cod" && totalAmount<1500) return next(errorHandler(400,"cash on delivery available only for above 1500 purchase"))
+        if(paymentMethod==="cod" && totalAmount>2000) return next(errorHandler(400,"Cash on Delivery is available only for purchases below Rs. 2000."))
 
         const {failedOrderId}=req.body;//repayment of order if falied payment
         let items=[]

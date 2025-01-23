@@ -11,7 +11,7 @@ import { loginUser, loginWithGoogle } from '@/api/User/authApi';
 
 // import dispatch form redux
 import { useDispatch } from 'react-redux';
-import { UserLogin } from '@/Redux/userSlice';
+import { UserFirstLogin, UserLogin } from '@/Redux/userSlice';
 
 
 import { useNavigate } from 'react-router-dom';
@@ -60,7 +60,7 @@ const handleSubmitForm=async(e)=>{
      const response = await loginUser(formData);
      toast.success(response.message);
      dispatch(UserLogin({name:response.userName}))
-     navigate('/')
+     dispatch(UserFirstLogin(response.isFirstLogin))
     }catch(error){
       if(error?.statusCode===403) return
       console.log("login error",error)
@@ -82,7 +82,7 @@ const googleSignin = async()=>{
       dispatch(UserLogin({name:result?.user.displayName,email:result?.user.email}))
   }
   catch(err){
-      // toast.error(err.message)
+      toast.error(err.message)
   }
 }
 

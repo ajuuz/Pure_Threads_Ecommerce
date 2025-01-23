@@ -44,7 +44,7 @@ const Coupon = () => {
     if(e.target.value==="") setRefresh(!refresh)
   }
 
-  const headers = ["SNO","Coupon Code","coupon value","description","Max Redeemable","minimum Purchase","Max Usable Limit","Per user Limit","Action"]
+  const headers = ["SNO","COUPON CODE","COUPON VALUE","DESCRIPTION","MAX REDEEMABLE","MINIMUM PURCHASE","MAX USABLE LIMIT","PER USER LIMIT","ACTION"]
   return (
     <div className="AdminAddCategory relative ps-5 md:ps-[300px] pe-5 pt-16">
       <SideBar />

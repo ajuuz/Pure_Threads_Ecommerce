@@ -18,7 +18,7 @@ import { couponActivation } from '../Middlewares/couponMiddleWares/couponActivat
 import { addMoneyToWallet, getWallet } from '../Controllers/UserController/walletController.js';
 import { getProducts } from '../Controllers/CommonController/productController.js';
 import { makePayment, paymentVerification } from '../Controllers/CommonController/razorPayController.js';
-import { applyRefferal, getRefferalCode } from '../Controllers/UserController/refferalController.js';
+import { applyRefferal, changeFirstLoginStatus, getRefferalCode } from '../Controllers/UserController/refferalController.js';
 
 import { placeFailedOrder } from '../Controllers/UserController/failedOrderController.js';
 
@@ -93,7 +93,7 @@ router.patch('/wallet',verifyUser,verifyUserBlocked,addMoneyToWallet)
 //refferal
 router.get('/refferal',verifyUser,verifyUserBlocked,getRefferalCode)
 router.post('/refferal',verifyUser,verifyUserBlocked,applyRefferal)
-
+router.post('/closeReferral',verifyUser,verifyUserBlocked,changeFirstLoginStatus)
 
 
 export default router;

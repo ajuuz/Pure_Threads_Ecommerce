@@ -12,10 +12,21 @@ export const getRefferalCode=async()=>{
     }
 }
 
-export const applyRefferal=async(refferalCode,currentUserRefferalCode)=>{
+export const applyRefferal=async(refferalCode)=>{
     try{
-        console.log(refferalCode,currentUserRefferalCode)
-        const response=await axiosInstance.post('/users/refferal',{refferalCode,currentUserRefferalCode})
+        const response=await axiosInstance.post('/users/refferal',{refferalCode})
+        return response.data
+    }
+    catch(error)
+    {
+        throw error?.response.data && {...error?.response.data,statusCode:error.status} || error
+    }
+}
+
+
+export const closeReferralDialog=async()=>{
+    try{
+        const response=await axiosInstance.post('/users/closeReferral')
         return response.data
     }
     catch(error)

@@ -59,8 +59,8 @@ export function PaymentMethods({isAvailableProduct,setIsAvailableProduct,cartPro
       setIsAvailableProduct={setIsAvailableProduct}
       />
       :<Button  
-      disabled={isAvailableProduct.filter(Boolean).length!==0 || cartProducts.length<1 || (paymentMethod==="cod" && amount<1500)} 
-      onClick={()=>handlePlaceOrder()} >{paymentMethod==="cod" && amount<1500?"Cash On Delivery is available only for 1500 above purchase":"Place Order"}</Button>
+      disabled={isAvailableProduct.filter(Boolean).length!==0 || cartProducts.length<1 || (paymentMethod==="cod" && amount>2000)} 
+      onClick={()=>handlePlaceOrder()} >{paymentMethod==="cod" && amount>2000?"Cash on Delivery is available only for purchases below Rs. 2000":"Place Order"}</Button>
       }
     </div>
   )

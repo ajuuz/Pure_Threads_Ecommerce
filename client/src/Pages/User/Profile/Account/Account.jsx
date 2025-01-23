@@ -124,7 +124,7 @@ const navigate = useNavigate();
             <div className='flex justify-end text-lg'><FaRegEdit onClick={handleEditButton}/></div>
             <InputComponent InputFields={InputFields} handleInputChange={handleInputChange}/>
             {!formData.disabled && <Button onClick={handleUpdate}>UPDATE</Button>}
-            <Dialog open={isPasswordDialogueBox}>
+            <Dialog open={isPasswordDialogueBox} onOpenChange={setIsPasswordDialogueBox}>
                 <DialogTrigger asChild>
                   <Button onClick={()=>setIsPasswordDialogueBox(true)} variant="outline">Want to Change Password?</Button>
                 </DialogTrigger>

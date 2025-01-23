@@ -39,10 +39,9 @@ const userSchema = new mongoose.Schema({
         return `${randomCode}`.toUpperCase();
       },
     },
-    refferalDetails:{
-      isRefferedUser:{type:Boolean,default:false},
-      friendName:{type:String,default:null},
-      friendId:{type:mongoose.Schema.ObjectId,default:null}
+    isFirstLogin:{
+      type:Boolean,
+      default:true
     }
 })
 

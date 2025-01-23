@@ -114,7 +114,8 @@ export const verifyLogin = async (req, res,next) => {
         generateUserRefreshToken(res,userExist);
 
         const userName=userExist.name;
-        return res.status(200).json({success: true,message: "user logged in successfully",userName});
+        const isFirstLogin=userExist.isFirstLogin;
+        return res.status(200).json({success: true,message: "user logged in successfully",userName,isFirstLogin});
 
   } catch (error) {
     return res.status(500).json({success: false,message: "Something went wrong. Please try again."});

@@ -2,7 +2,8 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState={
     user:localStorage.getItem('userInfo')
     ?JSON.parse(localStorage.getItem('userInfo'))
-    :null
+    :null,
+    isFirstLogin:false
 }
 
 const userSlice = createSlice({
@@ -16,9 +17,12 @@ const userSlice = createSlice({
         UserLogout:(state,action)=>{
             state.user=null,
             localStorage.removeItem('userInfo')
+        },
+        UserFirstLogin:(state,action)=>{
+            state.isFirstLogin=action.payload;
         }
     }
 })
 
-export const {UserLogin,UserLogout} = userSlice.actions
+export const {UserLogin,UserLogout,UserFirstLogin} = userSlice.actions
 export default userSlice.reducer;

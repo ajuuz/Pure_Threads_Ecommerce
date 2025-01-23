@@ -42,18 +42,7 @@ export const couponActivation=async(req,res,next)=>{
         req.body.couponUsed=couponUsed
         req.body.isCouponUsableLimit=isCouponUsableLimit;
         req.body.couponExistInUser=couponExist?true:false
-        // if(couponDetails?.maxUsableLimit?.isLimited){
-        //     await couponDB.updateOne({couponCode:couponDetails?.couponCode},{$inc:{"maxUsableLimit.limit":-1}})
-        // }
-
-
-        // if(couponExist){
-        //     couponExist.usedCount++;
-        // }
-        // else{
-        //     user?.usedCoupons.push({couponCode:couponDetails.couponCode,usedCount:1})
-        // }
-        // await user.save()
+       
         next();
     }
     catch(error)

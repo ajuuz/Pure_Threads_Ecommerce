@@ -9,9 +9,15 @@ import Card from "@/components/UserComponent/Card/Card";
 import Footer from "@/components/UserComponent/Footer/Footer";
 import { getProducts } from "@/api/User/productApi";
 import { getCategories } from "@/api/User/CategoryApi";
-import {  useNavigate } from "react-router-dom";
+import {  useLocation, useNavigate } from "react-router-dom";
+import RefferalDialog from "@/components/UserComponent/Dialog/RefferalDialog";
 
 const LandingPage = () => {
+
+    const location = useLocation()
+    const isFirstLogin=location?.state?.isFirstLogin
+    console.log(isFirstLogin);
+
 
     const [newArrivals,setNewArrivals] = useState([])
     const [trending,setTreding] = useState([])
@@ -63,6 +69,7 @@ const onCardClick=(id)=>{
   return (
     <div className="h-[200vh] relative pt-24">
       <NavBar />
+      {isFirstLogin && <RefferalDialog/>}
       <div className="p-8">
       <Carousel/>
       </div>
