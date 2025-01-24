@@ -25,6 +25,7 @@ const ProductDetailPage = () => {
     const [selectedSize,setSelectedSize] = useState(null)
     const [coupons,setCoupons] = useState([])
 
+    const [tab,setTab]=useState(1)
   
 
     const {productId} = useParams()
@@ -96,7 +97,7 @@ const ProductDetailPage = () => {
         <div className='images flex justify-center md:justify-end gap-5'>
             <div className='flex flex-col gap-3'>
             {images.map((image,index)=>(
-                <div key={image?.public_id} onClick={()=>setSelectedImageIndex(index)}  className={`w-[70px] rounded  ${selectedImageIndex===index && "border-2 border-gray-500  "}`}>
+                <div key={image?.public_id} onClick={()=>setSelectedImageIndex(index)}  className={`w-[70px] rounded  ${selectedImageIndex===index && "border-2 border-black  rounded-md"}`}>
                     <img src={image.url} alt={`product Image${index}`} className='rounded'/>
                 </div>
             ))}
@@ -107,10 +108,10 @@ const ProductDetailPage = () => {
             </div>
         </div>
 
-        <div className='details flex flex-col gap-9'>
+        <div className='details flex flex-col gap-9 md:p-0 ps-16'>
 
             <h1 className='font-bold text-3xl'>{product?.name||"product name"}</h1>
-            
+
             <div className='flex'>
               <p className='flex items-end gap-5'><span className='font-semibold text-3xl'>Rs. {product?.salesPrice||0}</span>  <span className='text-xl text-muted-foreground font-semibold'>Rs.<span className='line-through text-2xl text-muted-foreground ms-1'>{product?.regularPrice}</span></span> <span className='text-xl text-green-700 font-bold'></span></p>
                 {product?.takenOffer?.offerValue!==0 &&
@@ -122,8 +123,8 @@ const ProductDetailPage = () => {
 
             <div>
                 <h3>Available Coupons</h3>
-                    <div className='flex flex-wrap gap-4 w-[560px] font-semibold'>
-                {coupons?.map((coupon)=><div className='text-muted-foreground bg-gray-200 inline-block py-1 px-5 rounded-xl'>{`${coupon?.couponCode} - SAVE ${coupon.couponValue} ${coupon?.couponType}`}</div>)}
+                    <div className='flex flex-wrap  gap-4 font-semibold'>
+                {coupons?.slice(0,4).map((coupon)=><div className='text-muted-foreground w-fit bg-gray-200  py-1 px-5 rounded-xl'>{`${coupon?.couponCode} - SAVE ${coupon.couponValue} ${coupon?.couponType}`}</div>)}
                 </div>
             </div>
 
@@ -135,7 +136,7 @@ const ProductDetailPage = () => {
                     ))}
                 </div>
             </div>
-            <div className='pe-5'>
+            <div className='pe-24 sm:pe-5'>
                 <Button onClick={handleAddToCart} className="max-w-[510px]">Add to Cart</Button>
                 <Button className="max-w-[510px]">Add to Wishlist</Button>
             </div>
@@ -143,7 +144,7 @@ const ProductDetailPage = () => {
     </section>
 
     <section className=''>
-      <div className='w-[50%] mx-auto border p-5'>
+      <div className='w-[90%] lg:w-[70%] md:w-[90%] mx-auto border p-5'>
         <div className='flex mx-auto bg-slate-200  py-1 px-3'>
                 <div className='flex-1 text-center bg-white rounded'>Product Details</div>
                 <div className='flex-1 text-center'>Rating & Review</div>
