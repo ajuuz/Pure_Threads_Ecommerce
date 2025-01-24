@@ -4,6 +4,7 @@ import SideBar from '@/components/UserComponent/SideBar/SideBar'
 import AdminSideBar from '@/components/AdminComponent/SideBar';
 import { useEffect, useState } from 'react'
 import { useLocation, useParams } from 'react-router-dom';
+import { Badge } from '@/components/ui/badge';
 
 const OrderDetail=()=> {
     // useState
@@ -40,6 +41,17 @@ const OrderDetail=()=> {
         Failed:"text-gray-600",
         Refunded:"text-blue-600",
         Cancelled:"text-red-600"
+      }
+
+      const getStatusColor = (status) => {
+        switch (status) {
+            case 'Pending': return 'bg-[#FFA600]'
+            case 'Confirmed': return 'bg-[#007BFF]'
+            case 'Shipped': return 'bg-[#28A745]'
+            case 'Delivered': return 'bg-[#2dd251]'
+            case 'Cancelled': return 'bg-[#b30009]'
+          default: return 'bg-gray-500'
+        }
       }
 
   return (
@@ -99,7 +111,7 @@ const OrderDetail=()=> {
 
         {/* Order Items */}
         <h3 className="font-medium text-gray-800 mb-4">Order Items</h3>
-        <div className='flex flex-col gap-3'>
+        <div className='flex flex-col gap-3 relative'>
         {order?.items?.map((item)=>
             <div className="flex items-center bg-gray-100 p-4 rounded-lg">
                 <img
@@ -107,17 +119,26 @@ const OrderDetail=()=> {
                   alt="Product"
                   className="w-16 object-cover rounded"
                 />
-                <div className="ml-4">
+                <div className="ml-4 flex-1">
                   <h4 className="font-medium text-gray-800">
                     {item?.product?.name}
                   </h4>
-                  <p className="text-sm text-gray-600">
-                    Quantity: {item?.quantity} x ₹{item?.product?.salesPrice} <br />
-                    Size:{" "}
-                    <span className="text-blue-800 font-bold">{item?.size}</span>
-                  </p>
+                    <p className="text-sm text-gray-600">
+                      Quantity: {item?.quantity} x ₹{item?.product?.salesPrice}
+                      <div className='flex justify-between '>
+                          <p>Size:{" "}
+                          <span className="text-blue-800 font-bold">{item?.size}</span>
+                          </p>
+                        
+                      </div>
+                    </p>
                 </div>
-                <div className="ml-auto text-gray-800 font-semibold">₹{item?.quantity*item?.productPrice}</div>
+
+                <div className=" ml-auto flex flex-col  font-semibold gap-5">
+                  <p className='absolute right-0 top-10 rounded-tl-xl text-white px-3 bg-black'>₹{item?.quantity*item?.productPrice}</p>
+                  <Badge className={`${getStatusColor(item?.status)} absolute right-0 top-0 rounded-t-none rounded-ee-none  text-sm`}>{item?.status}</Badge>  
+                </div>
+                
             </div>)}
         </div>
 

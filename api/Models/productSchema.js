@@ -101,16 +101,16 @@ productSchema.pre("updateOne", async function (next) {
             throw error
         }
 
-        product.salesPrice=Math.floor(salesPrice);
         if(categorySalesPrice===salesPrice)
         {
             product.takenOffer = category.offer;
         }
         else
         {
-            product.takenOffer = product.offer;
+            product.takenOffer = update.offer;
         }
-        console.log(product.takenOffer)
+        product.salesPrice=Math.floor(salesPrice);
+        
         product.save()
         }
         next();

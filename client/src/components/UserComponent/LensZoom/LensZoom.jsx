@@ -8,12 +8,13 @@ export function LensZoom({imageURL}) {
   return (
     (<div>
 
-        <div className="relative z-10">
+        <div className="relative z-1">
           <Lens hovering={hovering} setHovering={setHovering}>
             <img
               src={imageURL}
               alt="image"
-              width={500}
+              className="w-[350px] md:w-[450px] lg:w-[400px]"
+              width={450}
               height={500} />
           </Lens>
         </div>

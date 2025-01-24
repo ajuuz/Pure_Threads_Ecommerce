@@ -79,7 +79,6 @@ useEffect(()=>{
   }
     const fetchCategory=async()=>{
     const categoriesResult=await getCategories();
-    console.log(categoriesResult)
     setCategories(categoriesResult.data);
     }
     fetchCategory();
@@ -227,7 +226,7 @@ useEffect(()=>{
             <label>Select Category</label>
             <Select name="category" onValueChange={(value)=>handleInputChange(false,null,value,"category")}>
               <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="category" />
+                <SelectValue placeholder={formData?.category?.name||"category"} />
               </SelectTrigger>
               <SelectContent>
                 {categories.map((category)=>(
@@ -241,7 +240,7 @@ useEffect(()=>{
             <label>Select Sleeves</label>
             <Select name="sleeves" onValueChange={(value)=>handleInputChange(false,null,value,"sleeves")}>
               <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Sleeves" />
+                <SelectValue placeholder={formData?.sleeves||"Sleeves"} />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="full">Full Sleeves</SelectItem>
@@ -255,7 +254,7 @@ useEffect(()=>{
             <label>Select Fit</label>
             <Select name="fit" onValueChange={(value)=>handleInputChange(false,null,value,"fit")}>
               <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Fit" />
+                <SelectValue placeholder={formData?.fit||"Fit"} />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="regular">Regular fit</SelectItem>

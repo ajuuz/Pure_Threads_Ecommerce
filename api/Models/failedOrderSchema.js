@@ -18,9 +18,10 @@ const failedOrderSchema = new mongoose.Schema({
             ref:'product',
             required:true,
             },
-        productPrice:Number,
-        size:String,
-        quantity:Number
+        productPrice:{type:Number},
+        size:{type:String},
+        quantity:{type:Number},
+        status:{type:String,default:"Pending"}
         }
         ],
         status: { 

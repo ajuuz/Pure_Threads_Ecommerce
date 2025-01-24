@@ -37,7 +37,7 @@ export const getProducts =async (req,res,next)=>{
 export const getParticularProduct = async(req,res,next)=>{
     const productId = req.params.productId;
     try{
-        const productDetails = await productDB.findOne({_id:productId})
+        const productDetails = await productDB.findOne({_id:productId}).populate('category','name')
         if(!productDetails) return next(errorHandler(404,"product not found"))
         const {sizes,...rest} = productDetails.toObject()
         const sizeObj={

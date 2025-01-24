@@ -12,13 +12,14 @@ import { toast } from 'sonner'
 import { Input } from '@/components/ui/input'
 import { applyRefferal, closeReferralDialog } from '@/api/User/refferalApi'
 import spinner from '../../../assets/Spin@1x-1.0s-200px-200px.svg'
+import { useNavigate } from 'react-router-dom'
 
 
 const RefferalDialog = () => {
   const [loading,setLoading] = useState(false)
    const [open,setOpen] = useState(true)
    const [refferalCode,setRefferalCode]=useState("")
-
+  const navigate=useNavigate();
 
    const handleRefferalChange=(e)=>{
     setRefferalCode(e.target.value);
@@ -31,6 +32,7 @@ const handleApplyRefferal=async()=>{
       toast.success(applyRefferalResult.message);
       setOpen(false)
       setLoading(false)
+      navigate('/')
     }catch(error){
       setLoading(false)
       toast.error(error.message)
@@ -39,8 +41,8 @@ const handleApplyRefferal=async()=>{
 
 const handleCloseReferralDialog=async()=>{
   await closeReferralDialog();
-  console.log("working")
   setOpen(false)
+  navigate('/')
 }
    
 

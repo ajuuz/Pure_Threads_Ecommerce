@@ -30,9 +30,10 @@ const orderSchema = new mongoose.Schema({
             ref:'product',
             required:true,
             },
-        productPrice:Number,
-        size:String,
-        quantity:Number
+        productPrice:{type:Number},
+        size:{type:String},
+        quantity:{type:Number},
+        status:{type:String,default:"Pending"}
         }
         ],
 
@@ -70,6 +71,7 @@ const orderSchema = new mongoose.Schema({
         },
         
 },{timestamps:true})
+
 
 const orderDB = mongoose.model('order',orderSchema);
 export default orderDB;
