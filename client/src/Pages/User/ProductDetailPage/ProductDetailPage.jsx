@@ -16,6 +16,11 @@ import { addToCart, selectSizeOfProduct } from '@/api/User/cartApi';
 
 import { motion } from 'framer-motion';
 import { getAllCoupons } from '@/api/User/couponApi';
+import { Star } from 'lucide-react';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
 
 const ProductDetailPage = () => {
     const [product,setProduct]=useState(null)
@@ -25,7 +30,7 @@ const ProductDetailPage = () => {
     const [selectedSize,setSelectedSize] = useState(null)
     const [coupons,setCoupons] = useState([])
 
-    const [tab,setTab]=useState(1)
+    const [activeTab,setActiveTab]=useState(0)
   
 
     const {productId} = useParams()
@@ -33,7 +38,6 @@ const ProductDetailPage = () => {
     const fetchCoupons = async()=>{
         try{
           const getAllCouponsResult =await getAllCoupons()
-          console.log(getAllCouponsResult.coupons)
           setCoupons(getAllCouponsResult.coupons);
         }
         catch(error)
@@ -42,9 +46,9 @@ const ProductDetailPage = () => {
         }
       } 
 
-      let categoryId="";
-        const fetchParticularProduct = async()=>{
-            try{
+      const fetchParticularProduct = async()=>{
+          try{
+                let categoryId="";
                 const productResult = await getParticularProduct(productId);
                 categoryId = productResult?.product?.category
                 setImages(productResult?.product?.images)
@@ -90,6 +94,7 @@ const ProductDetailPage = () => {
         }
     }
 
+    const tabPositions = ['translate-x-0', 'translate-x-[90%] md:translate-x-[95%]'];
   return (
     <div className=" relative pt-16">
       <NavBar />
@@ -108,61 +113,53 @@ const ProductDetailPage = () => {
             </div>
         </div>
 
-        <div className='details flex flex-col gap-9 md:p-0 ps-16'>
+        <div className='details'>
+            <div className=' flex flex-col gap-9'>
+                <h1 className='font-bold text-3xl'>{product?.name||"product name"}</h1>
 
-            <h1 className='font-bold text-3xl'>{product?.name||"product name"}</h1>
-
-            <div className='flex'>
-              <p className='flex items-end gap-5'><span className='font-semibold text-3xl'>Rs. {product?.salesPrice||0}</span>  <span className='text-xl text-muted-foreground font-semibold'>Rs.<span className='line-through text-2xl text-muted-foreground ms-1'>{product?.regularPrice}</span></span> <span className='text-xl text-green-700 font-bold'></span></p>
-                {product?.takenOffer?.offerValue!==0 &&
-                <motion.div className="flex items-center px-2 w-fit bg-gradient-to-r from-red-500 to-orange-500 text-white font-bold text-center rounded-lg shadow-lg" animate={{   scale: [1, 1.1, 1],   y: [0, -10, 0],   boxShadow: [     "0px 5px 15px rgba(0, 0, 0, 0.2)",     "0px 10px 25px rgba(0, 0, 0, 0.3)",     "0px 5px 15px rgba(0, 0, 0, 0.2)",   ], }} transition={{   duration: 3,   repeat: Infinity,   repeatType: "loop", }} >
-                    {product?.takenOffer?.offerValue} {product?.takenOffer?.offerType} off
-                </motion.div>
-                }
-            </div>
-
-            <div>
-                <h3>Available Coupons</h3>
-                    <div className='flex flex-wrap  gap-4 font-semibold'>
-                {coupons?.slice(0,4).map((coupon)=><div className='text-muted-foreground w-fit bg-gray-200  py-1 px-5 rounded-xl'>{`${coupon?.couponCode} - SAVE ${coupon.couponValue} ${coupon?.couponType}`}</div>)}
+                <div className='flex'>
+                  <p className='flex items-end gap-5'><span className='font-semibold text-3xl'>Rs. {product?.salesPrice||0}</span>  <span className='text-xl text-muted-foreground font-semibold'>Rs.<span className='line-through text-2xl text-muted-foreground ms-1'>{product?.regularPrice}</span></span> <span className='text-xl text-green-700 font-bold'></span></p>
+                    {product?.takenOffer?.offerValue!==0 &&
+                    <motion.div className="flex items-center px-2 w-fit bg-gradient-to-r from-red-500 to-orange-500 text-white font-bold text-center rounded-lg shadow-lg" animate={{   scale: [1, 1.1, 1],   y: [0, -10, 0],   boxShadow: [     "0px 5px 15px rgba(0, 0, 0, 0.2)",     "0px 10px 25px rgba(0, 0, 0, 0.3)",     "0px 5px 15px rgba(0, 0, 0, 0.2)",   ], }} transition={{   duration: 3,   repeat: Infinity,   repeatType: "loop", }} >
+                        {product?.takenOffer?.offerValue} {product?.takenOffer?.offerType} off
+                    </motion.div>
+                    }
                 </div>
-            </div>
 
-            <div>
-                <p>Select Size</p>
-                <div className='flex gap-4'>
-                    {product?.sizes.map((size,index)=>(
-                        <div onClick={()=>handleSelectSize(productId,index)} key={size?.size} className={`w-16 text-center py-2 border-2 rounded-md ${selectedSize===index && "bg-black text-white border-2 border-black"} ${size?.stock<1 && `bg-muted border-none text-muted-foreground`} `}>{size.size}</div>
-                    ))}
+                <div>
+                    <h3>Available Coupons</h3>
+                        <div className='grid grid-cols-2  gap-4 w-[70%] font-semibold'>
+                    {coupons?.slice(0,4).map((coupon)=><div className='text-muted-foreground w-fit bg-gray-200  py-1 px-5 rounded-xl'>{`${coupon?.couponCode} - SAVE ${coupon.couponValue} ${coupon?.couponType}`}</div>)}
+                    </div>
                 </div>
-            </div>
-            <div className='pe-24 sm:pe-5'>
-                <Button onClick={handleAddToCart} className="max-w-[510px]">Add to Cart</Button>
-                <Button className="max-w-[510px]">Add to Wishlist</Button>
+
+                <div>
+                    <p>Select Size</p>
+                    <div className='flex gap-4'>
+                        {product?.sizes.map((size,index)=>(
+                            <div onClick={()=>handleSelectSize(productId,index)} key={size?.size} className={`w-16 text-center py-2 border-2 rounded-md ${selectedSize===index && "bg-black text-white border-2 border-black"} ${size?.stock<1 && `bg-muted border-none text-muted-foreground`} `}>{size.size}</div>
+                        ))}
+                    </div>
+                </div>
+                <div className='pe-24 sm:pe-5'>
+                    <Button onClick={handleAddToCart} className="max-w-[510px]">Add to Cart</Button>
+                    <Button className="max-w-[510px]">Add to Wishlist</Button>
+                </div>
             </div>
         </div>
     </section>
 
-    <section className=''>
-      <div className='w-[90%] lg:w-[70%] md:w-[90%] mx-auto border p-5'>
-        <div className='flex mx-auto bg-slate-200  py-1 px-3'>
-                <div className='flex-1 text-center bg-white rounded'>Product Details</div>
-                <div className='flex-1 text-center'>Rating & Review</div>
+    <section className='mb-10'>
+      <div className='w-[90%] lg:w-[70%] md:w-[90%] mx-auto border p-5 '>
+        <div className='flex mx-auto font-semibold bg-slate-200 relative  py-2 items-center cursor-pointer'>
+                <div className={`flex-1 text-center absolute  bg-white rounded h-[70%] w-1/2 transition-all mx-3 duration-300 ${tabPositions[activeTab]}`}></div>
+                <div onClick={()=>setActiveTab(0)} className='flex-1 text-center  rounded z-10'>Product Details</div>
+                <div onClick={()=>setActiveTab(1)} className='flex-1 text-center rounded z-10'>Rating & Review</div>
         </div> 
-        <div className='flex flex-col gap-5'>
-            <div>
-                <h2 className='text-lg font-semibold mt-5'>Customer Reviews</h2>
-                <p>No review yet</p>
-            </div>
-            <div className='flex flex-col gap-3'>
-                <h1 className='text-lg'>Write a Review</h1>
-                <p>your Rating</p>
-                <Rating/>
-                <p>Your Review</p>
-                <textarea className='border p-4 rounded-lg' name="" id="" placeholder='Write your rview here...'></textarea>
-            </div>
-            <Button>Submit</Button>
-        </div>
+        {activeTab===1
+        ?<ReviewTab/>
+        :<ProductSpecTab product={product}/>
+        }
        </div>
     </section>
     <section>
@@ -179,3 +176,391 @@ const ProductDetailPage = () => {
 }
 
 export default ProductDetailPage;
+
+
+const ProductSpecTab=({product})=>{
+
+    return(
+        <div className='flex flex-col gap-4'>
+        <div>
+            <h2 className=' font-semibold mt-5'>Description</h2>
+            <p className='font-serif text-sm'>{product?.description}</p>
+        </div>
+        <div>
+            <h1 className='text-md font-medium'>size & fit</h1>
+            <p className='font-serif text-sm'>Fit - {product?.fit.split('').map((alphabet,index)=>index===0?alphabet.toUpperCase():alphabet).join('')} fit</p>
+            <p className='font-serif text-sm'>Size - {product?.sizeOfModel} Shirt</p>
+        </div>
+        <div>
+            <h1 className='text-md font-medium'>Wash Care</h1>
+            <p className='font-serif text-sm'>{product?.washCare}</p>
+        </div>
+        <div>
+            <h1 className='text-md font-medium'>Specifications</h1>
+            <p className='font-serif text-sm'>Color - {product?.color} color</p>
+            <p className='font-serif text-sm'>Sleeves - {product?.sleeves} Shirt</p>
+        </div>
+        <div>
+            <h1 className='text-md font-medium'>Addtional Info</h1>
+            {product?.additionalInfo.map((info)=><p className='font-serif text-sm'>{info}</p>)}
+
+        </div>
+    </div>
+    )    
+}
+
+const ReviewTab=()=>{
+    const [tab,setTab]=useState("displayReview")
+    return(
+        <div>
+            {tab==="addReview"
+            ?<AddReview/>
+            :<DiplayReview/>
+            }
+            <Button onClick={()=>setTab("addReview")}>ADD A REVIEW</Button>
+        </div>
+    )
+}
+
+const AddReview=()=>{
+    const [images,setImages]=useState([])
+    return(
+        <div className='flex flex-col gap-5'>
+            
+            <div className='flex flex-col gap-3'>
+                <h1 className='text-lg font-semibold mt-5 text-center'>Write a Review</h1>
+                <div className='space-y-4'>
+                    <div>
+                        <Label htmlFor="rating">Rating</Label>
+                        <Rating/>
+                    </div>
+                    <div>
+                        <Label htmlFor="review">Your Review</Label>
+                        <Textarea
+                          id="review"
+                        //   value={review}
+                        //   onChange={(e) => setReview(e.target.value)}
+                        placeholder="Write your review here"
+                        required
+                        />
+                    </div>
+                </div>
+
+                <div>
+                    <Label htmlFor="images">Add Images (optional)</Label>
+                    <Input id="images" type="file"  accept="image/*" multiple className="mt-1" />
+                </div>
+                    {images.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {images.map((image, index) => (
+                          <img
+                            key={index}
+                            src={URL.createObjectURL(image) || "/placeholder.svg"}
+                            alt={`Uploaded preview ${index + 1}`}
+                            className="w-20 h-20 object-cover rounded"
+                          />
+                        ))}
+                      </div>
+                    )}
+            </div>
+            <Button>Submit</Button>
+        </div>
+    )
+}
+
+const DiplayReview=()=>{
+    return(
+        <div className='flex flex-col gap-5'>
+            <h2 className='text-lg font-semibold mt-5 text-center'>Customer Reviews</h2>
+            <ScrollArea className=" h-[1000px]">
+            <div className=' flex flex-col gap-5'>
+                
+            <div>
+                <div className='border rounded-md p-4 flex flex-col gap-5'>
+                    <div className='flex items-center gap-4'>
+                        <span className='inline-block bg-black rounded-3xl py-[6px] px-[13px] text-white font-semibold'>A</span>
+                        <div>
+                            <p>Ajmal EA</p>
+                            <div className='flex gap-2'>
+                                <div className='flex items-center'>
+                                {[...Array(5)].map((_, i) => (
+                                    <Star
+                                    key={i}
+                                    className={`w-4 h-4 ${i < 4 ? "text-yellow-400 fill-current" : "text-gray-300"}`}
+                                    />
+                                ))}
+                                </div>                           
+                                  {new Date().toUTCString()}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <p>Absolutely love this product! It exceeded all my expectations.
+                             The quality is top-notch,and it has
+                              made my daily routine so much easier.
+                        </p>
+                    </div>
+                    <div>
+                        <div className='flex gap-5'>
+                                <img src="https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png" className='w-14  rounded' alt="" />
+                                <img src="https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png" className='w-14  rounded' alt="" />
+                        </div>
+                    </div>
+
+                    <div className='flex items-center gap-5'>
+                        <p>Was this review Helpful</p>
+                        <div>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className={`mr-2 `}
+                              //   onClick={() => handleVote(index, "helpful")}
+                              >
+                              Yes 
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className={`mr-2 `}
+                              //   onClick={() => handleVote(index, "helpful")}
+                              >
+                              No 
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div className='border rounded-md p-4 flex flex-col gap-5'>
+                    <div className='flex items-center gap-4'>
+                        <span className='inline-block bg-black rounded-3xl py-[6px] px-[13px] text-white font-semibold'>A</span>
+                        <div>
+                            <p>Ajmal EA</p>
+                            <div className='flex gap-2'>
+                                <div className='flex items-center'>
+                                {[...Array(5)].map((_, i) => (
+                                    <Star
+                                    key={i}
+                                    className={`w-4 h-4 ${i < 4 ? "text-yellow-400 fill-current" : "text-gray-300"}`}
+                                    />
+                                ))}
+                                </div>                           
+                                  {new Date().toUTCString()}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <p>Absolutely love this product! It exceeded all my expectations.
+                             The quality is top-notch,and it has
+                              made my daily routine so much easier.
+                        </p>
+                    </div>
+                    <div>
+                        <div className='flex gap-5'>
+                                <img src="https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png" className='w-14  rounded' alt="" />
+                                <img src="https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png" className='w-14  rounded' alt="" />
+                        </div>
+                    </div>
+
+                    <div className='flex items-center gap-5'>
+                        <p>Was this review Helpful</p>
+                        <div>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className={`mr-2 `}
+                              //   onClick={() => handleVote(index, "helpful")}
+                              >
+                              Yes 
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className={`mr-2 `}
+                              //   onClick={() => handleVote(index, "helpful")}
+                              >
+                              No 
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div className='border rounded-md p-4 flex flex-col gap-5'>
+                    <div className='flex items-center gap-4'>
+                        <span className='inline-block bg-black rounded-3xl py-[6px] px-[13px] text-white font-semibold'>A</span>
+                        <div>
+                            <p>Ajmal EA</p>
+                            <div className='flex gap-2'>
+                                <div className='flex items-center'>
+                                {[...Array(5)].map((_, i) => (
+                                    <Star
+                                    key={i}
+                                    className={`w-4 h-4 ${i < 4 ? "text-yellow-400 fill-current" : "text-gray-300"}`}
+                                    />
+                                ))}
+                                </div>                           
+                                  {new Date().toUTCString()}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <p>Absolutely love this product! It exceeded all my expectations.
+                             The quality is top-notch,and it has
+                              made my daily routine so much easier.
+                        </p>
+                    </div>
+                    <div>
+                        <div className='flex gap-5'>
+                                <img src="https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png" className='w-14  rounded' alt="" />
+                                <img src="https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png" className='w-14  rounded' alt="" />
+                        </div>
+                    </div>
+
+                    <div className='flex items-center gap-5'>
+                        <p>Was this review Helpful</p>
+                        <div>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className={`mr-2 `}
+                              //   onClick={() => handleVote(index, "helpful")}
+                              >
+                              Yes 
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className={`mr-2 `}
+                              //   onClick={() => handleVote(index, "helpful")}
+                              >
+                              No 
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div className='border rounded-md p-4 flex flex-col gap-5'>
+                    <div className='flex items-center gap-4'>
+                        <span className='inline-block bg-black rounded-3xl py-[6px] px-[13px] text-white font-semibold'>A</span>
+                        <div>
+                            <p>Ajmal EA</p>
+                            <div className='flex gap-2'>
+                                <div className='flex items-center'>
+                                {[...Array(5)].map((_, i) => (
+                                    <Star
+                                    key={i}
+                                    className={`w-4 h-4 ${i < 4 ? "text-yellow-400 fill-current" : "text-gray-300"}`}
+                                    />
+                                ))}
+                                </div>                           
+                                  {new Date().toUTCString()}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <p>Absolutely love this product! It exceeded all my expectations.
+                             The quality is top-notch,and it has
+                              made my daily routine so much easier.
+                        </p>
+                    </div>
+                    <div>
+                        <div className='flex gap-5'>
+                                <img src="https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png" className='w-14  rounded' alt="" />
+                                <img src="https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png" className='w-14  rounded' alt="" />
+                        </div>
+                    </div>
+
+                    <div className='flex items-center gap-5'>
+                        <p>Was this review Helpful</p>
+                        <div>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className={`mr-2 `}
+                              //   onClick={() => handleVote(index, "helpful")}
+                              >
+                              Yes 
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className={`mr-2 `}
+                              //   onClick={() => handleVote(index, "helpful")}
+                              >
+                              No 
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div className='border rounded-md p-4 flex flex-col gap-5'>
+                    <div className='flex items-center gap-4'>
+                        <span className='inline-block bg-black rounded-3xl py-[6px] px-[13px] text-white font-semibold'>A</span>
+                        <div>
+                            <p>Ajmal EA</p>
+                            <div className='flex gap-2'>
+                                <div className='flex items-center'>
+                                {[...Array(5)].map((_, i) => (
+                                    <Star
+                                    key={i}
+                                    className={`w-4 h-4 ${i < 4 ? "text-yellow-400 fill-current" : "text-gray-300"}`}
+                                    />
+                                ))}
+                                </div>                           
+                                  {new Date().toUTCString()}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <p>Absolutely love this product! It exceeded all my expectations.
+                             The quality is top-notch,and it has
+                              made my daily routine so much easier.
+                        </p>
+                    </div>
+                    <div>
+                        <div className='flex gap-5'>
+                                <img src="https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png" className='w-14  rounded' alt="" />
+                                <img src="https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png" className='w-14  rounded' alt="" />
+                        </div>
+                    </div>
+
+                    <div className='flex items-center gap-5'>
+                        <p>Was this review Helpful</p>
+                        <div>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className={`mr-2 `}
+                              //   onClick={() => handleVote(index, "helpful")}
+                              >
+                              Yes 
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className={`mr-2 `}
+                              //   onClick={() => handleVote(index, "helpful")}
+                              >
+                              No 
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+
+            </ScrollArea>
+        </div>
+    )
+}
