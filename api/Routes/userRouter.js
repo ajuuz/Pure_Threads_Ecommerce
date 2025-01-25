@@ -96,7 +96,7 @@ router.get('/refferal',verifyUser,verifyUserBlocked,getRefferalCode)
 router.post('/refferal',verifyUser,verifyUserBlocked,applyRefferal)
 router.post('/closeReferral',verifyUser,verifyUserBlocked,changeFirstLoginStatus)
 
-router.post('/review',addReview)
+router.post('/review',verifyUser,verifyUserBlocked,addReview)
 router.get('/review/:productId',getReviews)
 router.patch('/review/:reviewId',voteReview)
 

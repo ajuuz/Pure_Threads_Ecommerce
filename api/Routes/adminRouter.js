@@ -19,7 +19,8 @@ const router = express.Router();
 
 // LOGIN AND SIGN UP ROUTES
 router.post('/login',adminLogin) //USER SIGNUP
-router.post('/upload',verifyAdmin,upload.array("image",5),uploadImages)
+router.post('/upload',upload.array("image",5),uploadImages)
+// router.post('/upload',verifyAdmin,upload.array("image",5),uploadImages)
 router.post('/categories',verifyAdmin,addCategory)
 router.get('/categories',verifyAdmin,getCategories)
 router.get('/categories/:id',verifyAdmin,getParticularCategory)
