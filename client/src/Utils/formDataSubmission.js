@@ -2,8 +2,7 @@ import {toast} from 'react-toastify'
 import { uploadImage,formSubmit } from '@/api/Admin/formSubmissionApi';
 
 export const formDatasubmission =async (images,formData,endPoint)=>{
-        if(images.length===0){
-            console.log("please select 3 image");
+        if(images.length===0 && endPoint!="review"){
             toast.error("please select 3 image")
             return
         }

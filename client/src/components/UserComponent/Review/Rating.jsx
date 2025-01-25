@@ -1,8 +1,8 @@
 import { StarIcon } from "lucide-react";
 import React, { useState } from "react";
 
-const Rating = () => {
-  const [rating, setRating] = useState(0)
+const Rating = ({rating,setRating}) => {
+  
 
   const handleRatingChange = (newRating) => {
     setRating(newRating)

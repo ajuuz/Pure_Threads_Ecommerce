@@ -21,6 +21,7 @@ import { makePayment, paymentVerification } from '../Controllers/CommonControlle
 import { applyRefferal, changeFirstLoginStatus, getRefferalCode } from '../Controllers/UserController/refferalController.js';
 
 import { placeFailedOrder } from '../Controllers/UserController/failedOrderController.js';
+import { addReview, getReviews, voteReview } from '../Controllers/UserController/reviewController.js';
 
 const router = express.Router();
 
@@ -95,5 +96,8 @@ router.get('/refferal',verifyUser,verifyUserBlocked,getRefferalCode)
 router.post('/refferal',verifyUser,verifyUserBlocked,applyRefferal)
 router.post('/closeReferral',verifyUser,verifyUserBlocked,changeFirstLoginStatus)
 
+router.post('/review',addReview)
+router.get('/review/:productId',getReviews)
+router.patch('/review/:reviewId',voteReview)
 
 export default router;

@@ -11,6 +11,7 @@ import { removeProductImage } from "@/api/Admin/productApi";
 import { toast } from "sonner";
 
 const ImageInputComponent = ({ImagesFields,handleImageChange,croppedImage,setCroppedImage,showCropper,setShowCropper,isProductImage,setImagesFields,id}) => {
+
   const handleCropDone = async (croppedAreaPixels,zoom,image,index) => {
     const croppedImg = await getCroppedImg(image, croppedAreaPixels, zoom);
     setCroppedImage((prev) => {
@@ -18,9 +19,9 @@ const ImageInputComponent = ({ImagesFields,handleImageChange,croppedImage,setCro
       updated[index] = croppedImg; // Replace the value at the specific index
       return updated; // Return the updated array
     });
-
     setShowCropper(null);
   };
+  
   const handleCancel = () => {
     setShowCropper(null);
   };

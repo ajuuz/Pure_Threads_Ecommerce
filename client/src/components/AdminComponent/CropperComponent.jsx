@@ -17,7 +17,7 @@ const CropperComponent = ({ image, onCropDone, onCancel,index ,isProductImage}) 
   };
 
   return (
-    <div className="fixed  top-0 left-0 w-full h-full bg-gray-900 bg-opacity-75 flex justify-center items-center">
+    <div className="fixed  top-0 left-0 w-full h-full bg-gray-900 bg-opacity-75 flex justify-center items-center z-10">
       <div className="relative bg-white p-6 rounded-md w-full max-w-lg">
         <h2 className="font-bold text-lg mb-4">Crop Image</h2>
         <div className="relative w-full h-64 bg-gray-100">

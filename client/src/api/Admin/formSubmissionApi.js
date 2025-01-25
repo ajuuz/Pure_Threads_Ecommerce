@@ -28,7 +28,7 @@ export const formSubmit= async (formData,imageURLs,endPoint)=>{
     const data = {...formData,imageURLs}
     console.log(data)
     try{
-        const response = await axiosInstance.post(`admin/${endPoint}`,data)
+        const response = await axiosInstance.post(`${endPoint==="review"?'users':'admin'}/${endPoint}`,data)
         console.log(response.data)
         return response.data;
     }
