@@ -194,17 +194,18 @@ const DiplayReview=({productId})=>{
     useEffect(()=>{
         const fetchReviews=async()=>{
             try{
-                const reviewResult=await getReviews(productId);
-                console.log(reviewResult.reviews)
+                const limit=4;
+                const reviewResult=await getReviews(productId,currentPage,limit);
                 setReviews(reviewResult.reviews);
-                setUserId(reviewResult?.userId)
+                setUserId(reviewResult?.userId);
+                setNumberOfPages(reviewResult?.numberOfPages)
             }catch(error)
             {
                 toast.error(error.message)
             }
         }
         fetchReviews()
-    },[])
+    },[currentPage])
 
     const handleVote=async(reviewId,index,status,helpfulUsers)=>{
         if(status==="helpful" && helpfulUsers.some(id=>id===userId)) return;
@@ -302,7 +303,7 @@ const DiplayReview=({productId})=>{
                 ))
              }   
            
-            <PaginationComponent/>
+            <PaginationComponent currentPage={currentPage} numberOfPages={numberOfPages} setCurrentPage={setCurrentPage}/>
 
         </div>
     )
