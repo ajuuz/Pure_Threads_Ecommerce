@@ -24,6 +24,7 @@ import Wishlist from '@/Pages/User/Wishlist/Wishlist';
 import Coupon from '@/Pages/User/Profile/Coupon/Coupon';
 import Wallet from '@/Pages/User/Profile/Wallet/Wallet';
 import Refferal from '@/Pages/User/Profile/Refferal/Refferal';
+import PageNotFound from '@/Pages/Common/PageNotFound';
 const UserRoute = () => {
   return (
     <>
@@ -48,6 +49,7 @@ const UserRoute = () => {
         <Route path="/coupons" element={<UserPrivate><Coupon/></UserPrivate>}/>
         <Route path="/wallet" element={<UserPrivate><Wallet/></UserPrivate>}/>
         <Route path="/refferal" element={<UserPrivate><Refferal/></UserPrivate>}/>
+        <Route path='*' element={<PageNotFound/>}/>
     </Routes>
     </>
   )

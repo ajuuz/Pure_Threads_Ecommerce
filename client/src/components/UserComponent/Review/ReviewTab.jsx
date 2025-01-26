@@ -295,7 +295,6 @@ const DiplayReview=({productId})=>{
                                       No 
                                     </Button>
                                 }
-                                
                             </div>
                         </div>
                     </div>

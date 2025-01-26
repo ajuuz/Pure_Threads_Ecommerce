@@ -15,19 +15,7 @@ import { addToCart, selectSizeOfProduct } from '@/api/User/cartApi';
 
 import { motion } from 'framer-motion';
 import { getAllCoupons } from '@/api/User/couponApi';
-import { CrossIcon, Star } from 'lucide-react';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Input } from '@/components/ui/input';
-import { FaImage, FaPlus } from 'react-icons/fa';
-import { GiClick } from 'react-icons/gi';
-import { FaClosedCaptioning } from 'react-icons/fa6';
-import { IoClose } from 'react-icons/io5';
-import CropperComponent from '@/components/AdminComponent/CropperComponent';
-import { getCroppedImg } from '@/Utils/cropImage';
-import { formDatasubmission } from '@/Utils/formDataSubmission';
-import Rating from '@/components/UserComponent/Review/Rating';
+
 import { ReviewTab } from '@/components/UserComponent/Review/ReviewTab';
 
 const ProductDetailPage = () => {

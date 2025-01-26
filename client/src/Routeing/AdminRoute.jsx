@@ -15,6 +15,7 @@ import Orders from '@/Pages/Admin/Orders/Orders';
 import Coupon from '@/Pages/Admin/Coupon/Coupon';
 import SalesReport from '@/Pages/Admin/SalesReport/SalesReport';
 import Dashboard from '@/Pages/Admin/Dashboard/Dashboard';
+import PageNotFound from '@/Pages/Common/PageNotFound';
 const AdminRoute = () => {
   return (
    <>
@@ -31,6 +32,7 @@ const AdminRoute = () => {
         <Route path='/orders' element={<AdminPrivate><Orders/></AdminPrivate>}/>
         <Route path="/coupons" element={<AdminPrivate><Coupon/></AdminPrivate>}/>
         <Route path="/salesReport" element={<AdminPrivate><SalesReport/></AdminPrivate>}/>
+        <Route path='*' element={<PageNotFound/>}/>
     </Routes>
    </>
   )
