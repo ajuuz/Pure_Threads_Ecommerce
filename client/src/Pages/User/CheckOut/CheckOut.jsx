@@ -168,10 +168,7 @@ const handleFailedOrder=async()=>{
               selectedCoupon={selectedCoupon}
               />
 
-              <div className='flex gap-5 mb-5'>
-                <Input className="flex-1" placeHolder="Enter the coupon code..."/>
-                <Button className="m-0 w-fit">Apply Coupon</Button>
-              </div>
+              
 
               <Button onClick={cartProducts.length===0?()=>navigate('/shop'):()=>setShowCoupons(true)} className="m-0 relative w-full bg-black text-white py-2 rounded-md hover:bg-gray-800">
                 <Badge className="bg-gray-400 rounded-2xl py-1 absolute top-[-10px] right-[-10px]">
