@@ -21,7 +21,7 @@ const ImageInputComponent = ({ImagesFields,handleImageChange,croppedImage,setCro
     });
     setShowCropper(null);
   };
-  
+
   const handleCancel = () => {
     setShowCropper(null);
   };
@@ -49,12 +49,10 @@ const ImageInputComponent = ({ImagesFields,handleImageChange,croppedImage,setCro
           {
             try{
               const response = await removeProductImage(id,index)
-              console.log(response.message)
               toast.success(response.message)
               
             }catch(error)
             {
-              console.log(error.message);
               toast.error(error.message)
             }
           }

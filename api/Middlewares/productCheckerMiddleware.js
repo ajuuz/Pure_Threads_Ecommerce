@@ -49,6 +49,6 @@ export const validateProduct =async(req,res,next)=>{
           next();
     }
     catch(error){
-        console.log(error.message)
+      return next(errorHandler(500,"something went wrong during product checking"))
     }
 } 

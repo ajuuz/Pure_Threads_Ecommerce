@@ -67,6 +67,6 @@ export const getProducts = async(req,res,next)=>{
 
     catch(error)
     {
-        console.log(error.message)
+        return next(errorHandler(500,"something went wrong during getting products"))
     }
 }

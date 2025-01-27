@@ -112,7 +112,6 @@ const Orders = () => {
           })
       }
       catch(error){
-          console.log(error)
           toast.error(error?.message)
       }
       }
@@ -123,7 +122,6 @@ const Orders = () => {
           const userId = order?.userId
           const totalAmount=order?.totalAmount
           const confirmReturnResult = await confirmReturnOrder(orderId,userId,totalAmount,returnConfirmation,decision)
-          console.log(confirmReturnResult)
         }
         catch(error)
         {
@@ -187,7 +185,7 @@ const Orders = () => {
 
                 setNumberOfPages(ordersResult.numberOfPages)
             }catch(error){
-              console.log(error)
+              toast.error(error)
             }
         }
         fetchOrders()

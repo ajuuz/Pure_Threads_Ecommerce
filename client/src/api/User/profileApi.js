@@ -13,7 +13,6 @@ export const getUserProfile = async()=>{
 
 export const updateUserProfile=async(changedData)=>{
     try{
-        console.log("working")
         const response = await axiosInstance.put('/users',changedData);
         return response?.data
     }

@@ -6,7 +6,6 @@ export const getAllCoupons = async(req,res,next)=>{
     let filter = {}
     // if(isActive!==undefined) filter.isActive =isActive
     if(query?.trim()){
-        console.log(query)
         filter.couponCode = {$regex:query,$options:'i'};
     }
     try{

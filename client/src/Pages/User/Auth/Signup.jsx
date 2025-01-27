@@ -53,10 +53,8 @@ const Signup = () => {
             try{
                 setLoading(true)
                 const response = await signupUser(formData)
-                console.log(response)
                 if(response.success)
                 {
-                    console.log(formData.email)
                     toast.success(response.message)
                     localStorage.removeItem('count')
                     navigate('/otp',{state:{email:formData.email,from:"signup"}})

@@ -40,7 +40,6 @@ const inputChange=(e)=>{
 
 const handleSubmitForm=async(e)=>{
   
-  console.log(formData)
     e.preventDefault();
     const validation = validateUserDetailsForm(formData);
     if(Object.values(validation).length>0)
@@ -57,7 +56,6 @@ const handleSubmitForm=async(e)=>{
     dispatch(AdminLogin({name:response?.adminName}))
     }
     catch(error){
-      console.log("login error",error)
       toast.error(error?.message || "Login failed. Please try again.");
     }
 }

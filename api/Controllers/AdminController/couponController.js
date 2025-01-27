@@ -51,7 +51,6 @@ export const editCoupon=async(req,res,next)=>{
         const couponDetails = req.body;
         const couponId=req.body._id;
         couponHelperFunction(couponDetails,next);
-        console.log(couponDetails)
         
         if(!couponDetails?.maxUsableLimit) couponDetails.maxUsableLimit={ isLimited: false, limit: 0 }
         const updatedCoupon=await couponDB.updateOne({_id:couponId},{$set:couponDetails},{ runValidators: true })

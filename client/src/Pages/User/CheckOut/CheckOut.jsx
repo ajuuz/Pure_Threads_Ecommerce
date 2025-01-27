@@ -69,7 +69,6 @@ const CheckOut = () => {
       setIsAvailableProduct(fetchCartProductsResult?.isAvailableReducer)
     }
     catch(error){
-      console.log(error)
     }
   }
 
@@ -77,7 +76,6 @@ const CheckOut = () => {
     try{
       const getCheckoutAvailableCouponsResult =await getCheckoutAvailableCoupons()
       setAvailableCoupons(getCheckoutAvailableCouponsResult?.availableCoupons);
-      console.log(getCheckoutAvailableCouponsResult?.availableCoupons)
 
       if(!getCheckoutAvailableCouponsResult?.availableCoupons.some(coupon=>coupon.couponCode===selectedCoupon))
       {
@@ -125,7 +123,6 @@ const handlePlaceOrder=async(paymentDetails)=>{
   }
   catch(error)
   {
-    console.log(error.message)
     toast.error(error.message);
   }
 }

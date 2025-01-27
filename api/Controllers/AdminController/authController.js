@@ -7,7 +7,6 @@ import { generateAdminRefreshToken } from "../../utils/jwtTokens/refreshToken.js
 export const adminLogin=async(req,res,next)=>{
     const {email,password} = req.body;
     try{
-        console.log(email,password)
         const adminExist=await AdminDB.findOne({email})
         if(!adminExist) return next(errorHandler(404,`you are not the admin`))
         if(password!=adminExist.password) return next(errorHandler(404,`you are not the admin`))

@@ -13,7 +13,6 @@ export const getUserProfile = async(req,res,next)=>{
     }
     catch(error)
     {
-        console.log(error.message);
         return next(errorHandler(500,"something went wrong please try again"));
     }
 }
@@ -28,18 +27,15 @@ export const updateUserProfile = async(req,res,next)=>{
     }
     catch(error)
     {
-        console.log(error.message);
         return next(errorHandler(500,"something went wrong please try again"));
     }
 }
 
 export const changePassword = async(req,res,next)=>{
     const {currentPassword,newPassword} = req.body
-    console.log("working")
     try{
         const userId = refreshTokenDecoder(req);
         const user = await UsersDB.findOne({_id:userId})
-        console.log(user)
         if(!user) return next(errorHandler(404,"user not found"));
         const isPasswordCorrect = bcrypt.compareSync(currentPassword, user.password);
         if(!isPasswordCorrect) return next(errorHandler(400,"incorrect password"));
@@ -52,7 +48,6 @@ export const changePassword = async(req,res,next)=>{
         await user.save()
         return res.status(200).json({success:true,message:"password changed successfully"})
     }catch(error){
-        console.log(error.message);
         return next(errorHandler(500,"something went wrong please try again"));
     }
 }

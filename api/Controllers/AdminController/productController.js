@@ -140,7 +140,6 @@ const changeProductState=async(productId,res,next)=>{
         }
         catch(error)
         {
-            console.log(error)
             next(errorHandler(500,"something went wrong during gettting products"))
         }
 }

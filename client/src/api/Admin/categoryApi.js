@@ -36,7 +36,6 @@ export const editCategory=async(categoryId)=>{
             method:'PATCH',
             url:`admin/categories/${categoryId}`
         })
-        console.log(response.data)
         return response.data;
     }
     catch(error)
@@ -46,7 +45,6 @@ export const editCategory=async(categoryId)=>{
 }
 
 export const editEntireCategory=async(id,formData,imagesNeededToUpload)=>{
-    console.log(imagesNeededToUpload.length)
     try{
         let image=null
         if(imagesNeededToUpload.length>0)
@@ -58,7 +56,6 @@ export const editEntireCategory=async(id,formData,imagesNeededToUpload)=>{
            const imageUploadResult = await uploadImage(imageData);
             if(!imageUploadResult.success)
             {
-                console.log("image upload error")
                 throw new Error(imageUploadResult.message || "Failed to upload image");
                 return;
             }

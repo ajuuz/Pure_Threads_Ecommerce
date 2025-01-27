@@ -5,7 +5,6 @@ import { errorHandler } from "../../utils/error.js";
 //     const sort = JSON.parse(req.query.sort);
 //     try{
 //         const activeProducts = await productDB.find({isActive:true}).sort(sort).populate('category')
-//         console.log(activeProducts)
 //         const products = activeProducts.filter((activeProduct)=>activeProduct?.category && activeProduct?.category?.isActive)
 //         if(!products) return next(errorHandler(404,"products not found"))
 //         return res.status(200).json({success:true,message:"products fetched successfully",products})
@@ -27,7 +26,6 @@ export const getParticularProduct = async(req,res,next)=>{
     }
     catch(error)
     {
-        console.log(error)
         next(errorHandler(500,"something went wrong during gettting products"))
     }
 }
@@ -41,7 +39,6 @@ export const getRelatedProduct = async(req,res,next)=>{
     }
     catch(error)
     {
-        console.log(error)
         next(errorHandler(500,"something went wrong during gettting related products"))
     }
 }

@@ -15,12 +15,10 @@ export const loginUser = async (userData)=>{
 export const signupUser = async (userData)=>{
     try{
         const response = await axiosInstance.post('users/signup',userData);
-        console.log(response.data)
         return response.data;
     }
     catch(error)
     {
-        console.log(error)
         if(!error.response){
             throw error;
         }
@@ -33,7 +31,6 @@ export const signupUser = async (userData)=>{
 export const verifyOtp = async({email,otp})=>{
     try{
         const response = await axiosInstance.post('users/signup/otp',{email,otp})
-        console.log(response?.data)
         return response.data
     }
     catch(error)
@@ -55,7 +52,6 @@ export const resendOtp = async ({email})=>{
 
 
 export const loginWithGoogle = async(name,email)=>{
-    console.log(name,email)
     try{
         const response = await axiosInstance.post('/users/googleLogin',{name,email})
         return response.data
@@ -68,7 +64,6 @@ export const loginWithGoogle = async(name,email)=>{
 
 
 export const logout = async()=>{
-    console.log("workng")
     try{
         const response  = await axiosInstance.post('/users/logout')
         return response.data;
@@ -82,7 +77,6 @@ export const logout = async()=>{
 
 export const forgotVerifyEmail=async(email)=>{
     try{
-        console.log("working")
         const response  = await axiosInstance.post('/users/forgotPassword',{email})
         return response.data;
     }

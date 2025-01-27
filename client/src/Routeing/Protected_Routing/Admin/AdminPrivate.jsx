@@ -4,7 +4,6 @@ import { useSelector } from 'react-redux'
 
 const AdminPrivate = ({children}) => {
     const {admin} = useSelector((state)=>state.admin)
-    console.log(admin)
     if(admin)
     {
         return children;

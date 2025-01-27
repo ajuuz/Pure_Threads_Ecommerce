@@ -6,7 +6,6 @@ export const addReview=async(req,res,next)=>{
     try{
         const userId = refreshTokenDecoder(req);
         const data=req.body
-        console.log(data)
         const newReview=new reviewDB({...data,userId})
         await newReview.save()
         return res.status(201).json({success:true,message:"Review Added Successfully"})
@@ -29,7 +28,6 @@ export const getReviews=async(req,res,next)=>{
             ]
         )
         const numberOfPages=Math.ceil(reviews[0]/limit)
-        console.log(numberOfPages)
         return res.status(200).json({success:true,message:'reviews fetched succesfully',reviews:reviews[1],numberOfPages,userId});
     }catch(error)
     {
@@ -51,7 +49,6 @@ export const voteReview=async(req,res,next)=>{
         return res.status(200).json({success:true,message:'voted Successfully'});
     }catch(error)
     {
-        console.log(error.message)
         return next(errorHandler(500,"something went wrong during voting review"))
     } 
 }

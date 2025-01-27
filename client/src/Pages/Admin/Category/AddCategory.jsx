@@ -59,7 +59,6 @@ const AddCategory = () => {
     // functions
   const handleImageChange = (index,e) => {
     const file = e.target.files[0];
-    console.log(file)
     if (file) {
       const reader = new FileReader();
       reader.onload=()=>{
@@ -96,7 +95,6 @@ const AddCategory = () => {
     if(id)
     {
       try{
-        console.log(croppedImage)
         const imagesNeededToUpload=croppedImage[0] instanceof Blob ? [croppedImage[0]] :[];
         const response = await editEntireCategory(id,formData,imagesNeededToUpload)
         toast.success(response.message)
@@ -105,24 +103,20 @@ const AddCategory = () => {
       }
       catch(error)
       {
-        console.log(error.message)
         toast(error.message)
         setLoading(false)
       }
     }
     else
     {
-      console.log(formData)
       try{
         const response = await formDatasubmission(croppedImage,formData,"categories")
-        console.log(response.message)
         toast.success(response.message)
         navigate('/admin/categories')
         setLoading(false)
       }
       catch(error)
       {
-        console.log(error.message)
         toast(error.message)
         setLoading(false)
       }

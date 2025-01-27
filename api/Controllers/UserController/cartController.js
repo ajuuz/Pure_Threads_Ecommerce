@@ -87,17 +87,14 @@ export const updateCart = async(req,res,next)=>{
 
     if(quantity && quantity>0 && quantity<=5)
     {
-        console.log(quantity)
         try{
             const userId = refreshTokenDecoder(req);
             const updatedCart = await cartDB.findOneAndUpdate({userId,"items.product":productId,"items.size":size},{$set:{"items.$[item].quantity":quantity}},{arrayFilters:[{"item.product":productId,"item.size":size}]}).populate('items.product')
             if(!updatedCart) return next(errorHandler(404,"no product has been updated"));
-            console.log("working");
             return res.status(200).json({success:true,message:"updated successfully",updatedCart})
 
         }
         catch(error){
-            console.log(error)
             return next(errorHandler(500,"something went wrong please try again"))
 
         }
@@ -111,7 +108,6 @@ export const updateCart = async(req,res,next)=>{
 
         }
         catch(error){
-            console.log(error)
             return next(errorHandler(500,"something went wrong please try again"))
 
         }
@@ -122,7 +118,6 @@ export const updateCart = async(req,res,next)=>{
 export const proceedToCheckout = async(req,res,next)=>{
     try{
         const userId = refreshTokenDecoder(req);
-        console.log("working")
         const cart = await cartDB.findOne({userId}).populate('items.product')
 
     }

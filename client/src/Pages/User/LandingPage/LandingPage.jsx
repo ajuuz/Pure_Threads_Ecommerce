@@ -16,7 +16,6 @@ const LandingPage = () => {
 
     const location = useLocation()
     const isFirstLogin=location?.state?.isFirstLogin
-    console.log(isFirstLogin);
 
 
     const [newArrivals,setNewArrivals] = useState([])
@@ -39,7 +38,6 @@ const LandingPage = () => {
         }
         catch(error)
         {
-            console.log(error)
         } 
     }
 
@@ -50,7 +48,6 @@ const LandingPage = () => {
         }
         catch(error)
         {
-            console.log(error.message)
         }
     }
 

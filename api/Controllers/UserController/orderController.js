@@ -143,7 +143,6 @@ export const placeOrder = async(req,res,next)=>{
         res.status(201).json({success:true,message:"order Placed Successfully",orderData:{orderId:newOrder.orderId,deliveryDate:newOrder.deliveryDate,paymentStatus:newOrder.paymentStatus,createdAt:newOrder.createdAt}})
     }
     catch(error){
-        console.log(error)
        return next(errorHandler(500,"something went wrong"))
     }
 }
@@ -225,7 +224,6 @@ export const placeOrder = async(req,res,next)=>{
 //         res.status(201).json({success:true,message:"order Placed Successfully",orderData:{orderId:newOrder.orderId,deliveryDate:newOrder.deliveryDate,paymentStatus:newOrder.paymentStatus,createdAt:newOrder.createdAt}})
 //     }
 //     catch(error){
-//         console.log(error)
 //        return next(errorHandler(500,"something went wrong"))
 //     }
 // }
@@ -257,7 +255,6 @@ export const orderRepayment=async(req,res,next)=>{
     }
     catch(error)
     {
-        console.log(error.message)
         return next(errorHandler(500,"something went wrong"))
     }
 }
@@ -312,7 +309,6 @@ const cancelOrder=async(req,res,next)=>{
     }
     catch(error)
     {
-        console.log(error.message)
         return next(errorHandler(500,"something went wrong , please try again"))
     }
 }
@@ -320,7 +316,6 @@ const cancelOrder=async(req,res,next)=>{
 const returnOrderRequest=async(req,res,next)=>{
     try{
         const {orderId} = req.params
-        console.log(orderId)
         const updateOrderStatus=await orderDB.updateOne({orderId},{$set:{status:"Return Requested"}})
         if(updateOrderStatus.matchedCount===0) return next(errorHandler(404,"order not found"))
         if(updateOrderStatus.modifiedCount===0) return next(errorHandler(400,"no updation made"))
@@ -328,7 +323,6 @@ const returnOrderRequest=async(req,res,next)=>{
     }
     catch(error)
     {
-        console.log(error)
         return next(errorHandler(500,"something went wrong , please try again"))
     }
 }
@@ -340,7 +334,6 @@ export const downloadInvoice = async (req, res, next) => {
     try {
       const { orderId } = req.params
       const orderDetails = await orderDB.findOne({ orderId }).populate('items.product')
-        console.log(orderDetails)
       const doc = new PDFDocument({
         size: 'A4',
         margins: { top: 40, left: 40, right: 40, bottom: 40 },

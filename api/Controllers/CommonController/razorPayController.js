@@ -16,7 +16,6 @@ export const makePayment=async(req,res,next)=>{
         const order = await razorpay.orders.create(options);
         res.status(200).json(order);
       } catch (err) {
-        console.log(err)
         res.status(500).json({ error: err.message });
       }
 }
@@ -33,7 +32,6 @@ export const paymentVerification=(paymentDetails,next)=>{
       .digest('hex');
 
     if (razorpay_signature !== expectedSign) {
-        console.log("working error")
       return next(errorHandler(400,"Invalid payment signature"));
     }
 }

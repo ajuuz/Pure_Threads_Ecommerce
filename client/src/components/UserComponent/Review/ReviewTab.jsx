@@ -57,7 +57,6 @@ const AddReview=({productId})=>{
     }
 
     const handleImageInputChange=(index,e)=>{
-        console.log(index)
         const file = e.target.files[0];
         if (file) {
             const reader = new FileReader();
@@ -91,7 +90,6 @@ const AddReview=({productId})=>{
           if(Object.keys(errorObject).length>0)
           {
               setTimeout(()=>{
-                  console.log("working after 3000")
                   setErrors({ratingError:"",reviewError:""})
                   },3000)
             return;

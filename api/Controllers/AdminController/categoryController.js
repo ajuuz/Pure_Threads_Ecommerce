@@ -3,7 +3,6 @@ import { errorHandler } from "../../utils/error.js";
 
 
 export const addCategory=async(req,res,next)=>{
-    console.log(req.body)
     const {isActive,description,imageURLs,name} = req.body;
     try{
         const newCategory = await new categoryDB({
@@ -57,9 +56,7 @@ export const editEntireCategory=async(req,res,next)=>{
         const updatedCategory = await categoryDB.updateOne({_id:id},{$set:formData})
         if(image)
         {
-            console.log(image)
            const imageUpdate = await categoryDB.updateOne({_id:id},{$set:{'images.0':image}})
-           console.log(imageUpdate)
         }
         if (updatedCategory.nModified === 0) return next(errorHandler(400,"No changes made"));
         return res.status(200).json({ success:true,message: "category updated successfully" });
@@ -89,7 +86,6 @@ export const patchCategory=async(req,res,next)=>{
         .catch((error)=>{
             if(error.name==="ValidationError"){
                 const {type,path}=Object.values(error.errors)[0].properties;
-                console.log(path)
                 if(type==="min"){
                     if(path==="offer.offerValue") return next(errorHandler(400,"Offer value cannot be negative"))
                 }

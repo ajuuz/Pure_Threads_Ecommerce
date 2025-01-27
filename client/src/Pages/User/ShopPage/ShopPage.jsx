@@ -49,12 +49,10 @@ const ShopPage = () => {
           const searchQuery = searchInput;
           const productsResult = await getProducts(sortCriteria,limit,currentPage,category,fit,sleeves,searchQuery)
           setProducts(productsResult.products)
-          console.log(productsResult)
           setNumberOfPages(productsResult.numberOfPages)
         }
         catch(error)
         {
-            console.log(error)
         } 
     }
     fetchProducts();
@@ -65,7 +63,6 @@ const ShopPage = () => {
       try{
         const onlyIdNeeded=true
       const fetchWishlistedProductsResult = await getWishlistProducts(onlyIdNeeded);
-      console.log(fetchWishlistedProductsResult.wishlist.items)
       setWishlisted(fetchWishlistedProductsResult.wishlist.items)
       }catch(error){
       toast.error(error.message)

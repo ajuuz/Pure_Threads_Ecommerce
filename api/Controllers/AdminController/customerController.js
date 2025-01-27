@@ -9,15 +9,12 @@ export const getCustomers = async (req,res)=>{
     }
     catch(error)
     {
-        console.log(error)
         next(errorHandler(500,"something went wrong please try again"));
     }
 }
 
 
 export const editCustomers=async(req,res,next)=>{
-    console.log("working")
-    console.log(req.query.id)
     try{
         if(req.query && req.query.id)
         {

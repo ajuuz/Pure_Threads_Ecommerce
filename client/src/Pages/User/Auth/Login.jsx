@@ -63,7 +63,6 @@ const handleSubmitForm=async(e)=>{
      dispatch(UserFirstLogin(response.isFirstLogin))
     }catch(error){
       if(error?.statusCode===403) return
-      console.log("login error",error)
       toast.error(error?.message || "Login failed. Please try again.");
     }
 }
@@ -73,7 +72,6 @@ const googleSignin = async()=>{
   try{
      const result =  await signInWithPopup(auth,googleProvider)
      const response = await loginWithGoogle(result?.user.displayName,result?.user.email)
-     console.log(result)
       if(response.success)
       {
         navigate('/')

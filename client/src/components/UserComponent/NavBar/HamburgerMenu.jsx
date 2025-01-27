@@ -16,6 +16,7 @@ import { motion } from 'framer-motion';
 //   icons
   import { IoIosArrowBack } from "react-icons/io";
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 const HamburgerMenu = ({setIsHamburger}) => {
 
@@ -32,16 +33,16 @@ const HamburgerMenu = ({setIsHamburger}) => {
         }
         catch(error)
         {
-            console.log(error.message)
+            toast.error(error.message)
         }
        }
        fetchCategories();
     },[])
 
 
-    const handleCategoryClick=(id)=>{
-        console.log(id)
-    }
+    // const handleCategoryClick=(id)=>{
+    //     console.log(id)
+    // }
 
   return (
     <motion.div 

@@ -14,7 +14,6 @@ export const getRefferalCode=async(req,res,next)=>{
     }
     catch(error)
     {
-        console.log(error.message)
         return next(errorHandler(500,"something went wrong please try again"))
     }
 }
@@ -54,7 +53,6 @@ export const applyRefferal=async(req,res,next)=>{
 
     }catch(error)
     {
-        console.log(error)
         return next(errorHandler(500,"something went wrong please try again"))
     }
 }
@@ -68,7 +66,6 @@ export const changeFirstLoginStatus=async(req,res,next)=>{
     }
     catch(error)
     {
-        console.log(error)
         return next(errorHandler(500,"something went wrong please try again"))
     }
 }

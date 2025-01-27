@@ -56,7 +56,6 @@ export const updateOrderStatus = async(req,res,next)=>{
         if(!updatedOrder.modifiedCount) return next(errorHandler(400,"no changes made"));
         return res.status(200).json({success:true,message:"state update to "+status+" successfully"})
     }catch(error){
-        console.log(error.message)
         return next(errorHandler(500,"something went wrong please try again"))
     }
 }

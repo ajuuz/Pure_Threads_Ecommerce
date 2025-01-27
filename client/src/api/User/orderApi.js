@@ -57,7 +57,6 @@ export const cancelOrder=async(orderId,isPaymentDone,totalAmount)=>{
 }
 
 export const returnOrder=async(orderId)=>{
-    console.log(orderId)
     try{
         const response = await axiosInstance.patch(`/users/orders/${orderId}`)
         return response.data;
@@ -132,7 +131,6 @@ export const downloadInvoice=async(orderId)=>{
     }
     catch(error)
     {
-        console.log(error)
         throw error?.response.data && {...error?.response.data,statusCode:error.status} || error
     }
 }

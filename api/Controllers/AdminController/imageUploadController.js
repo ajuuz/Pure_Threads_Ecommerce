@@ -1,7 +1,6 @@
 import { errorHandler } from "../../utils/error.js";
 export const uploadImages=(req,res,next)=>{
 
-    console.log(req.file)
     try{
         const uploadedFiles = req.files.map((file)=>({
             url:file.path,

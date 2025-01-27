@@ -57,12 +57,10 @@ export const generateOtp = async (req, res, next) => {
     // expire otp
     setTimeout(async()=>{
         const updatedOtp = await otpDB.updateOne({email},{$set:{otp:null}})
-        console.log(updatedOtp)        
     },1000*60)
 
 
   } catch (error) {
-    console.log("error in verifying signup",error)
       return next(errorHandler(500, "something went wrong . please try again"));
   }
 };
@@ -71,7 +69,6 @@ export const generateOtp = async (req, res, next) => {
 export const verifyOtp = async (req, res,next) => {
 
   const { email, otp } = req.body;
-  console.log(email,otp)
   try {
     const document = await otpDB.findOne({ email });
     if (document.otp == otp) {
@@ -137,7 +134,6 @@ export const resendOtp = async (req,res,next)=>{
        // expire otp
       setTimeout(async()=>{
         const updatedOtp = await otpDB.updateOne({email},{$set:{otp:null}})
-        console.log(updatedOtp)        
     },1000*60)
     }
     catch(error)
@@ -198,7 +194,6 @@ export const logout = async(req,res,next)=>{
 
 export const forgotVerifyEmail = async(req,res,next)=>{
   const {email} = req.body;
-  console.log(email)
   if(!email) return next(errorHandler(400,"email doesnt recieved"))
   try{
     const user = await UsersDB.findOne({email})
@@ -220,27 +215,22 @@ export const forgotVerifyEmail = async(req,res,next)=>{
      // expire otp
      setTimeout(async()=>{
          const updatedOtp = await otpDB.updateOne({email},{$set:{otp:null}})
-         console.log(updatedOtp)        
      },1000*60)
 
   }catch(error){
-    console.log(error.message)
     return next(errorHandler(500, "something went wrong . please try again"));
   }
 }
 
 export const forgotChangePassword=async(req,res,next)=>{
   const {email,newPassword} = req.body;
-  console.log(email,newPassword)
   try{
     const hashedPassword = bcrypt.hashSync(newPassword, 10);
     const updatedPassword  = await UsersDB.updateOne({email},{$set:{password:hashedPassword}})
-    console.log(updatedPassword)
     if(!updatedPassword.matchedCount) return next(errorHandler(404,"user not found"));
     if(!updatedPassword.modifiedCount) return next(errorHandler(400,"no changes made"))
       return res.status(200).json({success:true,message:"password changed sucesfully"})
   }catch(error){
-    console.log("error in changing  password ",error)
     return next(errorHandler(500, "something went wrong . please try again"));
   }
 }

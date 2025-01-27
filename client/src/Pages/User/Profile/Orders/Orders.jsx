@@ -35,7 +35,6 @@ const Orders = () => {
       
       let ordersResult;
       ordersResult = await getOrders(sortCriteria,currentPage,limit,status);
-      console.log(ordersResult?.failedOrdersCount)
       setOrders(ordersResult.orders)
       setFailedOrdersCount(ordersResult?.failedOrdersCount)
       setOrdersCount(ordersResult?.ordersCount)
@@ -85,7 +84,7 @@ const Orders = () => {
     <div className="min-h-screen pe-8">
       <div className="max-w-3xl mx-auto">
         <div className='flex justify-between'>
-          <h1 onClick={()=>console.log(orderStatus)} className="text-3xl text-nowrap font-bold text-gray-900 mb-8">{status==="success"?`My Orders (${ordersCount})`:`Payment Failed Orders (${failedOrdersCount})`}</h1>
+          <h1  className="text-3xl text-nowrap font-bold text-gray-900 mb-8">{status==="success"?`My Orders (${ordersCount})`:`Payment Failed Orders (${failedOrdersCount})`}</h1>
           <Button 
             onClick={status!=="failed"?()=>setStatus("failed"):()=>setStatus("success")} 
             className="m-0 w-fit relative">

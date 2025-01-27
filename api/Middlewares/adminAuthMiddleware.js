@@ -14,7 +14,6 @@ export const  verifyAdmin = async(req,res,next)=>{
         }
         catch(error)
         {
-            console.log(error.message)
             return next(errorHandler(401,"you are not authorized , token verification failed"))
         }
     }
@@ -42,7 +41,6 @@ const handleRefreshToken=async (refreshToken,req,res,next)=>{
         }
         catch(error)
         {
-            console.log(error)
             return next(errorHandler(401,"you are not authorized , refresh token is invalid"))
         }
     }

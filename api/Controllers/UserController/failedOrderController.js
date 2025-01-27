@@ -34,7 +34,6 @@ export const placeFailedOrder=async(req,res,next)=>{
       
     }catch(error)
     {
-        console.log(error.message)
         return next(errorHandler(500,"something went wrong during order creation when payment failed"));
     }
   }

@@ -47,7 +47,6 @@ export const couponActivation=async(req,res,next)=>{
     }
     catch(error)
     {
-        console.log(error.message)
         return next(errorHandler(500,"something went wrong during activation of coupon"))
     }
 }

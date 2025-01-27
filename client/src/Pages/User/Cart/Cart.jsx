@@ -27,7 +27,6 @@ const Cart = () => {
         setIsAvailableProduct(fetchCartProductsResult.isAvailableReducer)
       }
       catch(error){
-        console.log(error)
       }
     }
     fetchProductAndValidate()
@@ -48,7 +47,6 @@ const Cart = () => {
     }
     catch(error)
     {
-      console.log(error.message)
       toast.error(error.message); 
     }
   }

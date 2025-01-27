@@ -13,7 +13,6 @@ export const addAddress =async(req,res,next)=>{
     }
     catch(error)
     {
-        console.log(error.message)
         return next(errorHandler(500,"something went wrong during adding new address"))
     }
 }
@@ -27,7 +26,6 @@ export const getAddresses = async(req,res,next)=>{
     }
     catch(error)
     {
-        console.log(error.message)
         return next(errorHandler(500,"something went wrong please try again"))
     }
 }
@@ -41,7 +39,6 @@ export const getAddress = async(req,res,next)=>{
     }
     catch(error)
     {
-        console.log(error.message)
         return next(errorHandler(500,"something went wrong please try again"))
     }
 }
@@ -76,7 +73,6 @@ export const deleteAddress = async(req,res,next)=>{
     }
     catch(error)
     {
-        console.log(error.message)
         return next(errorHandler(500,"something went wrong please try again"))
     }
 }
@@ -94,7 +90,6 @@ export const setDefaultAddress = async(req,res,next)=>{
     }
     catch(error)
     {
-        console.log(error.message)
         return next(errorHandler(500,"something went wrong please try again"))
     }
 }

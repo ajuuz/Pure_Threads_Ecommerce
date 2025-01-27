@@ -49,14 +49,12 @@ export const getWallet = async(req,res,next)=>{
     }
     catch(error)
     {
-        console.log(error.message)
         next(errorHandler(500,"something went wrong while fetching wallet"))
     }
 }
 
 export const addMoneyToWallet = async(req,res,next)=>{
     const {amount,description} = req.body;
-    console.log(req.body);
     try{
         const userId = refreshTokenDecoder(req);
         const transcationDetails={

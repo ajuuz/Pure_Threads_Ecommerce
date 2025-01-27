@@ -14,16 +14,13 @@ const OrderDetail=()=> {
     const {orderId} = useParams();
     const location = useLocation()
     const {from} = location.state ||null;
-    console.log(from)
 
     useEffect(()=>{
         const fetchOrder = async()=>{
             try{
                 const orderResult = await getParticulartOrder(orderId)
                 setOrder(orderResult.order)
-                console.log(orderResult.order)
             }catch(error){
-                console.log(error.message)
             }
         }
         fetchOrder();

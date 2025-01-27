@@ -47,10 +47,8 @@ const Category = () => {
     }
 
     const handleSwitchClick=async(id)=>{
-        console.log(id)
         try{
             const response = await editCategory(id);
-            console.log(response)
             toast.success(response.message,{autoClose: 1000});
             setRefresh(!refresh)
         }

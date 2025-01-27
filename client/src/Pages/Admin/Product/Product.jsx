@@ -65,7 +65,6 @@ const Product = () => {
     const handleSwitchClick =async (id)=>{
       try{
           const response = await changeProductState(id);
-          console.log(response)
           toast.success(response.message);
           setRefresh(!refresh)
       }

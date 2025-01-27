@@ -199,7 +199,6 @@ const fetchSalesReportData=async(req,res,next,isLimit)=>{
     }
     catch(error)
     {
-        console.log(error)
         return next(errorHandler(500,"something went wrong during fetching sales report"))
     }
 }
@@ -308,7 +307,6 @@ export const getSalesReport=async(req,res,next)=>{
     }
     catch(error)
     {
-        console.log(error.message)
         next(errorHandler(500,"something went wrong during fetching sales report"))
     }
 }
@@ -408,7 +406,6 @@ export const downloadSalesResportPdf=async(req, res,next) => {
       // Finalize the document
       doc.end();
     } catch (error) {
-      console.log(error.message);
       res.status(500).send('Error generating PDF');
     }
   };
@@ -433,7 +430,6 @@ export const downloadSalesReportExcel= async (req, res, next) => {
   
       const totalAmount = salesContent[0].totalSaleAmount;
       const totalSaleCount = salesContent[0].totalSaleCount;
-      console.log(totalAmount,totalSaleCount)
   
       // Create a workbook and add a worksheet
       const workbook = new ExcelJS.Workbook();
@@ -493,7 +489,6 @@ export const downloadSalesReportExcel= async (req, res, next) => {
 
 export const getSalesChartData=async(req,res,next)=>{
     const {criteria,year} = req.query;
-    console.log(criteria,year)
     let groupingId={};
     let projectFields={}
     let matchFilter={paymentStatus:"Success"}
@@ -539,7 +534,6 @@ export const getSalesChartData=async(req,res,next)=>{
     }
     catch(error)
     {
-        console.log(error.message)
         next(errorHandler(500,"something went wrong during fetching sales report chart"))
     }
 }

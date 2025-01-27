@@ -16,13 +16,11 @@ const Refferal = () => {
             const fetchUserRefferalCode = async()=>{
                 try{
                     const getRefferalCodeResult = await getRefferalCode();
-                    console.log(getRefferalCodeResult.refferalCode)
                     setRefferalCode(getRefferalCodeResult.refferalCode)
                     setIsRefferedUser(getRefferalCodeResult.isRefferedUser);
                 }
                 catch(error)
                 {
-                    console.log(error.message)
                 }
             }
             fetchUserRefferalCode();

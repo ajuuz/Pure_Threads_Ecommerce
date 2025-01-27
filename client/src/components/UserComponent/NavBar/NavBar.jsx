@@ -18,6 +18,7 @@ import { useSelector,useDispatch } from "react-redux";
 import { UserLogout } from "@/Redux/userSlice";
 import { toast } from "sonner";
 import { logout } from "@/api/User/authApi";
+import SearchBar from "./SearchBar";
 
 const NavBar = () => {
 
@@ -41,7 +42,6 @@ const NavBar = () => {
       }
       catch(error)
       {
-        console.log(error.message)
         toast.error(error.message)
       }
     }
@@ -61,7 +61,7 @@ const NavBar = () => {
   return (
     <>
   <div className="fixed top-0 left-0 w-full z-[1000]">
-    <div className="bg-white text-black text-center shadow-inner shadow-slate-300">FLAT 20% OFF</div>
+    <div className="bg-white text-black text-center shadow-inner shadow-slate-300"><marquee id="myMarquee" behavior="scroll" direction="left">FLAT 20% OFF</marquee></div>
         {isHamburger && <HamburgerMenu setIsHamburger={setIsHamburger}/>}
     <nav className="bg-black text-white flex items-center justify-between px-8 py-4  w-full">
       <div className="flex items-end gap-4 md:gap-16 ">
@@ -76,13 +76,14 @@ const NavBar = () => {
         </div>
       </div>
 
-      <div className="flex gap-6 w-[50%] items-center">
-        <div className="flex flex-1">
+      <div className="flex justify-end gap-6 w-[50%] items-center">
+        {/* <div className="flex flex-1">
             <Input placeHolder="what are you looking for?" className="w-full  h-7 rounded-e-none border-none placeholder:text-muted-foreground text-[12px] font-mono"/>
             <div className="bg-white h-7 rounded-e-md text-black flex items-center px-2">
             <FaSearch />
             </div>
-        </div>
+        </div> */}
+        {/* <SearchBar/> */}
         <div className="flex gap-7 items-center">
            <div className="hidden md:flex gap-7">
               <div onClick={()=>navigate('/wishlist')} className="cursor-pointer">

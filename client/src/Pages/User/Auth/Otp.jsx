@@ -77,7 +77,6 @@ const handleOtpSubmit=async()=>{
     try{
         setLoading(true)
         const response = await verifyOtp({email:email,otp:`${otp[0]+otp[1]+otp[2]+otp[3]+otp[4]}`})
-        console.log(response)
         if(response.success)
         {
             toast.success(response.message);
@@ -94,13 +93,11 @@ const handleOtpSubmit=async()=>{
     {
         if(error.sessionExpires)
             {
-                console.log("session expires not verified",error.message)
                 toast.error(error.message)
                 navigate('/signup')
             }
             else
             {    
-        console.log("verifiying otp error",error.message)
         toast.error(error.message)
             }
             setLoading(false)
@@ -113,7 +110,6 @@ const handleResendOtp=async()=>{
     try{
         setLoading(true)
         const response = await resendOtp({email:email});
-        console.log(response)
         toast.success(response.message)
         setOtp({
         '0':null,
@@ -128,12 +124,10 @@ const handleResendOtp=async()=>{
     catch(error){
         if(error.sessionExpires)
             {
-                console.log("session expires no resend",error.message)
             toast.error(error.message)
             navigate('/signup')
         }
         else{
-            console.log("resend otp error",error.message)
             toast.error(error.message)
         }
         setLoading(false)

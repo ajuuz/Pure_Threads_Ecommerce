@@ -103,13 +103,11 @@ export const getAllOrders = async(req,res,next)=>{
         }
     }
     ])
-    console.log(orders)
     const totalOrders=orders[0].totalCount;
     const numberOfPages=Math.ceil(totalOrders/limit)
     if(orders.length===0) return next(errorHandler(404,"order not found"));
     return res.status(200).json({success:true,message:"orders fetched successfully",orders:orders[0]?.orders,numberOfPages,failedOrders:orders[0]?.failedOrders})
     }catch(error){
-        console.log(error.message)
         return next(errorHandler(500,"something went wrong please try again"))
     }
 } 

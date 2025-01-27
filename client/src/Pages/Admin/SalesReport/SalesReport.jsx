@@ -121,7 +121,6 @@ const SalesReport = () => {
       const currentPage=null,limit=null;
       const sortCriteria = JSON.stringify(sort)
       const response = await downloadSalesReportPdf(dateRange,customDateRage.from,customDateRage?.to,currentPage,limit,sortCriteria,totalCouponDiscount)
-      console.log(response)
 
       if (!response.ok) {
         throw new Error('Failed to download sales report');
@@ -145,7 +144,6 @@ const SalesReport = () => {
       const currentPage=null,limit=null;
       const sortCriteria = JSON.stringify(sort)
       const response = await downloadSalesReportExcel(dateRange,customDateRage.from,customDateRage?.to,currentPage,limit,sortCriteria,totalCouponDiscount)
-      console.log(response)
 
       if (!response.ok) {
         throw new Error('Failed to download sales report');
