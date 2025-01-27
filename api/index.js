@@ -14,9 +14,10 @@ import AdminRouter from './Routes/adminRouter.js'
 
 // Enabling cors for all routes
 app.use(cors({
-    origin:"http://localhost:5173",
+    origin: ["http://localhost:5173", "http://purethreads.webhop.me"],
     credentials: true,
-}))
+}));
+
 
 app.use(cookieParser())
 
