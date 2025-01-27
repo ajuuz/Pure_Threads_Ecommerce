@@ -60,15 +60,7 @@ const Refferal = () => {
                     </code>
                 </div>
               </div>
-              {
-                !isRefferedUser &&
-              <div>
-              <h3 className="text-center text-lg font-semibold mb-2">Unlock Your Reward</h3>
-                <p className='text-center'>Enter your friend's Refferal Code to get reward of Rs.200 in to your wallet</p>
-                <Input onChange={handleRefferalChange} className="border w-full my-2"/>
-                <Button onClick={handleApplyRefferal}>SUBMIT</Button>
-              </div>
-            }
+              
         </div>
         </div>
     </div>
