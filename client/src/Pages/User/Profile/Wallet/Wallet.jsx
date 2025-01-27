@@ -13,7 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowUpCircle, ArrowDownCircle, Activity, CreditCard, DollarSign } from 'lucide-react';
 import { FaRupeeSign } from 'react-icons/fa';
 import PaginationComponent from '@/components/CommonComponent/PaginationComponent';
-import WalletDialog from '@/components/UserComponent/Dialog/walletDialog';
+import WalletDialog from '@/components/UserComponent/Dialog/WalletDialog';
 
 const Wallet = () => {
     const [wallet, setWallet] = useState({});
