@@ -6,8 +6,8 @@ export const generateUserAccessToken = (res,user)=>{
     });
 
     res.cookie("userAccessToken",token,{
-        httpOnly: false,
-        secure: false,
+        httpOnly: true,
+        secure: true,
         sameSite: "none",
         maxAge: 1 * 60 * 1000,
     })
@@ -19,8 +19,8 @@ export const generateAdminAccessToken = (res,admin)=>{
     })
 
     res.cookie("adminAccessToken",token,{
-        httpOnly: false,
-        secure: false,
+        httpOnly: true,
+        secure: true,
         sameSite: "none",
         maxAge: 1 * 60 * 1000,
     })
